@@ -1,0 +1,5 @@
+transformers
+torch
+# tensorflow
+tensorflow-cpu
+tf-keras
