@@ -1,0 +1,206 @@
+{
+  "kind": "teacher-measurement",
+  "measured_at": "2026-10-05T08:02:57+00:00",
+  "method": "tokenizers.Tokenizer.from_file(tokenizer.json).encode(text)",
+  "environment": {
+    "python": "3.10.15",
+    "platform": "Linux-5.15.0-1083-gcp-x86_64-with-glibc2.31",
+    "tokenizers": "0.22.1",
+    "huggingface-hub": "0.36.2"
+  },
+  "caveat": "本檔是教師在一台機器上的實測紀錄，不是學生本機實測，也不是任何 API 的計費保證。供應商可能使用不同 revision、額外特殊 token 或不同的計費口徑。",
+  "tokenizers": {
+    "bge-small-zh-v1.5": {
+      "repo": "BAAI/bge-small-zh-v1.5",
+      "revision": "7999e1d3359715c523056ef9478215996d62a620",
+      "vocab_size": 21128
+    },
+    "Qwen2.5-0.5B-Instruct": {
+      "repo": "Qwen/Qwen2.5-0.5B-Instruct",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "vocab_size": 151665
+    }
+  },
+  "cases": [
+    {
+      "id": "zh_word",
+      "text": "安全帽",
+      "chars": 3,
+      "counts": {
+        "bge-small-zh-v1.5": 5,
+        "Qwen2.5-0.5B-Instruct": 2
+      },
+      "pieces": {
+        "bge-small-zh-v1.5": [
+          "[CLS]",
+          "安",
+          "全",
+          "帽",
+          "[SEP]"
+        ],
+        "Qwen2.5-0.5B-Instruct": [
+          "安全",
+          "帽"
+        ]
+      }
+    },
+    {
+      "id": "zh_sentence",
+      "text": "工人未配戴安全帽，正在進入施工區。",
+      "chars": 17,
+      "counts": {
+        "bge-small-zh-v1.5": 19,
+        "Qwen2.5-0.5B-Instruct": 12
+      },
+      "pieces": {
+        "bge-small-zh-v1.5": [
+          "[CLS]",
+          "工",
+          "人",
+          "未",
+          "配",
+          "戴",
+          "安",
+          "全",
+          "帽",
+          "，",
+          "正",
+          "在",
+          "進",
+          "入",
+          "施",
+          "工",
+          "區",
+          "。",
+          "[SEP]"
+        ],
+        "Qwen2.5-0.5B-Instruct": [
+          "工人",
+          "未",
+          "配",
+          "戴",
+          "安全",
+          "帽",
+          "，",
+          "正在",
+          "進入",
+          "施工",
+          "區",
+          "。"
+        ]
+      }
+    },
+    {
+      "id": "zh_unseen",
+      "text": "頭盔",
+      "chars": 2,
+      "counts": {
+        "bge-small-zh-v1.5": 4,
+        "Qwen2.5-0.5B-Instruct": 2
+      },
+      "pieces": {}
+    },
+    {
+      "id": "zh_rhetoric",
+      "text": "並非未戴安全帽，照片顯示已戴好。",
+      "chars": 16,
+      "counts": {
+        "bge-small-zh-v1.5": 18,
+        "Qwen2.5-0.5B-Instruct": 13
+      },
+      "pieces": {}
+    },
+    {
+      "id": "en_sentence",
+      "text": "The worker did not wear a safety helmet.",
+      "chars": 40,
+      "counts": {
+        "bge-small-zh-v1.5": 17,
+        "Qwen2.5-0.5B-Instruct": 9
+      },
+      "pieces": {}
+    },
+    {
+      "id": "date",
+      "text": "2026-10-05",
+      "chars": 10,
+      "counts": {
+        "bge-small-zh-v1.5": 8,
+        "Qwen2.5-0.5B-Instruct": 10
+      },
+      "pieces": {
+        "bge-small-zh-v1.5": [
+          "[CLS]",
+          "202",
+          "##6",
+          "-",
+          "10",
+          "-",
+          "05",
+          "[SEP]"
+        ],
+        "Qwen2.5-0.5B-Instruct": [
+          "2",
+          "0",
+          "2",
+          "6",
+          "-",
+          "1",
+          "0",
+          "-",
+          "0",
+          "5"
+        ]
+      }
+    },
+    {
+      "id": "product_code",
+      "text": "AB-123",
+      "chars": 6,
+      "counts": {
+        "bge-small-zh-v1.5": 5,
+        "Qwen2.5-0.5B-Instruct": 5
+      },
+      "pieces": {}
+    },
+    {
+      "id": "python",
+      "text": "def classify(text): return \"missing\"",
+      "chars": 36,
+      "counts": {
+        "bge-small-zh-v1.5": 16,
+        "Qwen2.5-0.5B-Instruct": 8
+      },
+      "pieces": {
+        "bge-small-zh-v1.5": [
+          "[CLS]",
+          "de",
+          "##f",
+          "class",
+          "##if",
+          "##y",
+          "(",
+          "text",
+          ")",
+          ":",
+          "return",
+          "\"",
+          "miss",
+          "##ing",
+          "\"",
+          "[SEP]"
+        ],
+        "Qwen2.5-0.5B-Instruct": [
+          "def",
+          " classify",
+          "(text",
+          "):",
+          " return",
+          " \"",
+          "missing",
+          "\""
+        ]
+      }
+    }
+  ]
+}
