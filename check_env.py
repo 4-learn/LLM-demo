@@ -163,9 +163,46 @@ def check_stdlib() -> Result:
             "標準函式庫", FAIL, "無法載入：" + "、".join(broken),
             "第 01～04 節不需要任何第三方套件，這裡失敗代表 Python 安裝不完整。",
         )
+    # 自行編譯的 Python（pyenv）若編譯時找不到 OpenSSL／SQLite，這些模組會缺：
+    # 缺 ssl → pip 無法下載；缺 blake2b → hashlib 載入時印出一長串 ERROR；缺 sqlite3 → 第 29 節失敗。
+    # 2026-10-06 教師 M4 Pro 的 pyenv 3.11.9 實際出現 blake2b／blake2s 缺失。
+    missing = [label for label, probe in compiled_module_probes() if not probe()]
+    if missing:
+        return Result(
+            "標準函式庫", FAIL, "這個 Python 編譯不完整，缺：" + "、".join(missing),
+            "通常是 pyenv 編譯時找不到 OpenSSL（或之後 Homebrew 升級了 OpenSSL）。"
+            "換一個完整的 Python 重建 venv，見 INSTALL-BASELINE「Python 本身壞掉」。",
+        )
     return Result(
-        "標準函式庫", PASS, "第 01～04 節所需模組皆可載入（不需第三方套件）",
+        "標準函式庫", PASS, "第 01～04 節所需模組皆可載入；ssl、hashlib、sqlite3 完整",
     )
+
+
+def compiled_module_probes():
+    """(說明, 檢查函式)。檢查函式回 True 代表可用；任何例外都視為不可用。"""
+    def safe(check):
+        def run():
+            try:
+                return bool(check())
+            except Exception:
+                return False
+        return run
+
+    def has_ssl():
+        import ssl
+        return ssl.OPENSSL_VERSION
+
+    def has_blake2():
+        import hashlib
+        return hashlib.blake2b(b"x").hexdigest() and hashlib.sha256(b"x").hexdigest()
+
+    def has_sqlite():
+        import sqlite3
+        return sqlite3.connect(":memory:").execute("select 1").fetchone()
+
+    return (("ssl（pip 下載需要）", safe(has_ssl)),
+            ("hashlib blake2／sha256", safe(has_blake2)),
+            ("sqlite3（第 29 節）", safe(has_sqlite)))
 
 
 def check_venv() -> Result:
