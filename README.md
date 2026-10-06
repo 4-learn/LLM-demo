@@ -40,6 +40,7 @@ python3 04_sampling.py
 | 26 | LangGraph State 與 Reducer | `26_state_reducer.py` | — | langgraph==1.2.12（不需模型） |
 | 27 | 條件分支與 Unknown 測試 | `27_branch_unknown.py` | — | langgraph==1.2.12（不需模型） |
 | 28 | 重試、退避與冪等 | `28_retry_idempotency.py` | — | — |
+| 29 | HITL：真正拒絕與恢復 | `29_hitl_resume.py` | — | langgraph==1.2.12、langgraph-checkpoint-sqlite==3.1.1（不需模型） |
 | 30 | Trace 觀測與本地免費備援 | `30_local_trace.py` | — | — |
 | 41 | SFT 資料與按來源拆分 | `41_sft_split.py` | `data/sop_corpus.json` | — |
 | 42 | LoRA 低秩權重與訓練紀錄判讀 | `42_lora_math.py` | `data/model-candidates.json` | — |
