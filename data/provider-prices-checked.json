@@ -1,0 +1,36 @@
+{
+  "kind": "teacher-manual-check",
+  "purpose": "LLM 第 14 節：教師到各家官方價目頁逐一核對的價格（手動，與 LiteLLM 內建快照分開存放）",
+  "checked_on": "2026-10-06",
+  "caveat": "這是核對當天的公開標價（美元／每百萬 token，標準付費層、未計快取與批次折扣）。價格會變，上課前必須重新核對並更新日期。",
+  "models": {
+    "openai-mini": {
+      "official_model": "gpt-4o-mini",
+      "usd_per_1m_input": 0.15,
+      "usd_per_1m_output": 0.6,
+      "source": "https://developers.openai.com/api/docs/models/gpt-4o-mini",
+      "note": "與 LiteLLM 快照相同"
+    },
+    "deepseek-chat": {
+      "official_model": "deepseek-flash",
+      "usd_per_1m_input": 0.3,
+      "usd_per_1m_output": 1.2,
+      "source": "https://api-docs.deepseek.com/quick_start/pricing",
+      "note": "官方頁已改名 deepseek-flash（DeepSeek-V4.1-Flash），未列 deepseek-chat；上表為尖峰價（cache miss），離峰為一半 0.15／0.6；官方標示支援 Vision。LiteLLM 快照仍是舊名舊價 0.28／0.42"
+    },
+    "claude-haiku": {
+      "official_model": "claude-haiku-4-5",
+      "usd_per_1m_input": 1.0,
+      "usd_per_1m_output": 5.0,
+      "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "note": "與 LiteLLM 快照相同"
+    },
+    "gemini-flash": {
+      "official_model": "gemini-2.5-flash",
+      "usd_per_1m_input": 0.3,
+      "usd_per_1m_output": 2.5,
+      "source": "https://ai.google.dev/gemini-api/docs/pricing",
+      "note": "與 LiteLLM 快照相同（付費層、文字／影像輸入；免費層另計且內容會被用於改進產品）"
+    }
+  }
+}

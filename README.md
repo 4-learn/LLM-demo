@@ -29,6 +29,7 @@ python3 04_sampling.py
 | 08 | 幻覺、提示注入與權限邊界 | `08_boundaries.py` | — | — |
 | 12 | Structured Output：語法、Schema 與語義 | `12_structured_output.py` | — | — |
 | 13 | 原生 Function Calling 完整工具回合 | `13_tool_round.py` | — | — |
+| 14 | 多供應商介面、LiteLLM 與 API 成本 | `14_provider_contract.py` | `data/provider-prices-checked.json`、`data/provider-snapshot.json` | — |
 | 16 | Embedding 概念 | `16_embedding_lab.py` | — | torch、sentence-transformers（版本見第 16 節講義） |
 | 17 | 相似度、失敗案例與門檻評測 | `17_similarity_eval.py` | — | torch、sentence-transformers（版本見第 16 節講義） |
 | 18 | Chunk 與來源資料模型 | `18_chunking.py` | `data/sop_corpus.json` | — |
@@ -48,6 +49,7 @@ python3 04_sampling.py
 - `data/eval-set.json`：教材作者依標籤定義編寫的**合成**巡查通報與教學標註，不是真實通報；gold 由教師覆核。
 - `data/model-candidates.json`：Hugging Face 公開 API 的**快照**（日期見檔內），授權與檔案大小會變。
 - `data/tokenizer-fixtures.json`：教師在一台機器上的 tokenizer 實測紀錄，不是任何 API 的計費保證。
+- `data/provider-snapshot.json`：LiteLLM 套件內建的能力與價目**快照**（離線產生，會過期）；`data/provider-prices-checked.json`：教師手動核對官方價目頁的紀錄（日期與網址見檔內）。
 - `data/sop_corpus.json`、`data/search_cases.json`：與 MariaDB 課（[mariadb-demo](https://github.com/4-learn/mariadb-demo)）同一份合成 SOP 語料與標註，兩課共用。
 
 所有資料都是合成或公開資訊，不含個資。
