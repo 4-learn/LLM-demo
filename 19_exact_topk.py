@@ -136,7 +136,7 @@ if __name__ == "__main__":
     q0 = model.encode([QUERY_PREFIX + cases["cases"][0]["query"]], normalize_embeddings=True, show_progress_bar=False)[0]
     fast, slow = index.search(q0, 16), brute_force(ids, index.vectors, q0, 16)
     print("矩陣與逐筆計算排名相同:", [r[0] for r in fast] == [r[0] for r in slow],
-          "最大分數差:", f"{max(abs(a[1] - b[1]) for a, b in zip(fast, slow)):.1e}")
+          "最大分數差 < 1e-6:", max(abs(a[1] - b[1]) for a, b in zip(fast, slow)) < 1e-6)
 
     print("\n== 二、同分時的順序 ==")
     tie = ExactIndex(["C002", "C001", "C003"], [index.vectors[0], index.vectors[0], index.vectors[2]])
