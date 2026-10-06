@@ -47,10 +47,15 @@ PINNED_PACKAGES = {
 MODEL_ID = "BAAI/bge-small-zh-v1.5"
 MODEL_REVISION = "7999e1d3359715c523056ef9478215996d62a620"
 
-# (名稱, 模型 ID, revision, 用到的節次)。第 06 節的生成模型與第 02、05 節同一 revision。
+# (名稱, 模型 ID, revision, 用到的節次, 權重以外必須在快取裡的檔案)。
+# 第 06 節的生成模型與第 02、05 節同一 revision。
+# bge 由 sentence-transformers 載入：少了 modules.json／1_Pooling，會靜默改用 mean pooling，
+# 程式照跑、向量卻不同（2026-10-06 示範機 4-learn 沿用 MariaDB 課的不完整快取時實際發生）。
+BGE_FILES = ("config.json", "tokenizer.json", "modules.json", "1_Pooling/config.json")
+QWEN_FILES = ("config.json", "tokenizer.json", "generation_config.json")
 MODELS = (
-    ("bge-small-zh", MODEL_ID, MODEL_REVISION, "16、17、19"),
-    ("Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775", "06"),
+    ("bge-small-zh", MODEL_ID, MODEL_REVISION, "16、17、19", BGE_FILES),
+    ("Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775", "06", QWEN_FILES),
 )
 
 # 2026-10-06 備課機實測：venv 安裝後 1.5 GB、Qwen 快取 954 MB、bge 93 MB，合計約 2.6 GB；
@@ -267,7 +272,8 @@ def check_cpu_threads() -> Result:
 
 
 def check_model_cache(label: str = "bge-small-zh", model_id: str = MODEL_ID,
-                      revision: str = MODEL_REVISION, sections: str = "16、17、19") -> Result:
+                      revision: str = MODEL_REVISION, sections: str = "16、17、19",
+                      required: tuple = BGE_FILES) -> Result:
     """確認快取裡真的有模型，而不是只有 tokenizer。
 
     只檢查「目錄存在」會誤判：`tokenizers`／`huggingface_hub` 抓一個
@@ -283,15 +289,17 @@ def check_model_cache(label: str = "bge-small-zh", model_id: str = MODEL_ID,
         )
     present = {entry.name for entry in snapshot.iterdir()}
     has_weights = any(name in present for name in ("model.safetensors", "pytorch_model.bin"))
-    missing = [name for name in ("config.json",) if name not in present]
+    missing = [name for name in required if not (snapshot / name).is_file()]
     if not has_weights:
         missing.append("model.safetensors（或 pytorch_model.bin）")
     if missing:
         return Result(
             name, WARN,
             f"不完整：{snapshot} 只有 {sorted(present) or '空目錄'}，缺 {'、'.join(missing)}",
-            f"這通常代表只抓過 tokenizer（第 02 節的教師工具就會這樣）。第 {sections} 節需要完整權重；"
-            "離線環境下會直接失敗。",
+            f"只抓過 tokenizer（第 02 節的教師工具）或只抓了部分檔案（例如別門課先下載的）都會這樣。"
+            f"第 {sections} 節需要完整快取，離線時會直接失敗，或靜默改變輸出。"
+            f"補齊：`python -c \"from huggingface_hub import snapshot_download; "
+            f"snapshot_download('{model_id}', revision='{revision}')\"`",
         )
     return Result(name, PASS, f"已備妥權重（{snapshot}）")
 
