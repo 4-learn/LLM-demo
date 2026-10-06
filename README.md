@@ -15,6 +15,8 @@ python3 04_sampling.py
 
 需要 Python 3.10 以上。除下表註明的節次外，程式只用標準函式庫，不需要網路、模型或 API key。
 
+上課前先跑環境檢核（唯讀、不安裝、不連線）：`python3 check_env.py`；要上第 16 節再加 `--full`。
+
 | 節 | 講義 | 程式 | 讀取的資料 | 額外需求 |
 | --- | --- | --- | --- | --- |
 | 01 | 模型在系統中的角色 | `01_role_baseline.py` | — | — |
@@ -26,7 +28,7 @@ python3 04_sampling.py
 | 08 | 幻覺、提示注入與權限邊界 | `08_boundaries.py` | — | — |
 | 12 | Structured Output：語法、Schema 與語義 | `12_structured_output.py` | — | — |
 | 13 | 原生 Function Calling 完整工具回合 | `13_tool_round.py` | — | — |
-| 16 | Embedding 概念 | `16_embedding_lab.py` | — | torch、sentence-transformers（見 INSTALL-BASELINE） |
+| 16 | Embedding 概念 | `16_embedding_lab.py` | — | torch、sentence-transformers（版本見第 16 節講義） |
 | 18 | Chunk 與來源資料模型 | `18_chunking.py` | `data/sop_corpus.json` | — |
 | 22 | Reranking 與 Retrieval Evaluation | `22_rerank_eval.py` | `data/search_cases.json`、`data/sop_corpus.json` | — |
 | 23 | RAG 引用與查無答案 | `23_rag_citations.py` | `data/search_cases.json`、`data/sop_corpus.json` | — |
