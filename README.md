@@ -24,6 +24,7 @@ python3 04_sampling.py
 | 03 | Inference 概念 | `03_inference_lab.py` | — | — |
 | 04 | Sampling 與生成實驗 | `04_sampling.py` | — | — |
 | 05 | Hugging Face 模型選型與授權 | `05_model_selection.py` | `data/model-candidates.json` | — |
+| 06 | 本地推論載入與 CPU Smoke Test | `06_cpu_smoke.py` | — | torch、transformers、Qwen2.5-0.5B 權重約 942 MiB、可用記憶體約 3.3 GB（見第 06 節講義） |
 | 07 | 評測集、指標與可重現基準 | `07_evaluation.py` | `data/eval-set.json` | — |
 | 08 | 幻覺、提示注入與權限邊界 | `08_boundaries.py` | — | — |
 | 12 | Structured Output：語法、Schema 與語義 | `12_structured_output.py` | — | — |
