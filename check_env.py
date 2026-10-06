@@ -50,11 +50,11 @@ MODELS = (
     ("Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775", "06"),
 )
 
-# 2026-10-06 教師機實測：venv 安裝後 1.5 GB、Qwen 快取 954 MB、bge 93 MB，合計約 2.6 GB；
+# 2026-10-06 備課機實測：venv 安裝後 1.5 GB、Qwen 快取 954 MB、bge 93 MB，合計約 2.6 GB；
 # 加上 pip 下載暫存，保守抓 4 GB。（舊值 3 GB 是只算 torch wheel 下載大小時的估計，太少。）
 MIN_FREE_GB = 4.0
 
-# 第 06 節教師機實測峰值 3216–3218 MiB（Qwen2.5-0.5B 以 float32 載入）。
+# 第 06 節備課機實測峰值 3216–3218 MiB（Qwen2.5-0.5B 以 float32 載入）。
 SMOKE_RAM_MIB = 3300
 
 PASS, WARN, FAIL, SKIP = "PASS", "WARN", "FAIL", "SKIP"

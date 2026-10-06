@@ -118,7 +118,7 @@ class Store:
     """outbox 與 checkpointer 各用一條連線。
 
     共用同一條連線時，checkpointer 的交易與 outbox 的 commit 會互相干擾，
-    教師機實測偶發 `cannot start a transaction within a transaction`。
+    備課機實測偶發 `cannot start a transaction within a transaction`。
     """
 
     def __init__(self, path):
