@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import platform
 import shutil
 import socket
 import sys
@@ -40,8 +41,18 @@ PINNED_PACKAGES = {
 MODEL_ID = "BAAI/bge-small-zh-v1.5"
 MODEL_REVISION = "7999e1d3359715c523056ef9478215996d62a620"
 
-# torch（CPU wheel ≈ 200 MB）＋ 模型快取 ≈ 100 MB，保守抓 3 GB。
-MIN_FREE_GB = 3.0
+# (名稱, 模型 ID, revision, 用到的節次)。第 06 節的生成模型與第 02、05 節同一 revision。
+MODELS = (
+    ("bge-small-zh", MODEL_ID, MODEL_REVISION, "16、17、19"),
+    ("Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775", "06"),
+)
+
+# 2026-10-06 教師機實測：venv 安裝後 1.5 GB、Qwen 快取 954 MB、bge 93 MB，合計約 2.6 GB；
+# 加上 pip 下載暫存，保守抓 4 GB。（舊值 3 GB 是只算 torch wheel 下載大小時的估計，太少。）
+MIN_FREE_GB = 4.0
+
+# 第 06 節教師機實測峰值 3216–3218 MiB（Qwen2.5-0.5B 以 float32 載入）。
+SMOKE_RAM_MIB = 3300
 
 PASS, WARN, FAIL, SKIP = "PASS", "WARN", "FAIL", "SKIP"
 
@@ -100,9 +111,9 @@ def hf_cache_dir() -> Path:
     return Path.home() / ".cache" / "huggingface" / "hub"
 
 
-def model_snapshot_dir() -> Path:
-    folder = "models--" + MODEL_ID.replace("/", "--")
-    return hf_cache_dir() / folder / "snapshots" / MODEL_REVISION
+def model_snapshot_dir(model_id: str = MODEL_ID, revision: str = MODEL_REVISION) -> Path:
+    folder = "models--" + model_id.replace("/", "--")
+    return hf_cache_dir() / folder / "snapshots" / revision
 
 
 def check_python() -> Result:
@@ -163,7 +174,7 @@ def check_disk() -> Result:
     except OSError as error:  # pragma: no cover
         return Result("磁碟空間", WARN, f"無法查詢 {target}（{error}）")
     free_gb = usage.free / 1024 ** 3
-    detail = f"{free_gb:.1f} GB 可用（{target}）；第 16 節建議至少 {MIN_FREE_GB:.0f} GB"
+    detail = f"{free_gb:.1f} GB 可用（{target}）；第 06、16 節建議至少 {MIN_FREE_GB:.0f} GB"
     if free_gb < MIN_FREE_GB:
         return Result(
             "磁碟空間", FAIL, detail,
@@ -205,17 +216,19 @@ def check_cpu_threads() -> Result:
     return Result("CPU 執行緒", PASS, detail)
 
 
-def check_model_cache() -> Result:
+def check_model_cache(label: str = "bge-small-zh", model_id: str = MODEL_ID,
+                      revision: str = MODEL_REVISION, sections: str = "16、17、19") -> Result:
     """確認快取裡真的有模型，而不是只有 tokenizer。
 
     只檢查「目錄存在」會誤判：`tokenizers`／`huggingface_hub` 抓一個
     `tokenizer.json` 就會建出同名 snapshot 目錄，但完全沒有權重。
     """
-    snapshot = model_snapshot_dir()
+    name = f"模型快取 {label}（第 {sections} 節）"
+    snapshot = model_snapshot_dir(model_id, revision)
     if not snapshot.is_dir():
         return Result(
-            "模型快取", WARN, f"尚未下載（預期位置 {snapshot}）",
-            "第 16 節首次執行會自動下載。若教室禁止連外，請由教師事先以同一 revision 備妥快取；"
+            name, WARN, f"尚未下載（預期位置 {snapshot}）",
+            f"第 {sections} 節需要這個模型。若教室禁止連外，請由教師事先以同一 revision 備妥快取；"
             "課堂上才不會整班同時下載。",
         )
     present = {entry.name for entry in snapshot.iterdir()}
@@ -225,11 +238,56 @@ def check_model_cache() -> Result:
         missing.append("model.safetensors（或 pytorch_model.bin）")
     if missing:
         return Result(
-            "模型快取", WARN,
+            name, WARN,
             f"不完整：{snapshot} 只有 {sorted(present) or '空目錄'}，缺 {'、'.join(missing)}",
-            "這通常代表只抓過 tokenizer。第 16 節需要完整權重；離線環境下會直接失敗。",
+            f"這通常代表只抓過 tokenizer（第 02 節的教師工具就會這樣）。第 {sections} 節需要完整權重；"
+            "離線環境下會直接失敗。",
         )
-    return Result("模型快取", PASS, f"已備妥權重（{snapshot}）")
+    return Result(name, PASS, f"已備妥權重（{snapshot}）")
+
+
+def read_meminfo(path: str = "/proc/meminfo"):
+    """回傳 (總量 MiB, 可用 MiB)；非 Linux 或讀不到時回 (None, None)。"""
+    total = available = None
+    try:
+        with open(path, encoding="ascii") as handle:
+            for line in handle:
+                key, _, rest = line.partition(":")
+                if key == "MemTotal":
+                    total = int(rest.split()[0]) // 1024
+                elif key == "MemAvailable":
+                    available = int(rest.split()[0]) // 1024
+    except (OSError, ValueError, IndexError):
+        return None, None
+    return total, available
+
+
+def check_memory(meminfo=read_meminfo) -> Result:
+    total, available = meminfo()
+    if available is None:
+        return Result(
+            "記憶體", WARN, "讀不到可用記憶體（非 Linux 或無 /proc/meminfo）",
+            f"第 06 節載入生成模型實測峰值約 {SMOKE_RAM_MIB} MiB；請自行在系統監視器確認，"
+            "上課時先關掉瀏覽器等大程式。",
+        )
+    detail = f"總量 {total} MiB、目前可用 {available} MiB；第 06 節需約 {SMOKE_RAM_MIB} MiB"
+    if available < SMOKE_RAM_MIB:
+        return Result(
+            "記憶體", WARN, detail,
+            "其他節次不受影響；第 06 節的 smoke test 會在載入前停下並寫紀錄（離開碼 2）。"
+            "先關掉其他程式再試，仍不足就使用教師提供的備援紀錄。",
+        )
+    return Result("記憶體", PASS, detail)
+
+
+def check_platform(system: str = None) -> Result:
+    system = system or platform.system()
+    if system == "Windows":
+        return Result(
+            "作業系統", WARN, "Windows",
+            "第 06 節程式用到 `resource` 模組，Windows 沒有；請改用 WSL（Ubuntu）執行。其餘節次可在 Windows 執行。",
+        )
+    return Result("作業系統", PASS, f"{system} {platform.machine()}")
 
 
 def check_network(timeout: float = 5.0) -> Result:
@@ -249,8 +307,10 @@ def run_checks(full: bool, network: bool) -> list:
     if full:
         results.append(check_venv())
         results.append(check_cpu_threads())
+        results.append(check_platform())
+        results.append(check_memory())
         results.extend(check_packages())
-        results.append(check_model_cache())
+        results.extend(check_model_cache(*model) for model in MODELS)
     results.append(check_disk())
     if network:
         results.append(check_network())
