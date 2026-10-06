@@ -42,6 +42,7 @@ PINNED_PACKAGES = {
     "langgraph": "1.2.12",   # 第 26 節起；不需模型
     "langgraph-checkpoint-sqlite": "3.1.1",   # 第 29 節
     "mcp": "2.3.0",   # 第 32 節起；2.x 把 FastMCP 改名為 MCPServer
+    "fastapi": "0.142.2",   # 第 36 節
 }
 
 MODEL_ID = "BAAI/bge-small-zh-v1.5"

@@ -1,0 +1,26 @@
+{
+  "model": "Qwen/Qwen2.5-0.5B-Instruct@7ae557604adf67be50417f59c2c2f167def9a775",
+  "decoding": "greedy, max_new_tokens=120",
+  "environment": {
+    "host": "示範機 4-learn",
+    "python": "3.12.3",
+    "machine": "x86_64",
+    "torch": "2.8.0+cpu",
+    "transformers": "4.57.3",
+    "mcp": "2.3.0",
+    "recorded": "2026-10-06",
+    "seconds": 48.7
+  },
+  "caveat": "教師在示範機以 --live 實跑後凍結的模型輸出（fixtures）。換機器、換 torch／transformers 版本可能逐字不同；它不證明學生機器會產生同樣文字。",
+  "replies": {
+    "96447a40d328e5d47b99d4bba8672d595e67713708d48a1a02e3dd84f2fa2404": "<tool_call>\n{\"name\": \"count_events\", \"arguments\": {\"site\": \"A\", \"type\": \"no_helmet\"}}\n</tool_call>",
+    "952547fe61ccd473d07ea22f79db0f4a5867a728d7094bd470300f5c99fafa0c": "A 工地共有5次未戴安全帽事件。",
+    "853d55003b6044897b46c69ea0f709ba1a051387c6cf76b46ef819e6c057ed65": "<tool_call>\n{\"name\": \"count_events\", \"arguments\": {\"site\": \"B\", \"type\": \"blocked_exit\"}}\n</tool_call>",
+    "a4197ebe2a466f4e8f975998dd9ba586de0fadda833396570c407a8a891d6930": "B 工地有兩次逃生通道堵塞。",
+    "9ba236981d92042e9d026fc8c19b736ee19668fd3386ec37e25f31bbafa289a3": "<tool_call>\n{\"name\": \"count_events\", \"arguments\": {\"site\": \"C\", \"type\": \"no_helmet\"}}\n</tool_call>",
+    "ef70bbfe83a04b0097d2230c8c36ece0cf07ce0cecd6b66acfaa402c8665dfbb": "对不起，我无法执行这个命令。请提供正确的参数值。",
+    "564aa2d462f485d983a05a32de5f7e54295caa0f8be3c006ae2addbc1f4249eb": "<tool_call>\n{\"name\": \"list_events\", \"arguments\": {\"site\": \"A\"}}\n</tool_call>",
+    "58ff8c29a91c8222b734fb1745633c0ef6ed41915236513d5a3901ff868547e2": "A 工地的所有事件如下：\n1. 2026-10-01: 細心檢查逃生通道，發現堵塞。\n2. 2026-10-02: 沒有戴安全帽。\n3. 2026-10-03: 沒有戴安全帽。\n4. 2026-10-04: 沒有戴安全帽。",
+    "0e81c6eccfc6fbc2b7933070737440fb14a595e5fd75cce881e50611c8400dc7": "我是工地安全查詢助理，可以提供工地的安全信息和查询服务。"
+  }
+}

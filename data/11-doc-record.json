@@ -1,0 +1,58 @@
+{
+ "model": "HuggingFaceTB/SmolVLM-500M-Instruct@a7da5b986cb59b408707209984f360a5f4ad7e47",
+ "settings": {
+  "threads": 4,
+  "do_sample": false,
+  "max_new_tokens": 90,
+  "dtype": "float32"
+ },
+ "environment": {
+  "host": "4-learn",
+  "python": "3.12.3",
+  "torch": "2.8.0+cpu",
+  "transformers": "4.57.3",
+  "pillow": "12.3.0"
+ },
+ "image_sha256_16": {
+  "1": "560d2528d8b884df",
+  "2": "c8cf92ba749449ab",
+  "3": "33de0be98d88d554"
+ },
+ "runs": {
+  "不切塊": {
+   "1": {
+    "text": "Gateway Setup Guide (N2)\nStep 1: Connect to 2.4 GHz Wi-Fi only.\nStep 2: Enter the classroom password.\nStep 3:",
+    "input_tokens": 85,
+    "seconds": 5.7
+   },
+   "2": {
+    "text": "\"Troublehunting\" is a term used to describe the process of identifying and resolving problems in software or computer programs. It involves a combination of technical expertise, experience, and a deep understanding of the software's design and functionality. Troubleshooting is a crucial part of software development, as it allows developers to identify and fix issues before they cause problems for users.\n\nTroubleshooting can be performed in various ways,",
+    "input_tokens": 85,
+    "seconds": 10.3
+   },
+   "3": {
+    "text": "Error codes:\nE01 means a missing value.\nOther codes: report to the teacher.\nDo not guess the meaning of unlisted codes.",
+    "input_tokens": 85,
+    "seconds": 4.5
+   }
+  },
+  "切塊": {
+   "1": {
+    "text": "Gateway Setup Guide (v2) Step 1. Connect to 2.4 GHz Wi-Fi only. Step 2. 5 GHz is not supported. Step 3. Enter the classroom password. Step 4.",
+    "input_tokens": 881,
+    "seconds": 30.1
+   },
+   "2": {
+    "text": "Troubleshooting.",
+    "input_tokens": 881,
+    "seconds": 23.5
+   },
+   "3": {
+    "text": "Error codes. E01 means a missing value. Other codes: report to the teacher. Do not guess the meaning of unlisted codes.",
+    "input_tokens": 881,
+    "seconds": 27.7
+   }
+  }
+ },
+ "peak_rss_mib": 3307
+}
