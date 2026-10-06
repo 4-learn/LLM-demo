@@ -15,6 +15,8 @@ python3 04_sampling.py
 
 需要 Python 3.10 以上。除下表註明的節次外，程式只用標準函式庫，不需要網路、模型或 API key。
 
+**要安裝套件的節次（06、16 起），Python 請用 3.10～3.13（建議 3.10）**：釘選的 torch 2.8.0、numpy 2.2.6 沒有 3.14 的安裝檔，pip 會改裝別的版本。Linux 與 macOS 的安裝指令不同（macOS 不加 `--index-url`），見 [安裝基線](https://hackmd.io/@yillkid/HJl8JXTNkl) 的 INSTALL-BASELINE。
+
 上課前先跑環境檢核（唯讀、不安裝、不連線）：`python3 check_env.py`；要上第 16 節再加 `--full`。
 
 | 節 | 講義 | 程式 | 讀取的資料 | 額外需求 |

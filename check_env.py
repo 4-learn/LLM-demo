@@ -27,6 +27,9 @@ from importlib import metadata
 from pathlib import Path
 
 MIN_PYTHON = (3, 10)
+# 釘選的 torch 2.8.0、numpy 2.2.6 在 PyPI 只有 cp39～cp313 的 wheel（2026-10-06 查 PyPI）。
+# 3.14 起 pip 會改裝別的 torch 版本、numpy 從原始碼編譯，裝出來就不是講義的版本。
+MAX_WHEEL_PYTHON = (3, 13)
 RECOMMENDED_PYTHON = (3, 10)
 
 # 依講義 `16-embedding.md` 的安裝指令釘選。版本不同不代表壞掉，
@@ -127,6 +130,13 @@ def check_python() -> Result:
             "Python 版本", FAIL, text,
             f"需要 {MIN_PYTHON[0]}.{MIN_PYTHON[1]} 以上。本課範例使用 f-string、"
             "`match` 以外的現代語法與 `importlib.metadata`。",
+        )
+    if current > MAX_WHEEL_PYTHON:
+        return Result(
+            "Python 版本", WARN, text,
+            f"第 01～05 節可以上；但釘選的 torch 2.8.0、numpy 2.2.6 沒有 {current[0]}.{current[1]} 的安裝檔，"
+            f"pip 會改裝別的版本。要上第 06、16 節以後，請改用 {RECOMMENDED_PYTHON[0]}.{RECOMMENDED_PYTHON[1]}"
+            f"（最高 {MAX_WHEEL_PYTHON[0]}.{MAX_WHEEL_PYTHON[1]}）重建 venv，見 INSTALL-BASELINE。",
         )
     if current != RECOMMENDED_PYTHON:
         return Result(
@@ -265,11 +275,42 @@ def read_meminfo(path: str = "/proc/meminfo"):
     return total, available
 
 
-def check_memory(meminfo=read_meminfo) -> Result:
+def parse_vm_stat(text: str):
+    """macOS `vm_stat` 輸出 → 可用 MiB（free＋inactive＋speculative＋purgeable 頁）。讀不懂回 None。"""
+    import re
+
+    size = re.search(r"page size of (\d+) bytes", text)
+    if not size:
+        return None
+    pages = 0
+    for key in ("Pages free", "Pages inactive", "Pages speculative", "Pages purgeable"):
+        found = re.search(rf"^{key}:\s+(\d+)\.", text, re.M)
+        if found:
+            pages += int(found.group(1))
+    return pages * int(size.group(1)) // (1024 * 1024)
+
+
+def read_memory():
+    """Linux 讀 /proc/meminfo；macOS 用 sysctl 與 vm_stat（系統內建指令，唯讀）。"""
+    total, available = read_meminfo()
+    if available is not None or platform.system() != "Darwin":
+        return total, available
+    import subprocess
+
+    try:
+        total = int(subprocess.run(["sysctl", "-n", "hw.memsize"], capture_output=True, text=True,
+                                   timeout=5).stdout.strip()) // (1024 * 1024)
+        available = parse_vm_stat(subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=5).stdout)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None, None
+    return total, available
+
+
+def check_memory(meminfo=read_memory) -> Result:
     total, available = meminfo()
     if available is None:
         return Result(
-            "記憶體", WARN, "讀不到可用記憶體（非 Linux 或無 /proc/meminfo）",
+            "記憶體", WARN, "讀不到可用記憶體（不是 Linux／macOS，或系統指令無法執行）",
             f"第 06 節載入生成模型實測峰值約 {SMOKE_RAM_MIB} MiB；請自行在系統監視器確認，"
             "上課時先關掉瀏覽器等大程式。",
         )
