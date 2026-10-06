@@ -1,0 +1,146 @@
+{
+  "kind": "teacher-snapshot",
+  "purpose": "LLM 第 14 節：供應商能力矩陣與成本估算（LiteLLM 內建資料，非供應商即時狀態）",
+  "source": "litellm 套件內建 model_prices_and_context_window_backup.json（LITELLM_LOCAL_MODEL_COST_MAP=True）",
+  "generated_at": "2026-10-06T05:24:23+00:00",
+  "checked_on": null,
+  "environment": {
+    "python": "3.10.15",
+    "litellm": "1.104.0"
+  },
+  "caveat": "價格、能力旗標都會變。flags 為 null 代表價目表沒寫，不能當成不支援；token_counter 對非 OpenAI 模型可能是近似值；mock usage 與回覆內容無關。",
+  "models": {
+    "openai-mini": {
+      "litellm_key": "gpt-4o-mini",
+      "provider": "openai",
+      "usd_per_1m_input": 0.15,
+      "usd_per_1m_output": 0.6,
+      "max_input_tokens": 128000,
+      "max_output_tokens": 16384,
+      "flags": {
+        "supports_function_calling": true,
+        "supports_response_schema": true,
+        "supports_vision": true,
+        "supports_parallel_function_calling": true,
+        "supports_prompt_caching": true
+      },
+      "openai_params": {
+        "tools": true,
+        "tool_choice": true,
+        "response_format": true,
+        "seed": true,
+        "logprobs": true,
+        "n": true,
+        "stream_options": true
+      },
+      "token_counter": {
+        "工人有沒有戴安全帽？": 8,
+        "Is the worker wearing a helmet?": 7,
+        "AX300 濾網多久換一次？": 10
+      },
+      "token_counter_tokenizer": "o200k_base"
+    },
+    "deepseek-chat": {
+      "litellm_key": "deepseek/deepseek-chat",
+      "provider": "deepseek",
+      "usd_per_1m_input": 0.28,
+      "usd_per_1m_output": 0.42,
+      "max_input_tokens": 131072,
+      "max_output_tokens": 8192,
+      "flags": {
+        "supports_function_calling": true,
+        "supports_response_schema": true,
+        "supports_vision": null,
+        "supports_parallel_function_calling": true,
+        "supports_prompt_caching": true
+      },
+      "openai_params": {
+        "tools": true,
+        "tool_choice": true,
+        "response_format": true,
+        "seed": true,
+        "logprobs": true,
+        "n": true,
+        "stream_options": true
+      },
+      "token_counter": {
+        "工人有沒有戴安全帽？": 13,
+        "Is the worker wearing a helmet?": 7,
+        "AX300 濾網多久換一次？": 16
+      },
+      "token_counter_tokenizer": "cl100k_base"
+    },
+    "claude-haiku": {
+      "litellm_key": "claude-haiku-4-5",
+      "provider": "anthropic",
+      "usd_per_1m_input": 1.0,
+      "usd_per_1m_output": 5.0,
+      "max_input_tokens": 200000,
+      "max_output_tokens": 64000,
+      "flags": {
+        "supports_function_calling": true,
+        "supports_response_schema": true,
+        "supports_vision": true,
+        "supports_parallel_function_calling": null,
+        "supports_prompt_caching": true
+      },
+      "openai_params": {
+        "tools": true,
+        "tool_choice": true,
+        "response_format": true,
+        "seed": false,
+        "logprobs": false,
+        "n": false,
+        "stream_options": false
+      },
+      "token_counter": {
+        "工人有沒有戴安全帽？": 13,
+        "Is the worker wearing a helmet?": 7,
+        "AX300 濾網多久換一次？": 13
+      },
+      "token_counter_tokenizer": "huggingface:anthropic"
+    },
+    "gemini-flash": {
+      "litellm_key": "gemini/gemini-2.5-flash",
+      "provider": "gemini",
+      "usd_per_1m_input": 0.3,
+      "usd_per_1m_output": 2.5,
+      "max_input_tokens": 1048576,
+      "max_output_tokens": 65536,
+      "flags": {
+        "supports_function_calling": true,
+        "supports_response_schema": true,
+        "supports_vision": true,
+        "supports_parallel_function_calling": true,
+        "supports_prompt_caching": true
+      },
+      "openai_params": {
+        "tools": true,
+        "tool_choice": true,
+        "response_format": true,
+        "seed": false,
+        "logprobs": true,
+        "n": true,
+        "stream_options": false
+      },
+      "token_counter": {
+        "工人有沒有戴安全帽？": 13,
+        "Is the worker wearing a helmet?": 7,
+        "AX300 濾網多久換一次？": 16
+      },
+      "token_counter_tokenizer": "cl100k_base"
+    }
+  },
+  "mock_usage": [
+    {
+      "reply_chars": 7,
+      "prompt_tokens": 10,
+      "completion_tokens": 20
+    },
+    {
+      "reply_chars": 200,
+      "prompt_tokens": 10,
+      "completion_tokens": 20
+    }
+  ]
+}

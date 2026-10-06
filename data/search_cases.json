@@ -1,0 +1,79 @@
+{
+  "dataset_version": "sop-v1",
+  "annotation_version": "qrels-v1",
+  "provenance": {
+    "method": "逐段閱讀 sop-v1 後人工規則式編寫的教學標註；非向量排名或距離閾值產生。教材作者為 AI agent，教師須於授課前覆核。",
+    "source": "data/sop_corpus.json",
+    "source_versions": {"D001": 1, "D002": 1, "D003": 1, "D004": 1, "D005": 1, "D006": 1, "D007": 1, "D008": 1},
+    "eligibility": "document active AND EXISTS linked active product satisfying category_id; null category means all categories",
+    "relevance": "段落需直接支持問題要求的操作或限制；只有相似詞彙不算。無法滿足請求時標空集合；這不表示 top-k 自動拒答。",
+    "review_status": "teacher_review_required",
+    "warning": "全為虛構教學資料，不適用真實設備。更新文件、產品狀態或篩選條件後不可直接沿用 qrels。"
+  },
+  "cases": [
+    {
+      "case_id": "Q01",
+      "query": "教學感測器 A 如何恢復出廠設定，清除模擬連線？",
+      "category_id": 1,
+      "relevant_chunk_ids": ["C001"],
+      "kind": "synonym",
+      "rationale": "C001 以重設描述清除模擬連線並回到待配對，沒有恢復出廠設定這個字串。這是本課人工認定的同義需求，不承諾真實設備語意相同。"
+    },
+    {
+      "case_id": "Q02",
+      "query": "教學閘道器 A 連不上，應先檢查哪個無線頻段及密碼？",
+      "category_id": 2,
+      "relevant_chunk_ids": ["C003", "C004"],
+      "kind": "troubleshooting",
+      "rationale": "C003 說明只能使用 2.4 GHz；C004 明列頻段及模擬密碼檢查。兩段均提供相關限制或操作。"
+    },
+    {
+      "case_id": "Q03",
+      "query": "請提供支援 5 GHz 的教學閘道器及其 5 GHz 設定步驟。",
+      "category_id": 2,
+      "relevant_chunk_ids": [],
+      "kind": "no-answer-negation",
+      "rationale": "C003/C004 明說不支援 5 GHz，沒有符合『提供支援的產品與設定步驟』的段落。可引用限制向使用者說明，但不能把否定段落當成支援的證據。"
+    },
+    {
+      "case_id": "Q04",
+      "query": "教學閘道器是不是不支援 5 GHz？改用 5 GHz 可以排除連線失敗嗎？",
+      "category_id": 2,
+      "relevant_chunk_ids": ["C003", "C004"],
+      "kind": "negative-question",
+      "rationale": "與 Q03 相同關鍵詞但意圖不同。兩段均支持不支援；C004 明確否定改用 5 GHz 的排除方法。"
+    },
+    {
+      "case_id": "Q05",
+      "query": "P010 教學感測器 H 的專用重設 SOP 是什麼？",
+      "category_id": 1,
+      "relevant_chunk_ids": [],
+      "kind": "no-answer-model-number",
+      "rationale": "P010 沒有 product_documents 關聯。不能以 A/B 的 C001 回答 H 的專用 SOP；向量相似度不會替我們檢查產品編號。"
+    },
+    {
+      "case_id": "Q06",
+      "query": "P012 教學感測器 I 顯示 E01，缺少什麼資料，修正時要記錄什麼？",
+      "category_id": 1,
+      "relevant_chunk_ids": ["C015"],
+      "kind": "model-and-error-code",
+      "rationale": "P012 連到 D008；C015 定義 E01 為缺少測量值並要求保存代碼與前後欄位。C016 談未列代碼，不直接回答這次修正步驟。"
+    },
+    {
+      "case_id": "Q07",
+      "query": "教學配件 A 備註儲存被拒絕，應檢查角色還是停用權限檢查？",
+      "category_id": 3,
+      "relevant_chunk_ids": ["C013", "C014"],
+      "kind": "category-filter-permissions",
+      "rationale": "C013 定義檢視者與編輯者；C014 要記錄角色與錯誤並申請權限，不得停用檢查。category 3 只允許配件關聯文件。"
+    },
+    {
+      "case_id": "Q08",
+      "query": "如何在模擬面板重設感測器？",
+      "category_id": 999,
+      "relevant_chunk_ids": [],
+      "kind": "empty-filter",
+      "rationale": "不存在 category 999，合格集合為空。即使 C001 在未篩選時相關，也不屬於本題篩選後的 qrels。"
+    }
+  ]
+}

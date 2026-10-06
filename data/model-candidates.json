@@ -1,0 +1,173 @@
+{
+  "kind": "teacher-measurement",
+  "purpose": "LLM 第 05 節模型選型的候選清單（真實公開中介資料，未下載權重）",
+  "source": "Hugging Face 公開 API：/api/models/{id}?blobs=true 與 /{id}/raw/{sha}/config.json",
+  "fetched_at": "2026-10-05T11:51:15+00:00",
+  "environment": {
+    "python": "3.10.15",
+    "platform": "Linux-5.15.0-1083-gcp-x86_64-with-glibc2.31",
+    "client": "urllib（標準函式庫）"
+  },
+  "caveat": "授權、gated 狀態與檔案大小都會變；這是快照，不是即時狀態。gated 模型的 config.json 會回 401，因此沒有架構欄位——這是預期結果，代表『連 KV cache 都算不出來』，不是抓取失敗。",
+  "candidates": [
+    {
+      "id": "BAAI/bge-small-zh-v1.5",
+      "revision": "7999e1d3359715c523056ef9478215996d62a620",
+      "pipeline_tag": "feature-extraction",
+      "tags": [
+        "feature-extraction"
+      ],
+      "downloads": 4521194,
+      "last_modified": "2023-10-12T03:35:59.000Z",
+      "license": "mit",
+      "license_name": null,
+      "gated": false,
+      "config_status": 200,
+      "config": {
+        "model_type": "bert",
+        "architectures": [
+          "BertModel"
+        ],
+        "hidden_size": 512,
+        "num_hidden_layers": 4,
+        "num_attention_heads": 8,
+        "intermediate_size": 2048,
+        "vocab_size": 21128,
+        "max_position_embeddings": 512,
+        "torch_dtype": "float32"
+      },
+      "official_parameter_count": 23954432,
+      "official_dtypes": [
+        "F32",
+        "I64"
+      ],
+      "weight_file_bytes": 95827648,
+      "weight_file_names": [
+        "model.safetensors"
+      ]
+    },
+    {
+      "id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+      "pipeline_tag": "text-generation",
+      "tags": [
+        "text-generation"
+      ],
+      "downloads": 8635884,
+      "last_modified": "2024-09-25T12:32:56.000Z",
+      "license": "apache-2.0",
+      "license_name": null,
+      "gated": false,
+      "config_status": 200,
+      "config": {
+        "model_type": "qwen2",
+        "architectures": [
+          "Qwen2ForCausalLM"
+        ],
+        "hidden_size": 896,
+        "num_hidden_layers": 24,
+        "num_attention_heads": 14,
+        "num_key_value_heads": 2,
+        "intermediate_size": 4864,
+        "vocab_size": 151936,
+        "max_position_embeddings": 32768,
+        "torch_dtype": "bfloat16",
+        "tie_word_embeddings": true
+      },
+      "official_parameter_count": 494032768,
+      "official_dtypes": [
+        "BF16"
+      ],
+      "weight_file_bytes": 988097824,
+      "weight_file_names": [
+        "model.safetensors"
+      ]
+    },
+    {
+      "id": "microsoft/Phi-3.5-mini-instruct",
+      "revision": "2fe192450127e6a83f7441aef6e3ca586c338b77",
+      "pipeline_tag": "text-generation",
+      "tags": [
+        "text-generation"
+      ],
+      "downloads": 365509,
+      "last_modified": "2025-12-10T20:22:56.000Z",
+      "license": "mit",
+      "license_name": null,
+      "gated": false,
+      "config_status": 200,
+      "config": {
+        "model_type": "phi3",
+        "architectures": [
+          "Phi3ForCausalLM"
+        ],
+        "hidden_size": 3072,
+        "num_hidden_layers": 32,
+        "num_attention_heads": 32,
+        "num_key_value_heads": 32,
+        "intermediate_size": 8192,
+        "vocab_size": 32064,
+        "max_position_embeddings": 131072,
+        "torch_dtype": "bfloat16",
+        "tie_word_embeddings": false,
+        "has_auto_map": true
+      },
+      "official_parameter_count": 3821079552,
+      "official_dtypes": [
+        "BF16"
+      ],
+      "weight_file_bytes": 7642181880,
+      "weight_file_names": [
+        "model-00001-of-00002.safetensors",
+        "model-00002-of-00002.safetensors"
+      ]
+    },
+    {
+      "id": "google/gemma-2-2b-it",
+      "revision": "299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8",
+      "pipeline_tag": "text-generation",
+      "tags": [
+        "text-generation"
+      ],
+      "downloads": 578217,
+      "last_modified": "2024-08-27T19:41:44.000Z",
+      "license": "gemma",
+      "license_name": null,
+      "gated": "manual",
+      "config_status": 401,
+      "config": null,
+      "official_parameter_count": 2614341888,
+      "official_dtypes": [
+        "BF16"
+      ],
+      "weight_file_bytes": 5228717488,
+      "weight_file_names": [
+        "model-00001-of-00002.safetensors",
+        "model-00002-of-00002.safetensors"
+      ]
+    },
+    {
+      "id": "meta-llama/Llama-3.2-1B-Instruct",
+      "revision": "9213176726f574b556790deb65791e0c5aa438b6",
+      "pipeline_tag": "text-generation",
+      "tags": [
+        "text-generation"
+      ],
+      "downloads": 7494880,
+      "last_modified": "2024-10-24T15:07:51.000Z",
+      "license": "llama3.2",
+      "license_name": null,
+      "gated": "manual",
+      "config_status": 401,
+      "config": null,
+      "official_parameter_count": 1235814400,
+      "official_dtypes": [
+        "BF16"
+      ],
+      "weight_file_bytes": 2471645608,
+      "weight_file_names": [
+        "model.safetensors"
+      ]
+    }
+  ]
+}
