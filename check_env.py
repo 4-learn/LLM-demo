@@ -36,6 +36,7 @@ PINNED_PACKAGES = {
     "sentence-transformers": "5.1.2",
     "transformers": "4.57.3",
     "numpy": "2.2.6",
+    "langgraph": "1.2.12",   # 第 26 節起；不需模型
 }
 
 MODEL_ID = "BAAI/bge-small-zh-v1.5"

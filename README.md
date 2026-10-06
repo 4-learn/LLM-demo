@@ -37,6 +37,7 @@ python3 04_sampling.py
 | 22 | Reranking 與 Retrieval Evaluation | `22_rerank_eval.py` | `data/search_cases.json`、`data/sop_corpus.json` | — |
 | 23 | RAG 引用與查無答案 | `23_rag_citations.py` | `data/search_cases.json`、`data/sop_corpus.json` | — |
 | 25 | 工具權限與副作用控制 | `25_side_effects.py` | — | — |
+| 26 | LangGraph State 與 Reducer | `26_state_reducer.py` | — | langgraph==1.2.12（不需模型） |
 | 28 | 重試、退避與冪等 | `28_retry_idempotency.py` | — | — |
 | 30 | Trace 觀測與本地免費備援 | `30_local_trace.py` | — | — |
 | 41 | SFT 資料與按來源拆分 | `41_sft_split.py` | `data/sop_corpus.json` | — |
