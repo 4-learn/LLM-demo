@@ -43,6 +43,7 @@ python3 04_sampling.py
 | 29 | HITL：真正拒絕與恢復 | `29_hitl_resume.py` | — | langgraph==1.2.12、langgraph-checkpoint-sqlite==3.1.1（不需模型） |
 | 30 | Trace 觀測與本地免費備援 | `30_local_trace.py` | — | — |
 | 31 | 流程里程碑：沿用骨架整合 | `31_integration.py` | `data/search_cases.json`、`data/sop_corpus.json` | langgraph==1.2.12（不需模型；會載入同資料夾的 23、25、28、30 節程式） |
+| 32 | MCP 角色與工具參數契約 | `32_mcp_contract.py` | — | mcp==2.3.0（不需模型；會載入同資料夾的 25 節程式） |
 | 41 | SFT 資料與按來源拆分 | `41_sft_split.py` | `data/sop_corpus.json` | — |
 | 42 | LoRA 低秩權重與訓練紀錄判讀 | `42_lora_math.py` | `data/model-candidates.json` | — |
 | 46 | KV Cache 與 Prefix Cache 的機制與局限 | `46_prefix_cache.py` | — | — |
