@@ -1,0 +1,51 @@
+{
+ "model": "HuggingFaceTB/SmolVLM-500M-Instruct@a7da5b986cb59b408707209984f360a5f4ad7e47",
+ "settings": {
+  "threads": 4,
+  "do_sample": false,
+  "do_image_splitting": false,
+  "dtype": "float32"
+ },
+ "environment": {
+  "host": "4-learn",
+  "python": "3.12.3",
+  "torch": "2.8.0+cpu",
+  "transformers": "4.57.3",
+  "pillow": "12.3.0"
+ },
+ "image_sha256_16": "44038d2225a7b6f1",
+ "load_seconds": 0.7,
+ "answer_seconds": 49.2,
+ "peak_rss_mib": 3307,
+ "answers": {
+  "caption": "A simple, cartoon-style drawing of a person wearing a yellow hard hat and a red and orange striped shirt, standing on a brown surface with a green exit sign above them.",
+  "objects": "1. Person\n2. Ladder\n3. Sign\n4. Ground",
+  "questions": {
+   "has_person": "Yes.",
+   "has_cone": "No.",
+   "has_ladder": "Yes.",
+   "has_dog": "No.",
+   "has_forklift": "No.",
+   "count_people": "3.",
+   "person_side": "Left.",
+   "cone_vs_ladder": "Left.",
+   "sign_text": "EXIT."
+  },
+  "confidence": {
+   "has_person": "Yes.",
+   "has_cone": "No.",
+   "has_ladder": "Yes.",
+   "has_dog": "No.",
+   "has_forklift": "No.",
+   "count_people": "1.",
+   "person_side": "Left.",
+   "cone_vs_ladder": "Right.",
+   "sign_text": "EXIT."
+  },
+  "regions": {
+   "left": "Person.",
+   "middle": "Exit sign.",
+   "right": "Ladder."
+  }
+ }
+}

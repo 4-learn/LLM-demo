@@ -1,0 +1,687 @@
+{
+ "note": "第 38 節重播用 traces：每次模型呼叫的輸出、token 數與秒數。秒數是錄製機器當時量到的，不代表其他機器。",
+ "model": "Qwen/Qwen2.5-0.5B-Instruct",
+ "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+ "max_new_tokens": 8,
+ "recorded_on": "4-learn｜x86_64｜Python 3.12.3",
+ "calls": {
+  "001e3f30ff375db4d39b0738b152fef7cf8b8e9982e94c5a7038e3f6edce9119": {
+   "text": "present",
+   "prompt_tokens": 161,
+   "completion_tokens": 2,
+   "seconds": 0.833
+  },
+  "003a442d49c0f14ecaa3e79b7469edface52138a2499b68e4f89300fbb66dba5": {
+   "text": "no",
+   "prompt_tokens": 58,
+   "completion_tokens": 2,
+   "seconds": 0.458
+  },
+  "016d47ae463ebc33d5da9e02b4de58a6c1753bc00adc796dd377fc8e7de12f85": {
+   "text": "unknown",
+   "prompt_tokens": 143,
+   "completion_tokens": 2,
+   "seconds": 0.762
+  },
+  "0ef6b04f4bf51653c5905404e234b21f1dbde0baf205ee7469a4f430c0a34507": {
+   "text": "unknown",
+   "prompt_tokens": 124,
+   "completion_tokens": 2,
+   "seconds": 0.576
+  },
+  "122524f721cf7e412eee30bd132fbb304564b32ec4c7843f18615980f8307e78": {
+   "text": "no",
+   "prompt_tokens": 61,
+   "completion_tokens": 2,
+   "seconds": 0.47
+  },
+  "14de2b1326504f99514f2c9831e1aca68b389e4b7062bd55d01f1f2f7e44e27d": {
+   "text": "no",
+   "prompt_tokens": 64,
+   "completion_tokens": 2,
+   "seconds": 0.485
+  },
+  "1533268bdb5c8d472156d50feef4ea4b8de765d15df2acac2e4b555e17842cac": {
+   "text": "no",
+   "prompt_tokens": 61,
+   "completion_tokens": 2,
+   "seconds": 0.465
+  },
+  "156941b9559d5ca2bf009ca3c7a6ddda14679a969309540accd6eae2ff0fdf6d": {
+   "text": "present",
+   "prompt_tokens": 131,
+   "completion_tokens": 2,
+   "seconds": 0.729
+  },
+  "178d58831049a744e9ed76d80a0a3b8ee0f20df9f8c36085d7f1cecfb5d7595f": {
+   "text": "present",
+   "prompt_tokens": 133,
+   "completion_tokens": 2,
+   "seconds": 0.729
+  },
+  "19b4303f8c90b54aaf0d004d8640cd1174d3247dd481fe5e7ea76a4aae548979": {
+   "text": "unknown",
+   "prompt_tokens": 133,
+   "completion_tokens": 2,
+   "seconds": 0.727
+  },
+  "1dee4c57c9d235ccb223bd5c535b33943fdaf23ba680e810512925c52916293e": {
+   "text": "present",
+   "prompt_tokens": 145,
+   "completion_tokens": 2,
+   "seconds": 0.774
+  },
+  "22ebef488b1b89f8b50a50792beef186df678baff9c49a88134cc9d1cbd5ee99": {
+   "text": "unknown",
+   "prompt_tokens": 143,
+   "completion_tokens": 2,
+   "seconds": 0.765
+  },
+  "24d74690a5f7828baf237156fab550711b97a63bebf140faf08d1e0a0a59535a": {
+   "text": "unknown",
+   "prompt_tokens": 132,
+   "completion_tokens": 2,
+   "seconds": 0.718
+  },
+  "25e0a009f247bd72a11e78c3da03bcf43c024d965e2d5f5f2bcf0779be0627d4": {
+   "text": "present",
+   "prompt_tokens": 140,
+   "completion_tokens": 2,
+   "seconds": 0.748
+  },
+  "28613ceb6d6d1fd1fb953fdcb9ba4c266f8b6b8a93de84acab6e5b446f9f994c": {
+   "text": "present",
+   "prompt_tokens": 66,
+   "completion_tokens": 2,
+   "seconds": 0.48
+  },
+  "2e4a2783d8b607b00adf8dfbb661e1bc64455151b5e4c4157cf4cc4fcb94e000": {
+   "text": "unknown",
+   "prompt_tokens": 133,
+   "completion_tokens": 2,
+   "seconds": 0.728
+  },
+  "2fe68ec2301326838e8252c6a63f08d51ed3587cab3b9501071e0d890bfdcab0": {
+   "text": "present",
+   "prompt_tokens": 140,
+   "completion_tokens": 2,
+   "seconds": 0.757
+  },
+  "31321ab402ec06e72536f17b84e43e76d3c794a29f4e314a3239c7f63ff673b7": {
+   "text": "present",
+   "prompt_tokens": 130,
+   "completion_tokens": 2,
+   "seconds": 0.711
+  },
+  "314d74ed2f656dc45267b91a13a87af37fa58ec017df8f7e385decae330f1cbb": {
+   "text": "present",
+   "prompt_tokens": 132,
+   "completion_tokens": 2,
+   "seconds": 0.716
+  },
+  "33eff554aede928eea8e805f82dd9f63ce255fcc62bfe1b20dbb1aec1acfa376": {
+   "text": "present",
+   "prompt_tokens": 69,
+   "completion_tokens": 2,
+   "seconds": 0.487
+  },
+  "349f2703da2d689dd615f701d237d2eceb63739453e1cbe1d04ca3831cf4d1be": {
+   "text": "present",
+   "prompt_tokens": 141,
+   "completion_tokens": 2,
+   "seconds": 0.751
+  },
+  "3f544a3798a0587f4b339e7ce1df2fc29288395134252fd35a5f3b8b8877d7d9": {
+   "text": "unknown",
+   "prompt_tokens": 126,
+   "completion_tokens": 2,
+   "seconds": 0.593
+  },
+  "3ff536426f9c258271f0040e3e80a25e6d30536bcf713df230ecfc270495cbc9": {
+   "text": "present",
+   "prompt_tokens": 69,
+   "completion_tokens": 2,
+   "seconds": 0.484
+  },
+  "405ec4bd818c1fec6dc0b761879c6f9109a31ef76addd499d1802b2b8953549b": {
+   "text": "present",
+   "prompt_tokens": 142,
+   "completion_tokens": 2,
+   "seconds": 0.765
+  },
+  "417b1e7da341907b003da65bf21ff36efc26dd443d6a6bea44e669eaacfc3b46": {
+   "text": "yes",
+   "prompt_tokens": 61,
+   "completion_tokens": 2,
+   "seconds": 0.462
+  },
+  "46692aec725b0292aa79a4ee5e239284d7fc76c467a3e1bc3c7da55c06228ba0": {
+   "text": "present",
+   "prompt_tokens": 123,
+   "completion_tokens": 2,
+   "seconds": 0.58
+  },
+  "486b5ce488c83ff498c018a537a16aa25b43bff2f3a93fa61c88d81262c15227": {
+   "text": "present",
+   "prompt_tokens": 144,
+   "completion_tokens": 2,
+   "seconds": 0.76
+  },
+  "4c4c817ee067379822505a8f5b524dd3c67568cad801bd39a442c70a2c0b89bf": {
+   "text": "present",
+   "prompt_tokens": 122,
+   "completion_tokens": 2,
+   "seconds": 0.574
+  },
+  "4de7289785a6d18828d3e04503082b0509f6a89643e28a3921a0127a83fdd189": {
+   "text": "present",
+   "prompt_tokens": 130,
+   "completion_tokens": 2,
+   "seconds": 0.724
+  },
+  "4ef40c60d22f706df3176c9dfe58fabb4e934a56875dd71b29802e5a3f4f61e6": {
+   "text": "present",
+   "prompt_tokens": 125,
+   "completion_tokens": 2,
+   "seconds": 0.713
+  },
+  "5017a39330834267ed91f590b3acbf18ed39319d28e3e9b18ecd9f2d71202304": {
+   "text": "unknown",
+   "prompt_tokens": 127,
+   "completion_tokens": 2,
+   "seconds": 0.634
+  },
+  "505ed117ef123f696b3aec3d917f6e276ab19746b23f2fbb8dd38c0be75f2f3e": {
+   "text": "present",
+   "prompt_tokens": 140,
+   "completion_tokens": 2,
+   "seconds": 0.742
+  },
+  "55a0bb8fc07707a3f2491348c5363aa93ccba792bd0618180129971a3b526898": {
+   "text": "present",
+   "prompt_tokens": 139,
+   "completion_tokens": 2,
+   "seconds": 0.755
+  },
+  "567ce0f07b57f4a6bc4747c82dddf450250215040a08163d5bf0e932f018a7ef": {
+   "text": "present",
+   "prompt_tokens": 68,
+   "completion_tokens": 2,
+   "seconds": 0.483
+  },
+  "628f8028cc8dc904e3a60a919df4f17298b4ed1176cec9c5614ff4b1f99ddaa0": {
+   "text": "present",
+   "prompt_tokens": 141,
+   "completion_tokens": 2,
+   "seconds": 0.755
+  },
+  "6436bc91c3607b90063b8783b3d637ad3c5b43ca4a98b089ec09efeb72c87229": {
+   "text": "present",
+   "prompt_tokens": 129,
+   "completion_tokens": 2,
+   "seconds": 0.735
+  },
+  "65d73210c87249d7a45640652c3266dc3e345d594d1b9db558ed39f31512a2fd": {
+   "text": "present",
+   "prompt_tokens": 162,
+   "completion_tokens": 2,
+   "seconds": 0.838
+  },
+  "6e978365088b91b4da4934a615d9bad4a0fbfe597acd06cdedb5771c8be4cf6b": {
+   "text": "unknown",
+   "prompt_tokens": 125,
+   "completion_tokens": 2,
+   "seconds": 0.723
+  },
+  "708236552cc08592ec23f93a158d85babc77067a5cf13ddb9351b91f7489cb44": {
+   "text": "present",
+   "prompt_tokens": 129,
+   "completion_tokens": 2,
+   "seconds": 0.712
+  },
+  "7170733233e7379d2dce087fe0ce7771973793880b0630f519dfbb7221a7ae7b": {
+   "text": "present",
+   "prompt_tokens": 122,
+   "completion_tokens": 2,
+   "seconds": 0.576
+  },
+  "71e56e33e3ab322b97e4d0fdc85fd00d54c7501e672f8664973f7258288caac7": {
+   "text": "present",
+   "prompt_tokens": 68,
+   "completion_tokens": 2,
+   "seconds": 0.482
+  },
+  "7261eab8e5de822c820a74f13d2b386983456425059ec6fab056500cff3034a8": {
+   "text": "present",
+   "prompt_tokens": 145,
+   "completion_tokens": 2,
+   "seconds": 0.773
+  },
+  "76773acb12e2644b5508d29ec534d164ffb06e8d2777f6b8ac8caf3a59fbb472": {
+   "text": "present",
+   "prompt_tokens": 122,
+   "completion_tokens": 2,
+   "seconds": 0.703
+  },
+  "79b14fe9c4746b2ffd87610d0eecca9a095756b5728ce090db69b3899057170a": {
+   "text": "present",
+   "prompt_tokens": 136,
+   "completion_tokens": 2,
+   "seconds": 0.735
+  },
+  "7bebd8be83818fa45544a5939a8cbaf122ef9fff4769142f2ba4c2900af4cf25": {
+   "text": "present",
+   "prompt_tokens": 144,
+   "completion_tokens": 2,
+   "seconds": 0.757
+  },
+  "7c6efd229ec5cc1c312b3520217859582400d5eae370c63d7b1cf1fe448f6694": {
+   "text": "unknown",
+   "prompt_tokens": 124,
+   "completion_tokens": 2,
+   "seconds": 0.581
+  },
+  "7d9666cb3cc6c6aa188341a3120b05e1b900a8d95291375b2dd841be73ef0e28": {
+   "text": "present",
+   "prompt_tokens": 76,
+   "completion_tokens": 2,
+   "seconds": 0.501
+  },
+  "8380e9c345cb69d8b8d1284972d4feb708801d1d58bad7ef9cb671ee7aba9482": {
+   "text": "missing",
+   "prompt_tokens": 121,
+   "completion_tokens": 2,
+   "seconds": 0.598
+  },
+  "86ffa7127feefd0ed483f87f2501a07df4e8cc3a57eb5493fd2cdc1c6bb3e5d9": {
+   "text": "missing",
+   "prompt_tokens": 161,
+   "completion_tokens": 2,
+   "seconds": 0.849
+  },
+  "879a7ce9afbe5a9e962dc0d5dffabf3ea51d64befd8858e58c015084a0fcd18b": {
+   "text": "no",
+   "prompt_tokens": 62,
+   "completion_tokens": 2,
+   "seconds": 0.471
+  },
+  "88ca34f6fc1f78300caa0e5df5ea8ded59a72458561e3063a619fe74f906d8ff": {
+   "text": "unknown",
+   "prompt_tokens": 134,
+   "completion_tokens": 2,
+   "seconds": 0.73
+  },
+  "8a44772879913e3dfe8a1e49ccd397aa63dcf0b6eba6070cef2163bf53bb1014": {
+   "text": "unknown",
+   "prompt_tokens": 146,
+   "completion_tokens": 2,
+   "seconds": 0.778
+  },
+  "8dbc493a0357260115418ce4b693af1c4d7514a7c1d99c38ea14deddab970231": {
+   "text": "unknown",
+   "prompt_tokens": 126,
+   "completion_tokens": 2,
+   "seconds": 0.592
+  },
+  "900faf48f088f4f6827cf91416739ec9a3bab2ea1ac9b39dd9389486f28013b9": {
+   "text": "no",
+   "prompt_tokens": 58,
+   "completion_tokens": 2,
+   "seconds": 0.454
+  },
+  "9014d747581ddff3331786f1e8709a27b0a59d86543922d563a917d6736f7cb0": {
+   "text": "yes",
+   "prompt_tokens": 58,
+   "completion_tokens": 2,
+   "seconds": 0.454
+  },
+  "917979836a020d95d63c49f6f45c1bad9d10a2aabe68fca24c0aee4afc9c450d": {
+   "text": "missing",
+   "prompt_tokens": 132,
+   "completion_tokens": 2,
+   "seconds": 0.725
+  },
+  "92c372a733588da2f6fedadee10f5d3715e5d0eb6f563751fa244c30f9a719c7": {
+   "text": "present",
+   "prompt_tokens": 65,
+   "completion_tokens": 2,
+   "seconds": 0.487
+  },
+  "9848bb451ede6ae18a1c0d37320f2ef83ad7d815f36fc41141f83dad1c26be6a": {
+   "text": "no",
+   "prompt_tokens": 66,
+   "completion_tokens": 2,
+   "seconds": 0.541
+  },
+  "9e952b3c2ce909dfe9df0a2df21d438e6c426111442157c8e7beb37388eec415": {
+   "text": "present",
+   "prompt_tokens": 143,
+   "completion_tokens": 2,
+   "seconds": 0.76
+  },
+  "a2a2f889c95257323788b5401b671e9b977623f0a0b121194066843aa68f02ad": {
+   "text": "present",
+   "prompt_tokens": 163,
+   "completion_tokens": 2,
+   "seconds": 0.986
+  },
+  "a2d682f727e713fe15a6a292363891fce73d7a126071b9ab1f0f8c24774c57c7": {
+   "text": "present",
+   "prompt_tokens": 140,
+   "completion_tokens": 2,
+   "seconds": 0.76
+  },
+  "a5ff4722e7f8bcd5ac1052c05f7c948fe875593ddb0d08bafe06c7c23c6c0ad9": {
+   "text": "unknown",
+   "prompt_tokens": 146,
+   "completion_tokens": 2,
+   "seconds": 0.819
+  },
+  "a68138d9d29e7ac20be10d4cf9f8f490dd0c7812b4932e69d747a8baca0f80e9": {
+   "text": "present",
+   "prompt_tokens": 147,
+   "completion_tokens": 2,
+   "seconds": 0.781
+  },
+  "a83dd7db9b55de5e3f00751031262e5552647bebddd8701a91d317a1948aa210": {
+   "text": "present",
+   "prompt_tokens": 125,
+   "completion_tokens": 2,
+   "seconds": 0.59
+  },
+  "a974af8db88fa57e77a4460d9af6d3d573fcbd9217fdc0a86bb832ef4f755c93": {
+   "text": "yes",
+   "prompt_tokens": 58,
+   "completion_tokens": 2,
+   "seconds": 0.462
+  },
+  "ac70cefd48825935e521844dc9d3c51e07987edf3363066b19c51ca468977b83": {
+   "text": "present",
+   "prompt_tokens": 151,
+   "completion_tokens": 2,
+   "seconds": 0.792
+  },
+  "ae951df1c61d004716842bb7f4ebd3d1789f5ef919253f12185bf43229d8fd21": {
+   "text": "present",
+   "prompt_tokens": 144,
+   "completion_tokens": 2,
+   "seconds": 0.758
+  },
+  "aedd531f74bc5ffb815243704d2a0632895a39526f9d4b8504eaae24a3c65c1d": {
+   "text": "no",
+   "prompt_tokens": 60,
+   "completion_tokens": 2,
+   "seconds": 0.46
+  },
+  "af0cf859e22ab2407fa794d48b0bd70332133221164cc19d18a562e3697849b8": {
+   "text": "no",
+   "prompt_tokens": 63,
+   "completion_tokens": 2,
+   "seconds": 0.484
+  },
+  "afdcae92d4337386b765562c7b0d2253e5281ba56ce867f3956ef4c1696ec645": {
+   "text": "no",
+   "prompt_tokens": 65,
+   "completion_tokens": 2,
+   "seconds": 0.469
+  },
+  "b237c2a704c0cf1d311abdf42eece1323404c0d6a5b0f6de7cb7f564ef3064ca": {
+   "text": "present",
+   "prompt_tokens": 150,
+   "completion_tokens": 2,
+   "seconds": 0.789
+  },
+  "b29cb32bef3d5f800e04c4a9d1d90db6c7546d4aba59ea5b9e829aefd5a908ee": {
+   "text": "unknown",
+   "prompt_tokens": 135,
+   "completion_tokens": 2,
+   "seconds": 0.74
+  },
+  "b52fb68a821964571faec2ee909609bf787e075a6ccb60187dd4fe014031d877": {
+   "text": "present",
+   "prompt_tokens": 129,
+   "completion_tokens": 2,
+   "seconds": 0.724
+  },
+  "b832d6b2b1bf10300f7565090acf420c869898bf59f9c96baa81693f3a8dfe75": {
+   "text": "present",
+   "prompt_tokens": 134,
+   "completion_tokens": 2,
+   "seconds": 0.735
+  },
+  "baba8807fd8210dee0fa4d83c493a1dbb6106ae040a78605f5d140c64f1879d2": {
+   "text": "unknown",
+   "prompt_tokens": 144,
+   "completion_tokens": 2,
+   "seconds": 0.756
+  },
+  "bb4f0bb367d65cfceaf6b05308648a8fce81af1d8967ed32a1526cc237bb7aea": {
+   "text": "present",
+   "prompt_tokens": 124,
+   "completion_tokens": 2,
+   "seconds": 0.578
+  },
+  "bbb918da61b73ef7f94fdebc56839ebad0816e7cc9262d39516a4b70577a1296": {
+   "text": "no",
+   "prompt_tokens": 57,
+   "completion_tokens": 2,
+   "seconds": 0.454
+  },
+  "bbc7decd19281495dba695fa37ad6554c496f92859e857d919114fe0d9ad1275": {
+   "text": "no",
+   "prompt_tokens": 59,
+   "completion_tokens": 2,
+   "seconds": 0.459
+  },
+  "c06e7fb129e43c90d246da0f0373f06f09bfd43d55aff18c2c4a64c5bb3bb18f": {
+   "text": "unknown",
+   "prompt_tokens": 139,
+   "completion_tokens": 2,
+   "seconds": 0.745
+  },
+  "c52c5ae626b61716ac3525e8498d8d88a6f024d6875ca3e481c76fda929416a9": {
+   "text": "missing",
+   "prompt_tokens": 124,
+   "completion_tokens": 2,
+   "seconds": 0.581
+  },
+  "c54db5e0342e135c98f1249966389068b8e94e4688f7d245490a5cc941ba1655": {
+   "text": "yes",
+   "prompt_tokens": 59,
+   "completion_tokens": 2,
+   "seconds": 0.459
+  },
+  "c64c374e0ba82baba84cb19883e36017ac7e92773c23e1e629a22d2d8e4ce5d2": {
+   "text": "no",
+   "prompt_tokens": 68,
+   "completion_tokens": 2,
+   "seconds": 0.48
+  },
+  "c82d78982ccc1eed6ad9f96269af408dbce365a467320fed75ed09faa95aca1d": {
+   "text": "present",
+   "prompt_tokens": 132,
+   "completion_tokens": 2,
+   "seconds": 0.735
+  },
+  "c8c134356fd96a103266db537e4a9456e86d172d852c2b4347ee3ad8e6535453": {
+   "text": "present",
+   "prompt_tokens": 141,
+   "completion_tokens": 2,
+   "seconds": 0.749
+  },
+  "c9ffb20b1acab981c78ba4945aee2873c06655d78ef8d87f725aa1299b4cc4dd": {
+   "text": "present",
+   "prompt_tokens": 66,
+   "completion_tokens": 2,
+   "seconds": 0.478
+  },
+  "ce89e3ecf559ac8f42ee2824e2d0d7b4af08cd4d930cffe061a6483bc8a0d53e": {
+   "text": "present",
+   "prompt_tokens": 137,
+   "completion_tokens": 2,
+   "seconds": 0.739
+  },
+  "cf616e77bee0c794b17dc1aa334300f03dd711e8b723e4366f514c27b3f2dbe5": {
+   "text": "present",
+   "prompt_tokens": 128,
+   "completion_tokens": 2,
+   "seconds": 0.721
+  },
+  "d00f08f60e9c047852bca9d0e6cd6e19e228d263c74abe1814c0ff81692d27f3": {
+   "text": "present",
+   "prompt_tokens": 121,
+   "completion_tokens": 2,
+   "seconds": 0.57
+  },
+  "d0998b9361ecb6c8720645a0df19927058aa2149625192bc65acee55a04509f4": {
+   "text": "present",
+   "prompt_tokens": 125,
+   "completion_tokens": 2,
+   "seconds": 0.589
+  },
+  "d10aa187a26347fe5ea2e46687ecfab1209144b0056d3b559193029953e5e292": {
+   "text": "yes",
+   "prompt_tokens": 62,
+   "completion_tokens": 2,
+   "seconds": 0.476
+  },
+  "d14ae860cc78de9a6e2d4d88f1b247af85ff88fcdbaf3dbcf8c52a619748ca28": {
+   "text": "yes",
+   "prompt_tokens": 62,
+   "completion_tokens": 2,
+   "seconds": 0.475
+  },
+  "d2af5cf839fecb1ff52312e49b361bcd063ce12cea24fcf1f0674acbe4e8529d": {
+   "text": "present",
+   "prompt_tokens": 129,
+   "completion_tokens": 2,
+   "seconds": 0.709
+  },
+  "d4fa92489b6295e5b2c5d48845fd3fc12911cc6c177f756e4d7270696a6378b4": {
+   "text": "present",
+   "prompt_tokens": 143,
+   "completion_tokens": 2,
+   "seconds": 0.768
+  },
+  "d6b5e345a20f6884fe32ee1b7a6bd6e942d2081146cc725e02f4fd9f5e66017b": {
+   "text": "present",
+   "prompt_tokens": 130,
+   "completion_tokens": 2,
+   "seconds": 0.715
+  },
+  "d7ba70b408614a5eb8e032f637226d17cdb17c4f696c1a2381a6a6b94017d8a6": {
+   "text": "present",
+   "prompt_tokens": 140,
+   "completion_tokens": 2,
+   "seconds": 0.747
+  },
+  "da7058d7e835dd162da3e05c5c1ee743b5602215d65111fb4b82ebc76c56dc13": {
+   "text": "unknown",
+   "prompt_tokens": 131,
+   "completion_tokens": 2,
+   "seconds": 0.738
+  },
+  "dae10df09292bbb911d98370512f2f2181a89127c6cadc8cb4e885c8da65f018": {
+   "text": "present",
+   "prompt_tokens": 65,
+   "completion_tokens": 2,
+   "seconds": 0.475
+  },
+  "dbf8c05ba875e8bfaaf310166863f74c8a6a865a697990bd4a2bef597cd84c1d": {
+   "text": "present",
+   "prompt_tokens": 148,
+   "completion_tokens": 2,
+   "seconds": 0.776
+  },
+  "dcd7af01907d42c4b33dcac60527f6297f4d4f0b662eb0843ff494ce4ff86558": {
+   "text": "no",
+   "prompt_tokens": 64,
+   "completion_tokens": 2,
+   "seconds": 0.483
+  },
+  "dd5ae6c4d77327f69e985a1e5524d697414c40a8838f88dd886658fa0e457ad8": {
+   "text": "present",
+   "prompt_tokens": 121,
+   "completion_tokens": 2,
+   "seconds": 0.682
+  },
+  "dd932485c3c077e10ec80da28ac8dadf245ff457a9a5c8c2e2e510e3ba83a296": {
+   "text": "unknown",
+   "prompt_tokens": 127,
+   "completion_tokens": 2,
+   "seconds": 0.592
+  },
+  "de9683a75ff83567a0b6c847ee321c8b1b1f84af9d39e693043df1790efc0925": {
+   "text": "present",
+   "prompt_tokens": 121,
+   "completion_tokens": 2,
+   "seconds": 0.569
+  },
+  "e2a0757fe25aee6499c8523cb22f35c02bb6c4b7dedf55e0776aecd6b361189c": {
+   "text": "present",
+   "prompt_tokens": 129,
+   "completion_tokens": 2,
+   "seconds": 0.703
+  },
+  "e67cc7288f935de837bea5224e20629c0ec2facfe69031f4e2a5d95b0c423d9d": {
+   "text": "unknown",
+   "prompt_tokens": 128,
+   "completion_tokens": 2,
+   "seconds": 0.697
+  },
+  "e9eeba4dd556251a0e01aa377d50a3884dd68639bdbc4344793da15cbc370d56": {
+   "text": "unknown",
+   "prompt_tokens": 135,
+   "completion_tokens": 2,
+   "seconds": 0.758
+  },
+  "ef6773b294b5fa6653cf8894a717756a71a1a9892dcbf6f0b767ffc2b01af26e": {
+   "text": "present",
+   "prompt_tokens": 133,
+   "completion_tokens": 2,
+   "seconds": 0.731
+  },
+  "f574426a07cf43cd69604bee0666ea6183018598fc9e4f728aa719fdd1b6e79c": {
+   "text": "unknown",
+   "prompt_tokens": 120,
+   "completion_tokens": 2,
+   "seconds": 0.57
+  },
+  "f7fc9fd83609f9547f26dceedc6ab531ed156c427da0a266d0a6c853f7e28a8a": {
+   "text": "no",
+   "prompt_tokens": 63,
+   "completion_tokens": 2,
+   "seconds": 0.483
+  },
+  "fa798c18e3c2b912fe0e95a22cfd3bf9bf0a6cdf2fe7601c08e56a62db2f912b": {
+   "text": "no",
+   "prompt_tokens": 62,
+   "completion_tokens": 2,
+   "seconds": 0.471
+  },
+  "fbede6e1b12a360fe54880921bf6a1d348c86576e49ce8fe95ff02212397de2b": {
+   "text": "missing",
+   "prompt_tokens": 132,
+   "completion_tokens": 2,
+   "seconds": 0.72
+  },
+  "fcca6db9c5fc94f31fdf0601d51828973478827ca0c852419eb1e4583a75859a": {
+   "text": "yes",
+   "prompt_tokens": 59,
+   "completion_tokens": 2,
+   "seconds": 0.456
+  },
+  "fe6e68200b8afa139046edf9ecec6e0b30a282a6a3d6d6db398a900709a0263d": {
+   "text": "yes",
+   "prompt_tokens": 69,
+   "completion_tokens": 2,
+   "seconds": 0.484
+  },
+  "fecdad5ae16ec26bd8ac8f940694ef20156c50b6589f7968a6a4e6ae4c0493df": {
+   "text": "yes",
+   "prompt_tokens": 61,
+   "completion_tokens": 2,
+   "seconds": 0.465
+  }
+ }
+}

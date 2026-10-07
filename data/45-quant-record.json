@@ -1,0 +1,262 @@
+{
+ "note": "第 45 節重播用：示範機實測。每個條件在獨立子程序執行；不同機器、負載、torch 版本都可能不同。",
+ "threads": 2,
+ "results": {
+  "float32": {
+   "condition": "float32",
+   "load_seconds": 0.87,
+   "plain_linear_left": 169,
+   "peak_rss_mib": 3245,
+   "rss_end_mib": 2385,
+   "labels": {
+    "A01": "present",
+    "A02": "present",
+    "A03": "present",
+    "A04": "present",
+    "A05": "present",
+    "A06": "present",
+    "A07": "present",
+    "A08": "unknown",
+    "B01": "missing",
+    "B02": "unknown",
+    "B03": "unknown",
+    "B04": "unknown",
+    "B05": "unknown",
+    "B06": "unknown",
+    "C01": "unknown",
+    "C02": "present",
+    "C03": "missing",
+    "C04": "present",
+    "C05": "present",
+    "D01": "unknown",
+    "D02": "present",
+    "D03": "present",
+    "D04": "present",
+    "D05": "present",
+    "D06": "unknown"
+   },
+   "timings": [
+    {
+     "ttft": 2.4928,
+     "itl": 0.1413
+    },
+    {
+     "ttft": 1.9803,
+     "itl": 0.1408
+    },
+    {
+     "ttft": 2.0173,
+     "itl": 0.1413
+    },
+    {
+     "ttft": 2.0282,
+     "itl": 0.1415
+    }
+   ],
+   "answer": "工人進入工地前需要进行全面的安全檢查，包括但不限于以下方面：\n\n1. **了解工作环境**：確保工人的安全知識和技能符合项目要求。\n2. **检查个人防护装备",
+   "activation_top": [
+    [
+     "model.layers.2.mlp.down_proj",
+     1817.0,
+     0.042
+    ],
+    [
+     "model.layers.21.mlp.down_proj",
+     1730.1,
+     0.111
+    ],
+    [
+     "model.layers.3.mlp.down_proj",
+     1002.6,
+     0.05
+    ],
+    [
+     "model.layers.3.mlp.gate_proj",
+     336.4,
+     0.537
+    ],
+    [
+     "model.layers.3.mlp.up_proj",
+     336.4,
+     0.537
+    ],
+    [
+     "model.layers.21.mlp.gate_proj",
+     256.8,
+     0.883
+    ]
+   ],
+   "status": "完成"
+  },
+  "bfloat16": {
+   "condition": "bfloat16",
+   "load_seconds": 0.42,
+   "plain_linear_left": 169,
+   "peak_rss_mib": 1419,
+   "rss_end_mib": 1420,
+   "labels": {
+    "A01": "present",
+    "A02": "present",
+    "A03": "present",
+    "A04": "present",
+    "A05": "present",
+    "A06": "present",
+    "A07": "present",
+    "A08": "unknown",
+    "B01": "missing",
+    "B02": "unknown",
+    "B03": "unknown",
+    "B04": "unknown",
+    "B05": "missing",
+    "B06": "unknown",
+    "C01": "unknown",
+    "C02": "present",
+    "C03": "missing",
+    "C04": "present",
+    "C05": "present",
+    "D01": "unknown",
+    "D02": "present",
+    "D03": "present",
+    "D04": "present",
+    "D05": "present",
+    "D06": "unknown"
+   },
+   "timings": [
+    {
+     "ttft": 13.4252,
+     "itl": 0.0923
+    },
+    {
+     "ttft": 13.3426,
+     "itl": 0.0923
+    },
+    {
+     "ttft": 13.3406,
+     "itl": 0.0914
+    },
+    {
+     "ttft": 13.3492,
+     "itl": 0.092
+    }
+   ],
+   "answer": "工人進入工地前需要进行全面的安全檢查，包括但不限于：\n\n1. 確認工器具是否齐全且符合要求。\n2. 检查施工区域是否有潜在的危险源，",
+   "activation_top": [],
+   "status": "完成"
+  },
+  "int8-dynamic": {
+   "condition": "int8-dynamic",
+   "load_seconds": 3.74,
+   "plain_linear_left": 1,
+   "peak_rss_mib": 3245,
+   "rss_end_mib": 2652,
+   "labels": {
+    "A01": "給你的標籤是：",
+    "A02": "已知",
+    "A03": "通報指出「現場人員沒有戴",
+    "A04": "通報：",
+    "A05": "我的意思是，通報通報通",
+    "A06": "通報：有人未戴安全帽",
+    "A07": "通報：通報要求你做",
+    "A08": "到達目的地的通話，",
+    "B01": "The camera is too blurry to see clearly",
+    "B02": "判斷通報是否指出「有人",
+    "B03": "To provide a more detailed explanation, I",
+    "B04": "问题：陈述的意图是什么？",
+    "B05": "通報：通報不到，只有",
+    "B06": "通報：多到達面積",
+    "C01": ": \"通報\" is a verb",
+    "C02": "通報：請提供一星期的",
+    "C03": "由上可知，當前的",
+    "C04": "通報：混凝土灌注已完成，",
+    "C05": "1. 通報：通",
+    "D01": "答案：不存在需要进一步的指示。",
+    "D02": "通報指出有人未戴安全",
+    "D03": "抱歉，我說錯了。您",
+    "D04": "未知句：unknown\n答案：unknown",
+    "D05": "為此，我們可以推測這",
+    "D06": "通報：未戴安全帽（"
+   },
+   "timings": [
+    {
+     "ttft": 1.6108,
+     "itl": 0.0874
+    },
+    {
+     "ttft": 1.5209,
+     "itl": 0.0866
+    },
+    {
+     "ttft": 1.5167,
+     "itl": 0.0869
+    },
+    {
+     "ttft": 1.5222,
+     "itl": 0.0863
+    }
+   ],
+   "answer": "在回答这个问题时，我需要提供一些关于安全检查和工人进入工地的详细信息。首先，我们需要了解什么是“安全检查”以及它通常包括哪些内容。然后，我们还需要",
+   "activation_top": [],
+   "status": "完成"
+  },
+  "int8-skip-down": {
+   "condition": "int8-skip-down",
+   "load_seconds": 2.94,
+   "plain_linear_left": 25,
+   "peak_rss_mib": 3245,
+   "rss_end_mib": 2554,
+   "labels": {
+    "A01": "unknown",
+    "A02": "missing",
+    "A03": "present",
+    "A04": "unknown",
+    "A05": "present",
+    "A06": "present",
+    "A07": "present",
+    "A08": "unknown",
+    "B01": "present",
+    "B02": "unknown",
+    "B03": "missing",
+    "B04": "unknown",
+    "B05": "missing",
+    "B06": "unknown",
+    "C01": "present",
+    "C02": "missing",
+    "C03": "unknown",
+    "C04": "unknown",
+    "C05": "unknown",
+    "D01": "unknown",
+    "D02": "unknown",
+    "D03": "unknown",
+    "D04": "present",
+    "D05": "unknown",
+    "D06": "unknown"
+   },
+   "timings": [
+    {
+     "ttft": 1.8935,
+     "itl": 0.1073
+    },
+    {
+     "ttft": 1.5754,
+     "itl": 0.1078
+    },
+    {
+     "ttft": 1.5906,
+     "itl": 0.1079
+    },
+    {
+     "ttft": 1.6002,
+     "itl": 0.1086
+    }
+   ],
+   "answer": "工人進入工地前需要做安全檢查。",
+   "activation_top": [],
+   "status": "完成"
+  }
+ },
+ "versions": {
+  "torch": "2.8.0+cpu",
+  "transformers": "4.57.3"
+ },
+ "recorded_on": "4-learn｜x86_64｜Python 3.12.3"
+}

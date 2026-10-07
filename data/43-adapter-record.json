@@ -1,0 +1,132 @@
+{
+ "note": "第 43 節重播用：示範機實際訓練 LoRA 的紀錄與評估輸出。adapter 檔案本身不放進教材，只記雜湊；要檔案請用 --train 重建。",
+ "base": {
+  "model": "Qwen/Qwen2.5-0.5B-Instruct",
+  "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+ },
+ "train": {
+  "r": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.0,
+  "target_modules": [
+   "q_proj",
+   "v_proj"
+  ],
+  "epochs": 4,
+  "lr": 0.0002,
+  "batch_size": 1,
+  "threads": 4,
+  "seed": 20261006,
+  "samples": [
+   "A01",
+   "A02",
+   "A03",
+   "A04",
+   "A05",
+   "B01",
+   "B02",
+   "B03",
+   "B04",
+   "C01",
+   "C02",
+   "C03",
+   "D01",
+   "D02",
+   "D03"
+  ],
+  "trainable_params": 540672,
+  "epoch_loss": [
+   0.3504,
+   0.1938,
+   0.0368,
+   0.0109
+  ],
+  "seconds": 99.9
+ },
+ "adapter_files": {
+  "adapter_config.json": "e7e40dc126fe5b6a0ef0fc58cfbef8575938ef16e212e05a398d5e22dbc7a9fd",
+  "adapter_model.safetensors": "da1853a86db8419166f12398a35967b9e369879731b29b2cb7518599a640c3db"
+ },
+ "versions": {
+  "torch": "2.8.0+cpu",
+  "transformers": "4.57.3",
+  "peft": "0.17.1"
+ },
+ "recorded_on": "4-learn｜x86_64｜Python 3.12.3",
+ "outputs": {
+  "base": {
+   "A01": "present",
+   "A02": "present",
+   "A03": "present",
+   "A04": "present",
+   "A05": "present",
+   "A06": "present",
+   "A07": "present",
+   "A08": "unknown",
+   "B01": "missing",
+   "B02": "unknown",
+   "B03": "unknown",
+   "B04": "unknown",
+   "B05": "unknown",
+   "B06": "unknown",
+   "C01": "unknown",
+   "C02": "present",
+   "C03": "missing",
+   "C04": "present",
+   "C05": "present",
+   "D01": "unknown",
+   "D02": "present",
+   "D03": "present",
+   "D04": "present",
+   "D05": "present",
+   "D06": "unknown"
+  },
+  "lora": {
+   "A01": "missing",
+   "A02": "present",
+   "A03": "missing",
+   "A04": "present",
+   "A05": "present",
+   "A06": "unknown",
+   "A07": "present",
+   "A08": "unknown",
+   "B01": "unknown",
+   "B02": "unknown",
+   "B03": "unknown",
+   "B04": "unknown",
+   "B05": "unknown",
+   "B06": "unknown",
+   "C01": "unknown",
+   "C02": "unknown",
+   "C03": "unknown",
+   "C04": "unknown",
+   "C05": "unknown",
+   "D01": "unknown",
+   "D02": "present",
+   "D03": "unknown",
+   "D04": "present",
+   "D05": "unknown",
+   "D06": "unknown"
+  },
+  "merged_holdout": {
+   "A06": "unknown",
+   "A07": "present",
+   "A08": "unknown",
+   "B05": "unknown",
+   "B06": "unknown",
+   "C04": "unknown",
+   "C05": "unknown",
+   "D04": "present",
+   "D05": "unknown",
+   "D06": "unknown"
+  },
+  "probes_base": [
+   "在工地工作时，佩戴安全帽是为了保护头部免受坠落物、工具碰撞或机械伤害等风险的侵害。这不仅能够有效防止头部受伤，还能提升工人的整体",
+   "\"安全帽\"的中文意思是 \"安全帽\"，在英文中可以翻译为 \"Safety Helmet\"。"
+  ],
+  "probes_lora": [
+   "在工地工作時，佩戴安全帽的主要目的是保護工人免受高空坠落、物体打击和机械伤害等事故的侵害。安全帽可以有效防止头部受到撞击或挤压，保护",
+   "\"安全帽\"的中文意思是 \"安全帽\"，在英文中可以翻译为 \"Safety Helmet\"。"
+  ]
+ }
+}

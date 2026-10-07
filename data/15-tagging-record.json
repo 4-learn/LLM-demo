@@ -1,0 +1,85 @@
+{
+ "model": "HuggingFaceTB/SmolVLM-500M-Instruct@a7da5b986cb59b408707209984f360a5f4ad7e47",
+ "prompt_version": "tags-2026-10-06",
+ "environment": {
+  "host": "4-learn",
+  "python": "3.12.3",
+  "torch": "2.8.0+cpu",
+  "transformers": "4.57.3",
+  "pillow": "12.3.0"
+ },
+ "answer_seconds": 84.3,
+ "peak_rss_mib": 3307,
+ "answers": {
+  "IMG-01": {
+   "image_sha256_16": "37f582fe6bffd4b9",
+   "person": "Yes.",
+   "helmet": "Yes.",
+   "cone": "No.",
+   "visible": "Yes."
+  },
+  "IMG-02": {
+   "image_sha256_16": "ecaafac5a1258c95",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "No.",
+   "visible": "Yes."
+  },
+  "IMG-03": {
+   "image_sha256_16": "1b5942d9c70c6dd9",
+   "person": "Yes.",
+   "helmet": "Yes.",
+   "cone": "Yes.",
+   "visible": "Yes."
+  },
+  "IMG-04": {
+   "image_sha256_16": "80eb1231cc18d2f7",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "Yes.",
+   "visible": "Yes."
+  },
+  "IMG-05": {
+   "image_sha256_16": "fb043be0798cc1d9",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "No.",
+   "visible": "No."
+  },
+  "IMG-06": {
+   "image_sha256_16": "b2d54d0bd75c72b7",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "No.",
+   "visible": "No."
+  },
+  "IMG-07": {
+   "image_sha256_16": "6010f8fbd3572be5",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "Yes.",
+   "visible": "No."
+  },
+  "IMG-08": {
+   "image_sha256_16": "9656bc3078c8d136",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "Yes.",
+   "visible": "Yes."
+  },
+  "IMG-09": {
+   "image_sha256_16": "3ef1463a186a1c68",
+   "person": "Yes.",
+   "helmet": "Yes.",
+   "cone": "No.",
+   "visible": "No."
+  },
+  "IMG-10": {
+   "image_sha256_16": "1ff751f1145d80b1",
+   "person": "Yes.",
+   "helmet": "No.",
+   "cone": "No.",
+   "visible": "Yes."
+  }
+ }
+}

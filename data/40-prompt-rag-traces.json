@@ -1,0 +1,662 @@
+{
+ "note": "第 40 節重播用：Qwen2.5-0.5B 每個提示的輸出與輸入 token 數，以及 bge 的 dev 近鄰（留一）。不代表其他機器逐字相同。",
+ "model": "Qwen/Qwen2.5-0.5B-Instruct",
+ "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+ "embedding": "BAAI/bge-small-zh-v1.5",
+ "embedding_revision": "7999e1d3359715c523056ef9478215996d62a620",
+ "recorded_on": "4-learn｜x86_64｜Python 3.12.3",
+ "neighbours": {
+  "A01": [
+   [
+    "A02",
+    0.8646
+   ],
+   [
+    "A03",
+    0.8282
+   ],
+   [
+    "D02",
+    0.7698
+   ]
+  ],
+  "A02": [
+   [
+    "A01",
+    0.8646
+   ],
+   [
+    "A05",
+    0.7773
+   ],
+   [
+    "A04",
+    0.7752
+   ]
+  ],
+  "A03": [
+   [
+    "A01",
+    0.8282
+   ],
+   [
+    "B03",
+    0.7964
+   ],
+   [
+    "A05",
+    0.7594
+   ]
+  ],
+  "A04": [
+   [
+    "A05",
+    0.8152
+   ],
+   [
+    "A02",
+    0.7752
+   ],
+   [
+    "B03",
+    0.7434
+   ]
+  ],
+  "A05": [
+   [
+    "A04",
+    0.8152
+   ],
+   [
+    "B03",
+    0.7893
+   ],
+   [
+    "A02",
+    0.7773
+   ]
+  ],
+  "A06": [
+   [
+    "A03",
+    0.8346
+   ],
+   [
+    "A01",
+    0.8233
+   ],
+   [
+    "A02",
+    0.8202
+   ]
+  ],
+  "A07": [
+   [
+    "A02",
+    0.861
+   ],
+   [
+    "A05",
+    0.8392
+   ],
+   [
+    "A04",
+    0.8384
+   ]
+  ],
+  "A08": [
+   [
+    "A01",
+    0.8504
+   ],
+   [
+    "A02",
+    0.8235
+   ],
+   [
+    "A03",
+    0.8069
+   ]
+  ],
+  "B01": [
+   [
+    "D02",
+    0.8303
+   ],
+   [
+    "B03",
+    0.7619
+   ],
+   [
+    "A05",
+    0.7425
+   ]
+  ],
+  "B02": [
+   [
+    "B04",
+    0.7728
+   ],
+   [
+    "D02",
+    0.6965
+   ],
+   [
+    "B01",
+    0.6629
+   ]
+  ],
+  "B03": [
+   [
+    "A03",
+    0.7964
+   ],
+   [
+    "A05",
+    0.7893
+   ],
+   [
+    "D02",
+    0.7844
+   ]
+  ],
+  "B04": [
+   [
+    "B02",
+    0.7728
+   ],
+   [
+    "D02",
+    0.7515
+   ],
+   [
+    "A01",
+    0.6624
+   ]
+  ],
+  "B05": [
+   [
+    "B02",
+    0.7046
+   ],
+   [
+    "B04",
+    0.6201
+   ],
+   [
+    "B01",
+    0.6003
+   ]
+  ],
+  "B06": [
+   [
+    "B01",
+    0.6763
+   ],
+   [
+    "B02",
+    0.6147
+   ],
+   [
+    "B03",
+    0.6106
+   ]
+  ],
+  "C01": [
+   [
+    "C03",
+    0.4983
+   ],
+   [
+    "C02",
+    0.4907
+   ],
+   [
+    "D02",
+    0.4342
+   ]
+  ],
+  "C02": [
+   [
+    "D03",
+    0.5895
+   ],
+   [
+    "D01",
+    0.5361
+   ],
+   [
+    "A05",
+    0.5307
+   ]
+  ],
+  "C03": [
+   [
+    "C01",
+    0.4983
+   ],
+   [
+    "B03",
+    0.4904
+   ],
+   [
+    "A03",
+    0.4842
+   ]
+  ],
+  "C04": [
+   [
+    "C02",
+    0.4765
+   ],
+   [
+    "C01",
+    0.4521
+   ],
+   [
+    "A05",
+    0.4481
+   ]
+  ],
+  "C05": [
+   [
+    "B04",
+    0.6149
+   ],
+   [
+    "C02",
+    0.6072
+   ],
+   [
+    "D01",
+    0.604
+   ]
+  ],
+  "D01": [
+   [
+    "D03",
+    0.631
+   ],
+   [
+    "D02",
+    0.5777
+   ],
+   [
+    "B04",
+    0.5668
+   ]
+  ],
+  "D02": [
+   [
+    "B01",
+    0.8303
+   ],
+   [
+    "B03",
+    0.7844
+   ],
+   [
+    "A01",
+    0.7698
+   ]
+  ],
+  "D03": [
+   [
+    "D01",
+    0.631
+   ],
+   [
+    "C02",
+    0.5895
+   ],
+   [
+    "A05",
+    0.5315
+   ]
+  ],
+  "D04": [
+   [
+    "A03",
+    0.7593
+   ],
+   [
+    "A05",
+    0.7527
+   ],
+   [
+    "D02",
+    0.7465
+   ]
+  ],
+  "D05": [
+   [
+    "D01",
+    0.6589
+   ],
+   [
+    "B01",
+    0.5924
+   ],
+   [
+    "D03",
+    0.563
+   ]
+  ],
+  "D06": [
+   [
+    "D02",
+    0.7609
+   ],
+   [
+    "A01",
+    0.7519
+   ],
+   [
+    "B03",
+    0.7232
+   ]
+  ]
+ },
+ "calls": {
+  "085b8a4746b445aa8f01f3a1f0f1217a811cbe100bc6e09fb278e89f2e669597": {
+   "text": "present",
+   "prompt_tokens": 125
+  },
+  "095a5bce51f78a91bf1f4851f3b09ad6231b58d3c3780c3310e03ba094bb8274": {
+   "text": "unknown",
+   "prompt_tokens": 124
+  },
+  "0d41e01788618e2fdd069c8b2422c689c73757385d78a6e4ed4317162aa8ef9a": {
+   "text": "unknown",
+   "prompt_tokens": 201
+  },
+  "14880ba32781985c01557f7cba713d6e0fe44d6d640e97df83f41f487f76e8a4": {
+   "text": "missing",
+   "prompt_tokens": 197
+  },
+  "172326e7410f969edd27d4e853379b399ef5f2c50ce236c5cc60b2a34aeee35a": {
+   "text": "unknown",
+   "prompt_tokens": 126
+  },
+  "17601b7e902da253a0037a33500878478efe8f726392dcb25da961841e82279a": {
+   "text": "present",
+   "prompt_tokens": 201
+  },
+  "1b9c71c06398cfc065e772a28a5d915fadce27bfc2b68bb34fdbf70e22ca2156": {
+   "text": "unknown",
+   "prompt_tokens": 125
+  },
+  "20f7bf86b0cd00de0ea03526e8588e9a6baf98b91da6b09592237a23b204b1ee": {
+   "text": "unknown",
+   "prompt_tokens": 172
+  },
+  "22728ab10f83696770b6db0e9d6b3a5f61ea23b20be2c0af10b51480314b07eb": {
+   "text": "present",
+   "prompt_tokens": 211
+  },
+  "236a914c8c787d8dbf63919ac73c8f82dccd299d0acfa3a79d0cf89cbf52df2f": {
+   "text": "present",
+   "prompt_tokens": 200
+  },
+  "24db6e3626f3784aa932d327b531d796feee8f83cbbedbd1597ef3b6ac9a5bf5": {
+   "text": "unknown",
+   "prompt_tokens": 201
+  },
+  "259414bfd82fdc5ed7a1cdcc41803b2c6ed4f411f44ff2f83d28a3e234726ff6": {
+   "text": "missing",
+   "prompt_tokens": 202
+  },
+  "26f773f7e5bd94506fa9a28cd6db3e1f9b2d1102953189f0ad3e56223b61ae60": {
+   "text": "unknown",
+   "prompt_tokens": 131
+  },
+  "2a5f94f4a535efe98fd5f2b75187748e08f96d6ae3f8a520ab94d487ca4961ab": {
+   "text": "unknown",
+   "prompt_tokens": 127
+  },
+  "2cd2ecb7afc380740856ae6a2dde2e74e0a80d7d9a1873565d21a98505e6cb7f": {
+   "text": "unknown",
+   "prompt_tokens": 198
+  },
+  "346a1354c0290f56a71c848ceaed3d0916d628fc16f396e34c41135cd4f7647a": {
+   "text": "present",
+   "prompt_tokens": 122
+  },
+  "35d4c9d2e8a6cf866f8ae84e01230a937fdf2da5fdaadaab541eeac773bc6def": {
+   "text": "present",
+   "prompt_tokens": 197
+  },
+  "35e004c8f39713640987d3c97a81a97d548ce38bb617f61eda0a741f37a042b3": {
+   "text": "present",
+   "prompt_tokens": 121
+  },
+  "383176fc2ee055b9d66592181a10a700820611c3127b4b91d1031ee96605180a": {
+   "text": "unknown",
+   "prompt_tokens": 200
+  },
+  "3c8f93c246b1c10e714e71d9782acb8f662744c18ca93c0b82171fd426a695bd": {
+   "text": "present",
+   "prompt_tokens": 129
+  },
+  "3e906ba97457ff73c007a459ad458cbe90dc7ba7eecfa3503e697a23ee40a92d": {
+   "text": "missing",
+   "prompt_tokens": 215
+  },
+  "49d37b6585900b2af9b4cacd6a6d40452a92eb5447fc4c2f9cf3c97e06bbca13": {
+   "text": "unknown",
+   "prompt_tokens": 215
+  },
+  "4e4944f2bae42ac252afde1db57d4a95c980f375ac7f38a76f8105db807c220a": {
+   "text": "present",
+   "prompt_tokens": 125
+  },
+  "558909f1ecde7327e9f5dc19da0485d44ba8802d26e2289094ebd3e0f2897857": {
+   "text": "unknown",
+   "prompt_tokens": 198
+  },
+  "5608e5c3e737afaff3b38e5a493864164aa664c4893092d1b38fd76826bc6192": {
+   "text": "present",
+   "prompt_tokens": 121
+  },
+  "564fc4bf2d67ef06c91030889449bcd6f6e754fb2f0884e1df4189fd003fe7d2": {
+   "text": "unknown",
+   "prompt_tokens": 124
+  },
+  "6048f94ffed098e8a35aad1971aa851cd0b0648b9a6d5337e4dbc42e75842b94": {
+   "text": "unknown",
+   "prompt_tokens": 212
+  },
+  "6514c6dc922e172973ad3b2368ff6fb4a1da24878d41c627a0e146fa6af22c94": {
+   "text": "present",
+   "prompt_tokens": 124
+  },
+  "65f75aa58a054e1fdbf03af2a4dbfe3d7f3280fad2e5c7c5b4bd60f386ed9725": {
+   "text": "present",
+   "prompt_tokens": 123
+  },
+  "66472d027c21d33d89da0945e9e1c0f2bfdbf4d3287f89c2e2d2db77a6026057": {
+   "text": "missing",
+   "prompt_tokens": 124
+  },
+  "679c5dbb0e6350c4fdb36940fd272e318727159c0516833ca89903745f20f298": {
+   "text": "present",
+   "prompt_tokens": 200
+  },
+  "6cb3db164d93c09cd012522ca01282d6afc637ade8fad69776bd61e507f066ab": {
+   "text": "unknown",
+   "prompt_tokens": 208
+  },
+  "70e1e6db459108211df368b4beec0d789328450de3fd3b8edd4a5879e14f287d": {
+   "text": "unknown",
+   "prompt_tokens": 213
+  },
+  "7150da18c9e1209eb47a1d7cf284b28395b26fcdbf4bdb31d3434e9708d60b43": {
+   "text": "present",
+   "prompt_tokens": 196
+  },
+  "7278df75ab04105800d5a29a3d043a571817a815049aae4ff5c4591ed7ba28a9": {
+   "text": "unknown",
+   "prompt_tokens": 199
+  },
+  "73efb7eb9d55c61eae9d19ac2a78f14602053da88f4be2da0a08ae62c799aefa": {
+   "text": "missing",
+   "prompt_tokens": 203
+  },
+  "76dcd7cfd7f9da27963aaaab389dc1fd40c54aa4c7dc170157b29749ab7bfdeb": {
+   "text": "present",
+   "prompt_tokens": 122
+  },
+  "815e656c0080367981231377a7c9d1a68368aa8afbddbe2abe6cae13e48a3425": {
+   "text": "present",
+   "prompt_tokens": 203
+  },
+  "85b8e8db07e6c35632c398eb62540def0d2d486e005d4b3fa8ff398e018f7816": {
+   "text": "present",
+   "prompt_tokens": 121
+  },
+  "87a585d6097cffa48fbc5fed2961476ccf78f5f8b3a08d502d5ce92809678efb": {
+   "text": "missing",
+   "prompt_tokens": 121
+  },
+  "8828a687b18a99514c98c5c80145ac27c895f7b87b8c242554cf461350417cdd": {
+   "text": "unknown",
+   "prompt_tokens": 126
+  },
+  "9cb921675cfdb820aef3c6fcafbadfd8487f7ca5e4cd013cfd6fc01ee11cd5d1": {
+   "text": "unknown",
+   "prompt_tokens": 127
+  },
+  "9dd6e3820f5a84de4b205900894b6531e741c92e029f49fabd834b9f585f67fa": {
+   "text": "unknown",
+   "prompt_tokens": 206
+  },
+  "a6fda513797429ec48458b459a9e082970457ff5c307077f2a78f1a64b3a006b": {
+   "text": "present",
+   "prompt_tokens": 216
+  },
+  "a83409ee90f1142145dc546ce81cbef803d1a7f78c6178b6aa17f16787ef31ed": {
+   "text": "present",
+   "prompt_tokens": 128
+  },
+  "a9b7dd818f414f42895639cc6e5d2adfd8cd08461af22dbf45d355fc7e62abf1": {
+   "text": "unknown",
+   "prompt_tokens": 210
+  },
+  "ad9a504c71ce53181af8b1d2491bcf28e2e7544a778adf50d924515fa8d58824": {
+   "text": "present",
+   "prompt_tokens": 125
+  },
+  "ae523fde1bb83f05a1fdcc4cce95e2302f31df797bfed03fedea08a1eacb11f9": {
+   "text": "unknown",
+   "prompt_tokens": 209
+  },
+  "aeac8e5ce549fad2e0468e6dd531894a40aa59e344342df549ad9c48c3724411": {
+   "text": "unknown",
+   "prompt_tokens": 195
+  },
+  "b3a6beef91e4754feb103834ecc8249cc8b17d9fcaeb5c53facf5afe45967ee0": {
+   "text": "missing",
+   "prompt_tokens": 201
+  },
+  "b66f0135c4ecce5ff80cbdfeca157ae0d794dc1a5be1a023371f4333582da50f": {
+   "text": "unknown",
+   "prompt_tokens": 200
+  },
+  "b74bf8e7176ae8c7ca21088eeb31b04e0bbcaef9dea5c07a8da3f5fb44693e97": {
+   "text": "missing",
+   "prompt_tokens": 196
+  },
+  "b85ce2b05bd775444e503cff0686b4e71de28d23b00fcc70259177820caf3902": {
+   "text": "present",
+   "prompt_tokens": 207
+  },
+  "b9607abe4c90ee094d249ffa2eb1c6530a87242395432bdf83c1faea6d95800b": {
+   "text": "present",
+   "prompt_tokens": 205
+  },
+  "bdd84adf300e7893b61762c2a7d873137c7379cdd499324d71be24505628fac7": {
+   "text": "unknown",
+   "prompt_tokens": 198
+  },
+  "be1fc9d702e2ffb651d46826642731cef2e5f3613d2a26872e3e7439937fafd5": {
+   "text": "present",
+   "prompt_tokens": 132
+  },
+  "bead5d3df0d1f5478ef01aec1d28b7b9ace88f573a01d61aaa6f0df087764758": {
+   "text": "present",
+   "prompt_tokens": 203
+  },
+  "c3f10b239de5736022dfbe676a4f9b9edd26a621408a934532d197595f0548f7": {
+   "text": "unknown",
+   "prompt_tokens": 120
+  },
+  "cc84e80fdf674b8273df9d4d7f213aa21681c1c6d097b58ee3e9a4bbe7bdf414": {
+   "text": "unknown",
+   "prompt_tokens": 201
+  },
+  "ccbbb2da93b65263118505efd40fec17b227f17a44810806e768f6a431a65b4a": {
+   "text": "missing",
+   "prompt_tokens": 204
+  },
+  "cff06b5d8306752d85f590197abe0bc6803e17c52bc9cbc167b2983d6055e3dc": {
+   "text": "missing",
+   "prompt_tokens": 197
+  },
+  "d335177bf0b1883c2779d6e059ed791d1296f37fed66afe32c99b49ed97a49d5": {
+   "text": "present",
+   "prompt_tokens": 122
+  },
+  "d45d767e5c3c6a8b40c82c3456e6db6f3167c483b8946fbe553c85ecf17547d3": {
+   "text": "present",
+   "prompt_tokens": 199
+  },
+  "d85a0167b8659d9580d4a8011a7d8c014bb5f82ac14bf9afa5207e00327387e8": {
+   "text": "missing",
+   "prompt_tokens": 172
+  },
+  "d8e13dff9a9803a17a7b03c81d0867358170f68c00dd911e63ef02957025726b": {
+   "text": "present",
+   "prompt_tokens": 212
+  },
+  "dc7c9426ae7d37550a6bc208650dfd830ae1dda0449ad340b71660af916702e0": {
+   "text": "unknown",
+   "prompt_tokens": 199
+  },
+  "e354422f969751dde53f7b3acb2b38fc2d745b44feb4e8d31ceafc4d0459a160": {
+   "text": "present",
+   "prompt_tokens": 208
+  },
+  "e816d1dce4bf097fcb07598b792cf71a6df3b8258e8be3e23d3d1b1d0450cac1": {
+   "text": "unknown",
+   "prompt_tokens": 211
+  },
+  "e9ff7f1572583b3ef6468f7f7e57530e4028e6e6dd36ede3284a59c8b427e398": {
+   "text": "unknown",
+   "prompt_tokens": 212
+  },
+  "f2075ec00584ec39e8faec40b122897da8cc3420780b1a4634679635cfac2da7": {
+   "text": "unknown",
+   "prompt_tokens": 199
+  },
+  "f2ceb561d3e4312deb28bc2ea3f7b33c06ccf648ff69a8e84597d7fd45696879": {
+   "text": "unknown",
+   "prompt_tokens": 202
+  },
+  "f4f5c282c4efe4a86f0bef0bf031ffa21af73c3de4fbe3103abf71078319e862": {
+   "text": "present",
+   "prompt_tokens": 200
+  },
+  "f61b388f368350ebdc1b75c1ce7a04726b08100f9d7bb46fc6bea9d119ae70da": {
+   "text": "present",
+   "prompt_tokens": 172
+  },
+  "f7606502e877192e7e0cf9018454e7f8efb545de035ccf15c6665859326d097e": {
+   "text": "present",
+   "prompt_tokens": 205
+  },
+  "f9e6cca83c6f088754ae2a7e1733619833d4237c3d37ad62dc0e86586b89016c": {
+   "text": "unknown",
+   "prompt_tokens": 198
+  }
+ }
+}
