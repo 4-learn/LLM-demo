@@ -21,14 +21,14 @@ python3 04_sampling.py
 
 | 節 | 講義 | 程式 | 讀取的資料 | 額外需求 |
 | --- | --- | --- | --- | --- |
-| 01 | 模型在系統中的角色 | `01_role_baseline.py` | — | — |
-| 02 | Tokenizer 與上下文預算 | `02_token_budget.py` | — | — |
-| 03 | Inference 概念 | `03_inference_lab.py` | — | — |
-| 04 | Sampling 與生成實驗 | `04_sampling.py` | — | — |
-| 05 | Hugging Face 模型選型與授權 | `05_model_selection.py` | `data/model-candidates.json` | — |
-| 06 | 本地推論載入與 CPU Smoke Test | `06_cpu_smoke.py` | — | torch、transformers、Qwen2.5-0.5B 權重約 942 MiB、可用記憶體約 3.3 GB（見第 06 節講義） |
-| 07 | 評測集、指標與可重現基準 | `07_evaluation.py` | `data/eval-set.json` | — |
-| 08 | 幻覺、提示注入與權限邊界 | `08_boundaries.py` | — | — |
+| 01 | 不用 AI，能做到幾分？ | `01_role_baseline.py` | — | — |
+| 02 | 一筆事件要花多少 token？ | `02_token_budget.py` | — | — |
+| 03 | 模型怎麼一個字一個字寫出報告？ | `03_inference_lab.py` | — | — |
+| 04 | 報告要穩定，還是要活潑？ | `04_sampling.py` | — | — |
+| 05 | 該用哪個模型？ | `05_model_selection.py` | `data/model-candidates.json` | — |
+| 06 | 工地電腦跑得動嗎？ | `06_cpu_smoke.py` | — | torch、transformers、Qwen2.5-0.5B 權重約 942 MiB、可用記憶體約 3.3 GB（見第 06 節講義） |
+| 07 | AI 到底幾分？ | `07_evaluation.py` | `data/eval-set.json` | — |
+| 08 | AI 會不會闖禍？ | `08_boundaries.py` | — | — |
 | 09 | 多模態輸入、證據與未知 | `09_vision_unknown.py` | `data/09-vision-record.json` | 重播只需標準函式庫（有 Pillow 會核對圖片雜湊）；--live 需要 torch、transformers==4.57.3、Pillow 與 SmolVLM-500M-Instruct 模型快取（約 3.3 GB 記憶體） |
 | 10 | 可核對的圖像描述 | `10_grounded_caption.py` | `data/10-caption-record.json` | 重播只需標準函式庫（有 Pillow 會核對圖片雜湊）；--live 需求同 09_vision_unknown.py |
 | 11 | 文件摘要、來源與頁碼 | `11_doc_citations.py` | `data/11-doc-record.json` | 重播只需標準函式庫（有 Pillow 會核對圖片雜湊）；--live 需求同 09_vision_unknown.py |
