@@ -14,6 +14,16 @@ CORPUS = [
     "通報", "通報", "現場通報",
 ]
 MERGE_COUNT = 6
+EVENT = {
+    "event_id": "EVT-0042",
+    "time": "2026-11-03 09:12",
+    "site": "B 棟 3F",
+    "detector": "camera-07",
+    "label": "no_helmet",
+    "confidence": 0.82,
+    "note": "疑似有一人未戴安全帽",
+    "image": "evt-0042.jpg",
+}
 
 
 def learn_merges(corpus, merge_count):
