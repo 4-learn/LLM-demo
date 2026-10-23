@@ -16,7 +16,7 @@ CORPUS = [
 MERGE_COUNT = 6
 EVENT = {
     "event_id": "EVT-0042",
-    "time": "2026-11-03 09:12",
+    "time": "20E07-E01-03 09:12",
     "site": "B 棟 3F",
     "detector": "camera-07",
     "label": "no_helmet",
