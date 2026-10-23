@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LLM 49 節環境檢核（只用 Python 標準函式庫）。
+"""LLM 50 節環境檢核（只用 Python 標準函式庫）。
 
 設計原則：**本檔不 import 任何第三方套件**，所以在 `pip install` 之前就能跑。
 它不會修改任何東西、不會安裝套件、預設也不會連線（要連線需自己加 `--network`）。
@@ -7,7 +7,7 @@
 用法：
 
     python3 check_env.py              # 最小檢核：Python 版本、標準函式庫、磁碟
-    python3 check_env.py --full       # 完整檢核：加上 venv、第 16 節套件版本、模型快取
+    python3 check_env.py --full       # 完整檢核：加上 venv、第 17 節套件版本、模型快取
     python3 check_env.py --full --json
     python3 check_env.py --network    # 額外測試 huggingface.co 是否可達
 
@@ -32,38 +32,38 @@ MIN_PYTHON = (3, 10)
 MAX_WHEEL_PYTHON = (3, 13)
 RECOMMENDED_PYTHON = (3, 10)
 
-# 依講義 `16-embedding.md` 的安裝指令釘選。版本不同不代表壞掉，
+# 依講義 `17-embedding.md` 的安裝指令釘選。版本不同不代表壞掉，
 # 但同一份程式在不同版本上不保證逐字相同的輸出與數值。
 PINNED_PACKAGES = {
     "torch": "2.8.0",
     "sentence-transformers": "5.1.2",
     "transformers": "4.57.3",
     "numpy": "2.2.6",
-    "langgraph": "1.2.12",   # 第 26 節起；不需模型
-    "langgraph-checkpoint-sqlite": "3.1.1",   # 第 29 節
-    "mcp": "2.3.0",   # 第 32 節起；2.x 把 FastMCP 改名為 MCPServer
-    "fastapi": "0.142.2",   # 第 36 節
+    "langgraph": "1.2.12",   # 第 27 節起；不需模型
+    "langgraph-checkpoint-sqlite": "3.1.1",   # 第 30 節
+    "mcp": "2.3.0",   # 第 33 節起；2.x 把 FastMCP 改名為 MCPServer
+    "fastapi": "0.142.2",   # 第 37 節
 }
 
 MODEL_ID = "BAAI/bge-small-zh-v1.5"
 MODEL_REVISION = "7999e1d3359715c523056ef9478215996d62a620"
 
 # (名稱, 模型 ID, revision, 用到的節次, 權重以外必須在快取裡的檔案)。
-# 第 06 節的生成模型與第 02、05 節同一 revision。
+# 第 07 節的生成模型與第 02、05 節同一 revision。
 # bge 由 sentence-transformers 載入：少了 modules.json／1_Pooling，會靜默改用 mean pooling，
 # 程式照跑、向量卻不同（2026-10-06 示範機 4-learn 沿用 MariaDB 課的不完整快取時實際發生）。
 BGE_FILES = ("config.json", "tokenizer.json", "modules.json", "1_Pooling/config.json")
 QWEN_FILES = ("config.json", "tokenizer.json", "generation_config.json")
 MODELS = (
-    ("bge-small-zh", MODEL_ID, MODEL_REVISION, "16、17、19", BGE_FILES),
-    ("Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775", "06", QWEN_FILES),
+    ("bge-small-zh", MODEL_ID, MODEL_REVISION, "17、18、20", BGE_FILES),
+    ("Qwen2.5-0.5B", "Qwen/Qwen2.5-0.5B-Instruct", "7ae557604adf67be50417f59c2c2f167def9a775", "07", QWEN_FILES),
 )
 
 # 2026-10-06 備課機實測：venv 安裝後 1.5 GB、Qwen 快取 954 MB、bge 93 MB，合計約 2.6 GB；
 # 加上 pip 下載暫存，保守抓 4 GB。（舊值 3 GB 是只算 torch wheel 下載大小時的估計，太少。）
 MIN_FREE_GB = 4.0
 
-# 第 06 節備課機實測峰值 3216–3218 MiB（Qwen2.5-0.5B 以 float32 載入）。
+# 第 07 節備課機實測峰值 3216–3218 MiB（Qwen2.5-0.5B 以 float32 載入）。
 SMOKE_RAM_MIB = 3300
 
 PASS, WARN, FAIL, SKIP = "PASS", "WARN", "FAIL", "SKIP"
@@ -141,7 +141,7 @@ def check_python() -> Result:
         return Result(
             "Python 版本", WARN, text,
             f"第 01～05 節可以上；但釘選的 torch 2.8.0、numpy 2.2.6 沒有 {current[0]}.{current[1]} 的安裝檔，"
-            f"pip 會改裝別的版本。要上第 06、16 節以後，請改用 {RECOMMENDED_PYTHON[0]}.{RECOMMENDED_PYTHON[1]}"
+            f"pip 會改裝別的版本。要上第 07、17 節以後，請改用 {RECOMMENDED_PYTHON[0]}.{RECOMMENDED_PYTHON[1]}"
             f"（最高 {MAX_WHEEL_PYTHON[0]}.{MAX_WHEEL_PYTHON[1]}）重建 venv，見 INSTALL-BASELINE。",
         )
     if current != RECOMMENDED_PYTHON:
@@ -170,7 +170,7 @@ def check_stdlib() -> Result:
             "第 01～04 節不需要任何第三方套件，這裡失敗代表 Python 安裝不完整。",
         )
     # 自行編譯的 Python（pyenv）若編譯時找不到 OpenSSL／SQLite，這些模組會缺：
-    # 缺 ssl → pip 無法下載；缺 blake2b → hashlib 載入時印出一長串 ERROR；缺 sqlite3 → 第 29 節失敗。
+    # 缺 ssl → pip 無法下載；缺 blake2b → hashlib 載入時印出一長串 ERROR；缺 sqlite3 → 第 30 節失敗。
     # 2026-10-06 教師 M4 Pro 的 pyenv 3.11.9 實際出現 blake2b／blake2s 缺失。
     missing = [label for label, probe in compiled_module_probes() if not probe()]
     if missing:
@@ -208,7 +208,7 @@ def compiled_module_probes():
 
     return (("ssl（pip 下載需要）", safe(has_ssl)),
             ("hashlib blake2／sha256", safe(has_blake2)),
-            ("sqlite3（第 29 節）", safe(has_sqlite)))
+            ("sqlite3（第 30 節）", safe(has_sqlite)))
 
 
 def check_venv() -> Result:
@@ -218,7 +218,7 @@ def check_venv() -> Result:
         return Result("虛擬環境", PASS, f"已在虛擬環境內（{text}）")
     return Result(
         "虛擬環境", FAIL, f"不在虛擬環境內（{text}）",
-        "第 16 節會安裝 torch 等大型套件，必須在 venv 內："
+        "第 17 節會安裝 torch 等大型套件，必須在 venv 內："
         "`python3 -m venv .venv && source .venv/bin/activate`。",
     )
 
@@ -230,7 +230,7 @@ def check_disk() -> Result:
     except OSError as error:  # pragma: no cover
         return Result("磁碟空間", WARN, f"無法查詢 {target}（{error}）")
     free_gb = usage.free / 1024 ** 3
-    detail = f"{free_gb:.1f} GB 可用（{target}）；第 06、16 節建議至少 {MIN_FREE_GB:.0f} GB"
+    detail = f"{free_gb:.1f} GB 可用（{target}）；第 07、17 節建議至少 {MIN_FREE_GB:.0f} GB"
     if free_gb < MIN_FREE_GB:
         return Result(
             "磁碟空間", FAIL, detail,
@@ -247,7 +247,7 @@ def check_packages() -> list:
             results.append(Result(
                 f"套件 {name}", FAIL, f"未安裝（講義釘選 {expected}）",
                 f"在 venv 內執行 `python -m pip install \"{name}=={expected}\"`；"
-                "缺套件時第 16 節無法載入模型。",
+                "缺套件時第 17 節無法載入模型。",
             ))
         elif actual.split("+")[0] == expected:
             # `+cpu` 是 PEP 440 的本地版本標記：照講義從 PyTorch CPU index 安裝就會得到 2.8.0+cpu，
@@ -267,13 +267,13 @@ def check_cpu_threads() -> Result:
     if not count or count < 2:
         return Result(
             "CPU 執行緒", WARN, detail,
-            "第 16 節用 `torch.set_num_threads(2)`；可用執行緒過少時速度會明顯變慢。",
+            "第 17 節用 `torch.set_num_threads(2)`；可用執行緒過少時速度會明顯變慢。",
         )
     return Result("CPU 執行緒", PASS, detail)
 
 
 def check_model_cache(label: str = "bge-small-zh", model_id: str = MODEL_ID,
-                      revision: str = MODEL_REVISION, sections: str = "16、17、19",
+                      revision: str = MODEL_REVISION, sections: str = "17、18、20",
                       required: tuple = BGE_FILES) -> Result:
     """確認快取裡真的有模型，而不是只有 tokenizer。
 
@@ -357,14 +357,14 @@ def check_memory(meminfo=read_memory) -> Result:
     if available is None:
         return Result(
             "記憶體", WARN, "讀不到可用記憶體（不是 Linux／macOS，或系統指令無法執行）",
-            f"第 06 節載入生成模型實測峰值約 {SMOKE_RAM_MIB} MiB；請自行在系統監視器確認，"
+            f"第 07 節載入生成模型實測峰值約 {SMOKE_RAM_MIB} MiB；請自行在系統監視器確認，"
             "上課時先關掉瀏覽器等大程式。",
         )
-    detail = f"總量 {total} MiB、目前可用 {available} MiB；第 06 節需約 {SMOKE_RAM_MIB} MiB"
+    detail = f"總量 {total} MiB、目前可用 {available} MiB；第 07 節需約 {SMOKE_RAM_MIB} MiB"
     if available < SMOKE_RAM_MIB:
         return Result(
             "記憶體", WARN, detail,
-            "其他節次不受影響；第 06 節的 smoke test 會在載入前停下並寫紀錄（離開碼 2）。"
+            "其他節次不受影響；第 07 節的 smoke test 會在載入前停下並寫紀錄（離開碼 2）。"
             "先關掉其他程式再試，仍不足就使用教師提供的備援紀錄。",
         )
     return Result("記憶體", PASS, detail)
@@ -375,7 +375,7 @@ def check_platform(system: str = None) -> Result:
     if system == "Windows":
         return Result(
             "作業系統", WARN, "Windows",
-            "第 06 節程式用到 `resource` 模組，Windows 沒有；請改用 WSL（Ubuntu）執行。其餘節次可在 Windows 執行。",
+            "第 07 節程式用到 `resource` 模組，Windows 沒有；請改用 WSL（Ubuntu）執行。其餘節次可在 Windows 執行。",
         )
     return Result("作業系統", PASS, f"{system} {platform.machine()}")
 
@@ -424,7 +424,7 @@ def print_report(results: list) -> None:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        description="LLM 49 節環境檢核（唯讀，不安裝任何東西）",
+        description="LLM 50 節環境檢核（唯讀，不安裝任何東西）",
     )
     parser.add_argument("--full", action="store_true",
                         help="加上虛擬環境、package 版本、模型快取檢查")
