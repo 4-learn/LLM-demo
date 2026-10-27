@@ -65,6 +65,12 @@
 | E05 | 語音 ASR／TTS 與語音代理 | `E05-voice-agents.md` | `E05_voice_agents.py` | 63 | 0 | replay/fixture | 部分可替換；保留本地/工具/驗證流程 |
 | E06 | Docker、Gradio/Streamlit 與產品化 | `E06-productization.md` | `E06_productization.py` | 47 | 0 | 未見模型呼叫（純流程/演算法或缺 demo） | 依課程目的不需/不宜改，或非模型呼叫 |
 
+## API 呼叫遷移界線複核
+
+僅有文字生成且可保留教學目標的即時呼叫才遷移。已完成 lesson 07 與 lesson 16：兩者 live 使用 `client.chat.completions.create`、NVIDIA Build base URL、`NVIDIA_API_KEY`，預設仍為離線 fixture；lesson 16 的 tool allowlist、參數/權限驗證、唯讀執行及回合上限仍由 host 程式負責。
+
+原 KPI 列出的其他 ID 多為無 live 模型呼叫的教材，而非待遷移端點：規則/算法/fixture 的課（如 05、10、12、15、17、25、27–29、31–35、41–42、50–51、E04–E06）、本機模型特性課（14、E01–E03）、本機 embedding/生成或架構效能比較（38、43、45）不改成遠端 Chat Completions；如此避免把本機推論、VLM、訓練/embedding、工具/MCP 授權或延遲成本教學混為一談。確有需外部生成的個別情境，再另加 opt-in API adapter 與量測方法，而非取代原實驗。
+
 ## 覆蓋核對
 
 - Mapping 課數：60（必修 51、選修 9）。
