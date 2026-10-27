@@ -5,6 +5,8 @@ import argparse, csv, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEFAULT_MAPPING = pathlib.Path('/home/dsh/workspace/swarm/hives/4-learn/course-plans/llm-restructure-mapping.csv')
+if not DEFAULT_MAPPING.is_file():
+    DEFAULT_MAPPING = ROOT.parent/'course-plans'/'llm-restructure-mapping.csv'
 API_COMPLETE = {'07','15','16','17','27','28','31','33','34','35','41','42','50'}
 API_PARTIAL = {'05','10','12','14','25','29','38','43','45','51','E01','E02','E03','E04','E05'}
 API_NO = {'03','09','48','49','E07','E09'}
@@ -20,22 +22,22 @@ def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--mapping',type=pathlib.Path,default=DEFAULT_MAPPING); ap.add_argument('--output',type=pathlib.Path,default=ROOT/'docs/course-inventory.md'); ap.add_argument('--check',action='store_true'); a=ap.parse_args()
     rows=list(csv.DictReader(a.mapping.open(encoding='utf-8')))
     if len(rows)!=60: raise SystemExit(f'mapping rows={len(rows)}, expected 60')
-    out=['# 60 課呼叫、圖示與長程式盤點','',f'> 盤點來源：課程 mapping（{len(rows)} 節）與本 repo main 基線 b2db366；此 inventory 由 `tools/build_epic12_inventory.py` 產生。`lines` 為 matching demo 最大行數；有多支同前綴工具/重複 alias 時另列清單。','', '| 課號 | 課名 | 講義 | Demo 檔案（課號前綴） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |','|---|---|---|---|---:|---:|---|---|']
+    out=['# 60 課呼叫、圖示與長程式盤點','',f'> 盤點來源：課程 mapping（{len(rows)} 節）與本 repo main 基線 b2db366；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。','', '| 課號 | 課名 | 講義 | Demo 檔案（依錨點） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |','|---|---|---|---|---:|---:|---|---|']
     missing=[]
     for r in rows:
         id=r['new_id']; mds=sorted(ROOT.glob(id+'-*.md')); md=mds[0] if mds else (ROOT/'51-acceptance.md' if id=='51' and (ROOT/'51-acceptance.md').exists() else None)
-        # demos are current IDs, despite a subset of stale filenames; list matching prefix broadly
-        pys=sorted(p for p in ROOT.glob('*.py') if p.stem.startswith(id+'_'))
-        # Include README's mapped demo if it is stale/under old prefix, to expose mismatch.
-        readme=ROOT/'README.md'; read=readme.read_text(encoding='utf8')
-        match=re.search(r'^\|\s*'+re.escape(id)+r'\s*\|[^\n]*?`([^`]+\.py)`',read,re.M)
-        mapped=match.group(1) if match else ''
-        allfiles=list(dict.fromkeys(([md] if md else [])+pys+([ROOT/mapped] if mapped and (ROOT/mapped).exists() else [])))
+        # Resolve demos from actual lesson anchors, not filename prefixes: historical
+        # filenames are intentionally retained and prefix matches can cross-map lessons.
+        anchors=re.findall(r'<!--\s*demo:\s*([^\s]+\.py)\s*-->',md.read_text(encoding='utf8') if md else '')
+        pys=[ROOT/name for name in dict.fromkeys(anchors) if (ROOT/name).is_file()]
+        missing_demos=[name for name in dict.fromkeys(anchors) if not (ROOT/name).is_file()]
+        allfiles=list(dict.fromkeys(([md] if md else [])+pys))
         lines=max((len(p.read_text(encoding='utf8',errors='ignore').splitlines()) for p in allfiles if p.suffix=='.py'),default=0)
         charts=sum(1 for x in md.read_text(encoding='utf8',errors='ignore').splitlines() if x.strip()=='```mermaid' and md) if md else 0
         if not md and id!='51': missing.append(id)
+        if not anchors and id!='51': missing.append(f'{id}:demo-anchor')
+        if missing_demos: missing.extend(f'{id}:missing-demo:{name}' for name in missing_demos)
         filename=', '.join(f'`{p.name}`' for p in pys) or '—'
-        if mapped and mapped not in {p.name for p in pys}: filename += f'（README 指向 `{mapped}`，與課號前綴不符）'
         if id in API_COMPLETE: decision='可完整替換文字 LLM live 呼叫'
         elif id in API_PARTIAL: decision='部分可替換；保留本地/工具/驗證流程'
         elif id in API_NO: decision='不改呼叫方式；可補本機 vs API 對照'

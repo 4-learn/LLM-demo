@@ -1,10 +1,10 @@
 # Streamable HTTP MCP 服務
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 37 節：Streamable HTTP MCP 服務與部署。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 40 節：Streamable HTTP MCP 服務與部署。**
 > 第 34～36 節的 server 都是 client 開的子程序（stdio），只活在同一台機器的同一個使用者底下。本節把第 36 節讀檔的 server 掛進 FastAPI，用 Uvicorn 啟動成獨立的 HTTP 服務，再從另一個程序連進去。核心主張：**一旦走網路，server 就不再「只有啟動它的人能用」。驗證身分（token）、檢查來源（Origin／Host）、逾時與關閉，都要自己做，而且要用實際被拒絕的請求證明，不能只畫架構圖。**
 > 本節只綁 `127.0.0.1`，不對外公開。對外部署需要 TLS、正式的身分系統與教師受控的主機，列為**待驗證**。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Streamable HTTP MCP 服務與部署
 
@@ -71,6 +71,60 @@ SDK 在 `host="127.0.0.1"` 時預設會開這個保護。本節仍然明確寫�
 - **關閉要有紀錄。** 送 SIGINT（等同 Ctrl-C），Uvicorn 會跑完 lifespan 的關閉段落。結束碼 0、埠不再監聽，才算真的關掉。
 
 ## 三、可執行 Demo
+
+### Session 1：FastAPI/MCP HTTP 服務生命週期
+
+**系統層：子程序服務啟動、健康檢查與資源清理**
+
+```mermaid
+flowchart LR
+    A[Demo client] --> B[start_service]
+    B --> C[Uvicorn 子程序]
+    C --> D[FastAPI lifespan]
+    D --> E[MCP session 與工具]
+    B --> F[wait_ready / healthz]
+    F --> G[scenarios]
+    G --> H[finally 終止程序與清理]
+```
+
+**函式內部：`start_service` 建立獨立服務程序**
+
+```mermaid
+flowchart TD
+    A[start_service(base, token)] --> B[分配 free_port]
+    B --> C[準備 env 與工作目錄]
+    C --> D[啟動 Uvicorn subprocess]
+    D --> E[wait_ready]
+    E --> F{服務可用?}
+    F -- 是 --> G[回傳 port 與 process]
+    F -- 否 --> H[記錄 log_lines 並回報啟動錯誤]
+```
+
+### Session 2：HTTP client、錯誤情境與關閉
+
+**系統層：client 呼叫、逾時/認證錯誤與清理**
+
+```mermaid
+flowchart LR
+    A[scenarios] --> B[mcp_client]
+    B --> C[Streamable HTTP]
+    C --> D[FastAPI auth / MCP tool]
+    D --> E[成功、401 或 timeout]
+    E --> F[root_cause 與紀錄]
+    F --> G[main finally 關閉 server]
+```
+
+**函式內部：`scenarios` 逐一驗證 HTTP 行為**
+
+```mermaid
+flowchart TD
+    A[scenarios(port, token)] --> B[建立 MCP client]
+    B --> C[成功呼叫工具]
+    C --> D[測錯誤 token]
+    D --> E[測 timeout]
+    E --> F[捕捉例外並 root_cause]
+    F --> G[回報每個 scenario]
+```
 
 服務是另一個程序（`python -m uvicorn app:app`），Demo 主程式是 client，兩者只透過 HTTP 溝通。服務直接載入第 36 節的 server（路徑防護用 `safe`），另外加一個慢工具 `slow_report` 來示範逾時。同資料夾要有 `E08_mcp_file_source.py` 或第 36 節講義（Markdown）。
 

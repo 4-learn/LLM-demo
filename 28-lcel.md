@@ -1,20 +1,21 @@
 # Orchestration 與 LangChain LCEL
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 25 節：Orchestration 與 LangChain LCEL。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 28 節：Orchestration 與 LangChain LCEL。**
 > 第 24 節的 RAG 流程（合格過濾 → 檢索 → 上下文 → 生成 → 驗證 → 處置）已經可以跑、有測試。本節**不改任何一步**，只換「串接方式」：一版是普通的 Python 函式依序呼叫，一版是 LangChain 的 LCEL（每一步包成 Runnable，用 `|` 接起來，`invoke` 執行）。同一組 9 個案例、同一份契約跑三次（第 24 節原本的 `handle()`、純 Python、LCEL），結果逐案相同。然後看框架**做了什麼、沒做什麼**：錯誤怎麼傳遞、權限誰負責。核心主張：**框架是串接工具，不會讓模型變好，也不會替你補上權限檢查；先有契約測試，再換串接方式。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Orchestration 與 LangChain LCEL
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 51_lcel.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[相同輸入與 handler 契約] --> B[原生 Python 步驟鏈]
+    A --> C[LCEL runnable composition]
+    B --> D[retrieve → context → generate → disposition]
+    C --> E[組合等價 runnable 與錯誤恢復]
+    D --> F[run_all 執行正常/故障案例]
+    E --> F
+    F --> G[contract 比較輸出、狀態與呼叫次數]
 ```
 
 ## 學習目標與時間
@@ -57,6 +58,56 @@ N2 這一條要特別注意：第 24 節刻意讓它**通過驗證被送出**（
 LCEL 本身**沒有**提示模板、模型、檢索的魔法；那些是其他套件提供的 Runnable。本節只用 `langchain-core`，不接任何模型。
 
 ## 三、可執行 Demo
+
+### Session 1：原生函式與 LCEL 共用步驟契約
+
+**系統層：同一業務步驟、兩種 orchestration**
+
+```mermaid
+flowchart LR
+    I[案例 state] --> N[native: 依序呼叫 step 函式]
+    I --> L[build_chain: Runnable 串接]
+    N --> O[結果與錯誤]
+    L --> O
+    O --> C[contract 比較兩種輸出]
+```
+
+**函式內部：`native` 呼叫步驟並傳遞 state**
+
+```mermaid
+flowchart TD
+    A[native(state)] --> B[step_allowed]
+    B --> C[step_retrieve]
+    C --> D[step_context]
+    D --> E[step_generate]
+    E --> F[step_disposition]
+    F --> G[回傳結果 state]
+```
+
+### Session 2：LCEL 鏈建構、錯誤 fallback 與契約
+
+**系統層：build、invoke 與契約驗證**
+
+```mermaid
+flowchart LR
+    A[setup] --> B[build_chain]
+    B --> C[Runnable sequence]
+    C --> D[invoke 每個案例]
+    D --> E[results 與 calls]
+    E --> F[contract]
+```
+
+**函式內部：`build_chain` 的步驟與例外處理**
+
+```mermaid
+flowchart TD
+    A[build_chain(steps, catch)] --> B[串接 steps]
+    B --> C{catch 啟用?}
+    C -- 是 --> D[with_fallbacks retrieval_failed]
+    C -- 否 --> E[原始錯誤傳出]
+    D --> F[回傳 Runnable]
+    E --> F
+```
 
 需要 `langchain-core==1.6.6`（安裝 `langgraph==1.2.12` 時已一起裝，不必另外裝）；同資料夾要有第 24 節的程式（`E08_filter_update.py` 或講義）與 MariaDB 課共用的 `data/sop_corpus.json`、`data/search_cases.json`。不需要模型、不需要 API key，約 1 秒。
 

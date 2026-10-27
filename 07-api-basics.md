@@ -6,12 +6,15 @@
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E02_api_basics.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[使用者訊息] --> B{模式}
+    B -- 預設 --> C[Fixture 回放]
+    B -- 選擇 live --> D[以 SDK 與環境金鑰送請求]
+    D --> E{HTTP 與 JSON 成功？}
+    E -- 否 --> F[顯示可理解錯誤]
+    E -- 是 --> G[擷取 completion 文字]
+    C --> H[展示與比較輸出]
+    F --> H
+    G --> H
 ```
 
 ## 學習目標
@@ -21,7 +24,7 @@ flowchart TD
 - 從一筆合成事件建立 chat completion 請求，辨認輸入、輸出、usage 與錯誤
 - 在不洩漏憑證、不送真實個資、不把模型當成法規或工安判斷者的前提下，安全地描述真實 API 呼叫的條件
 
-[回 51 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 範例程式碼
 

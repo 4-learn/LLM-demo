@@ -1,6 +1,8 @@
 """第 50 節：全課增量驗收。
 
 不做新功能，只把前面 49 節的產物整理成「能回答問題的證據」：
+
+> Historical version: this pre-restructure script scans lessons 01–49. The current course acceptance lesson is 51; see `51_acceptance.py`.
   一、來源 manifest：每節的程式、證據等級、用到的資料檔與雜湊。
   二、代表性重跑：挑幾節，**現在**重跑一次，與講義凍結的輸出逐字比對；缺套件就標「未重跑」，不算通過。
   三、品質／延遲／成本表：直接從示範機紀錄讀數字，每一列都標來源與證據等級。
@@ -180,7 +182,7 @@ def main(argv=()):
     if not rows:
         sys.exit("找不到任何講義（NN-*.md）。本節要比對講義裡的凍結輸出，請在放講義的資料夾執行"
                  "（llm-demo 只有程式，沒有講義：把 HackMD 講義下載成 .md 放進同一個資料夾）")
-    print(f"教材資料夾：第 01–49 節中已改版的講義 {len(rows)} 節（新增節次後，本節輸出會跟著變）")
+    print(f"教材資料夾：舊版 50_acceptance.py 依序號掃描 01–49（{len(rows)} 節）；不代表目前 51 節必修課的涵蓋範圍")
 
     print("\n== 一、來源 manifest（節次｜程式｜證據等級｜資料檔雜湊前 12 碼） ==")
     for r in rows:

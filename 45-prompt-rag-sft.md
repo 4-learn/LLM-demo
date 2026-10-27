@@ -1,20 +1,22 @@
 # Prompt、RAG 與 SFT 的選擇
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 41 節：Prompt、RAG 與 SFT 的選擇。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 45 節：Prompt、RAG 與 SFT 的選擇。**
 > 「模型答錯，所以要微調」常常跳過了中間幾步。本節在同一個任務（第 08 節的安全帽通報分類，25 筆）上，先把**不用訓練**的做法做到合理：zero-shot、固定 few-shot、檢索 few-shot（RAG）、不生成的 embedding 分類器。全部用同一個 Qwen2.5-0.5B、同樣的解碼與解析規則；範例只能來自 dev，評 dev 時排除案例本身。核心主張：**先判斷錯誤屬於知識、格式、行為還是流程，再決定方法；微調要跟合理的 baseline 比，不能跟刻意寫差的提示比。** 本節不訓練模型，最後產出的是「還剩哪些錯，SFT 可能有幫助」的假說，交給第 42～44 節驗證。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Prompt、RAG 與 SFT 的選擇
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E09_prompt_rag_sft.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[相同任務與評估資料] --> B[Prompt baseline / few-shot]
+    A --> C[RAG few-shot：檢索 dev 範例]
+    A --> D[SFT：訓練成本與資料需求分析]
+    B --> E[同一評估集比較品質]
+    C --> E
+    D --> F[比較準備成本、可更新性與部署取捨]
+    E --> G[報告準確率與錯誤]
+    F --> G
 ```
 
 ## 學習目標與時間
@@ -65,6 +67,54 @@ flowchart TD
 ## 三、可執行 Demo
 
 預設重播示範機錄下的模型輸出與檢索結果，只需要標準函式庫；同資料夾要有第 43 節的程式（`E08_agent_compare.py` 或講義）與 `data/eval-set.json`、`data/41-prompt-rag-traces.json`。`--live` 需要第 07 節的 Qwen 與第 17 節的 bge 快取，示範機約 2 分鐘。
+
+### Call session 1：Prompt、檢索 few-shot 與 embedding 分類替代方案
+
+**System layer**
+```mermaid
+flowchart TD
+    A[load eval items] --> B[Live 或 Replay 準備檢索與生成結果]
+    B --> C[四種 strategy 各自處理案例]
+    C --> D[parse 並對照 gold]
+    D --> E[報告 dev/holdout、解析失敗與成本]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[Live 建 BGE vectors] --> B[相似度矩陣與 dev pool]
+    B --> C[neighbours 排除自身取 K 筆]
+    C --> D{策略}
+    D -- zero/fixed/RAG --> E[build_messages 與模型生成]
+    D -- embedding classifier --> F[近鄰標籤投票，不生成]
+    E --> G[parse]
+    F --> H[直接分類結果]
+```
+
+### Call session 2：依錯誤類型選方案而非假設順序升級
+
+**System layer**
+```mermaid
+flowchart LR
+    A[檢視分類錯誤與任務需求] --> B{問題類型}
+    B -- 輸出格式/行為 --> C[比較 zero-shot 與 fixed few-shot]
+    B -- 可更新知識 --> D[比較 RAG few-shot]
+    B -- 只需標籤 --> E[比較 embedding classifier]
+    C --> F[同 parse 與 holdout 評估]
+    D --> F
+    E --> F
+    F --> G[寫下是否值得交由後續 SFT 驗證的假說]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[shots_messages 組對話範例] --> B[build_messages 組 system 與 user]
+    C[neighbours_of 取得相似 dev 範例] --> D[排除案例自身的 leave-one-out 清單]
+    D --> A
+    B --> E[Live.__call__ 生成或 Replay 查記錄]
+    E --> F[parse 與評估]
+```
 
 <!-- demo: E09_prompt_rag_sft.py -->
 ```python

@@ -1,21 +1,24 @@
 # 單代理、固定流程、多代理：品質、延遲與成本比較
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 39 節：單／多 Agent 品質、延遲與成本比較。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 43 節：單／多 Agent 品質、延遲與成本比較。**
 > 第 38 節說「多代理不是升級」，本節用數字檢查。三種架構用**同一個模型、同一份評測集（第 08 節 25 筆）、同樣的輸出上限與每筆呼叫預算**，同時報品質、解析失敗、呼叫數、token 與延遲。核心主張：**比較要控制條件，單代理要用合理的提示，不能拿弱的單代理當陪襯；結果要逐筆看，不能只看平均。** 在示範機的這次實測中，多代理沒有任何一筆比單代理好，退步 2 筆，token 是單代理的 2.4 倍；固定流程最好。
 > **這個結果只適用於這個模型（Qwen2.5-0.5B）和這 25 筆。** 換成更大的模型或其他任務，結論可能不同；本節教的是比較的方法，不是「多代理一定比較差」。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：單／多 Agent 品質、延遲與成本比較
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E08_agent_compare.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[同一組案例與資料] --> B[single-pass 策略]
+    A --> C[fixed decomposition 策略]
+    A --> D[multi-step 策略]
+    B --> E[Replay/Live adapter 正規化呼叫]
+    C --> E
+    D --> E
+    E --> F[逐案例執行並解析標籤]
+    F --> G[評估 accuracy、latency、cost]
+    G --> H[公平彙總與錯誤報告]
 ```
 
 ## 學習目標與時間
@@ -61,6 +64,58 @@ flowchart TD
 ## 四、可執行 Demo
 
 重播只需要 Python 標準函式庫；`--live` 需要 torch、transformers 與 Qwen2.5-0.5B 快取。同資料夾要有 `data/eval-set.json`、`data/39-agent-traces.json`。
+
+### Call session 1：三種策略公平比較
+
+**System layer**
+```mermaid
+flowchart TD
+    A[eval-set.json 載入固定案例] --> B[evaluate 對每筆套用 ARCHS]
+    B --> C{Live 或 Replay}
+    C -->|Live| D[本機 Qwen 生成]
+    C -->|Replay| E[查錄製 trace]
+    D --> F[evaluate 收集各策略結果]
+    E --> F
+    F --> G[report 彙總品質、解析失敗、token、延遲]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[evaluate 選定架構與案例] --> B[run_arch 初始化 calls]
+    B --> C[arch(text, call) 執行策略]
+    C --> D{single / fixed / multi}
+    D --> E[call 檢查 CALL_BUDGET]
+    E --> F[Live 生成或 Replay 查 trace]
+    F --> G[parse 標籤並計 token / 時間]
+    G --> H[結果回到 evaluate 對照 gold]
+```
+
+### Call session 2：定位策略分歧與預算影響
+
+**System layer**
+```mermaid
+flowchart LR
+    A[同一案例文字] --> B[single]
+    A --> C[fixed]
+    A --> D[multi]
+    B --> E[逐筆結果並列]
+    C --> E
+    D --> E
+    E --> F[識別改善、退步、無差別]
+    F --> G[改 CALL_BUDGET 再比較失敗與成本]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[fixed 呼叫證據 gate] --> B{gate 有直接證據？}
+    B -- no --> C[回 unknown]
+    B -- yes --> D[呼叫 missing/present 判斷]
+    E[multi 呼叫 auditor 與 foreman] --> F{parse 結果一致？}
+    F -- 是 --> G[採用一致標籤]
+    F -- 否 --> H[呼叫裁判並 parse]
+```
 
 <!-- demo: E08_agent_compare.py -->
 ```python

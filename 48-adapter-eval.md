@@ -1,20 +1,20 @@
 # 微調前後評估與 Adapter 交付
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 44 節：微調前後評估與 Adapter 交付。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 48 節：微調前後評估與 Adapter 交付。**
 > 第 41 節留下一個假說：有些錯是「行為」，SFT 可能有幫助。本節在示範機（8 GB、無 GPU）上**真的訓練**一個很小的 LoRA（Qwen2.5-0.5B，q_proj／v_proj，r=8，訓練資料只有 dev 15 筆，約 100 秒），然後在公平條件下比較：base zero-shot、base 檢索 few-shot（第 41 節）、base＋adapter。另外檢查非分類問題有沒有退步、合併前後是否一致，最後寫出 artifact manifest。核心主張：**微調要跟合理的 baseline 比；交付的是「base revision＋adapter＋設定＋評估紀錄」這一組，少一樣就無法重現。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：微調前後評估與 Adapter 交付
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 51_adapter_eval.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[固定 holdout 與分類 prompt] --> B[評估 base 模型]
+    B --> C[訓練/載入 LoRA adapter]
+    C --> D[評估 adapter 模型]
+    D --> E[merge adapter 權重]
+    E --> F[比較 merged 與 adapter 輸出 parity]
+    F --> G[記錄 hash、指標與交付結果]
 ```
 
 ## 學習目標與時間
@@ -49,6 +49,53 @@ flowchart TD
 預設**重播**示範機的訓練與評估紀錄，只需要標準函式庫；同資料夾要有第 39、41 節的程式（`NN_*.py` 或講義）與 `data/eval-set.json`、`data/41-prompt-rag-traces.json`、`data/44-adapter-record.json`。
 
 `--train` 會真的訓練並把 adapter 寫到 `51-adapter/`，需要 `torch`、`transformers`、**`peft==0.17.1`**（會一起裝 `accelerate 1.15.0`、`psutil 7.2.2`）與第 07 節的 Qwen 快取。示範機 4-learn 全程約 2 分 41 秒（訓練約 100 秒），峰值記憶體約 3.9 GB。
+
+### Call session 1：Base、adapter 與合理 baseline 評估
+
+**System layer**
+```mermaid
+flowchart TD
+    A[載入評測資料] --> B[train_and_evaluate 載入 base]
+    B --> C[base zero-shot 與檢索 few-shot]
+    B --> D[dev 訓練 LoRA adapter]
+    D --> E[holdout adapter 評估與 probes]
+    C --> F[比較分類、退步與解析結果]
+    E --> F
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[load_base] --> B[run_eval base labels/probes]
+    B --> C[encode prompt 與 target]
+    C --> D[labels prompt 設為 -100]
+    D --> E[get_peft_model 與 Trainer 訓練]
+    E --> F[run_eval adapter]
+    F --> G[與 base 檢索 few-shot 結果對照]
+```
+
+### Call session 2：Merge parity 與可重現交付
+
+**System layer**
+```mermaid
+flowchart LR
+    A[base revision 與訓練設定] --> B[adapter 儲存至 OUT]
+    B --> C[manifest 記錄檔案 hash 與評估]
+    C --> D[載入 adapter 模型與 merged 模型]
+    D --> E[同一組 prompts 比較輸出 parity]
+    E --> F[形成交付/待驗證報告]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[PeftModel.from_pretrained 載入 adapter] --> B[merged = peft.merge_and_unload]
+    B --> C[run_eval merged]
+    C --> D{merged labels/probes 等於 adapter？}
+    D -- 是 --> E[記錄 parity]
+    D -- 否 --> F[報告差異，不宣稱等價]
+    E --> G[建立 artifact manifest]
+```
 
 <!-- demo: 51_adapter_eval.py -->
 ```python

@@ -2,18 +2,27 @@
 
 > **正文改版：2026-04-16｜對應新版 LLM 第 08 節：Prompt 與 Context Engineering。**本節把提示設計視為可測試的輸入工程，練習把任務、資料與限制分開；本節不是保證模型服從，也不是特定供應商語法指南。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Prompt 與 Context Engineering
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 08_prompt_context.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[Instructions 與 documents] --> B[計算預算：預設 len 字元代理]
+    B --> C{budget 非負且 count callable？}
+    C -- 否 --> X[輸入錯誤]
+    C -- 是 --> D[驗證 instruction 計數為非負整數]
+    D --> E{instructions 超預算？}
+    E -- 是 --> F[立即 ValueError]
+    E -- 否 --> G[used 設為 instruction cost]
+    G --> H[依原序逐份計算 document cost]
+    H --> I{used + cost 不超預算？}
+    I -- 是 --> J[加入 kept 並更新 used]
+    I -- 否 --> K[略過此文件，繼續下一份]
+    J --> L{還有文件？}
+    K --> L
+    L -- 是 --> H
+    L -- 否 --> M[回傳 kept 與 used]
 ```
 
 ## 學習目標與時間

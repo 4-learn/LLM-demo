@@ -1,9 +1,9 @@
 # RAG 引用與查無答案
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 24 節：RAG 引用與查無答案。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 27 節：RAG 引用與查無答案。**
 > 把第 19–23 節接起來：合格過濾 → 檢索 → 上下文預算 → 生成 → **驗證** → 處置。核心主張：**回答能不能送出，由驗證器決定，不由模型決定**；而且要分清「找不到」「資料衝突」「檢索故障」三種不同的失敗，各有不同的處置。只用 Python 標準函式庫；生成由劇本扮演（與第 14 節相同做法），換成真實模型只要換掉 `generate` 一個函式。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：RAG 引用與查無答案
 
@@ -68,6 +68,57 @@ flowchart TD
 ## 三、可執行 Demo
 
 九個案例，用 MariaDB 課的 qrels 題目當查詢。`SCRIPT` 是每個案例「模型」的回覆，刻意寫成各種錯誤。
+
+### Call session 1：檢索、上下文與生成
+
+系統層 call-session 流程：
+
+```mermaid
+flowchart LR
+    A[使用者問題] --> B[候選文件與 qrels]
+    B --> C[合格條件過濾]
+    C --> D[建立有界上下文]
+    D --> E[ScriptedGenerator 回覆]
+    E --> F[引用驗證器]
+```
+
+函式內部流程：
+
+```mermaid
+flowchart TD
+    A[輸入候選文件] --> B[eligible 篩選]
+    B --> C[依相關度排序與預算截斷]
+    C --> D[build_context 組 source 區塊]
+    D --> E[claim 取得預錄回答]
+    E --> F[輸出候選答覆供驗證]
+```
+
+### Call session 2：引用逐字核對與拒答處置
+
+系統層 call-session 流程：
+
+```mermaid
+flowchart LR
+    A[候選回答與引用] --> B[verify 檢查引用存在]
+    B --> C{是否可支持？}
+    C -- 否 --> D[拒答或標記 unsupported]
+    C -- 是 --> E[handle 套用政策]
+    D --> F[回傳安全處置]
+    E --> F
+```
+
+函式內部流程：
+
+```mermaid
+flowchart TD
+    A[解析答案宣稱與 source ID] --> B[確認 source 在實際上下文]
+    B --> C[比對引用文字/證據片段]
+    C --> D{所有必要引用有效？}
+    D -- 否 --> E[驗證失敗]
+    D -- 是 --> F[標記通過]
+    E --> G[形成最終處置]
+    F --> G
+```
 
 <!-- demo: E08_rag_citations.py -->
 ```python

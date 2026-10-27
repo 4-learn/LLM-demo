@@ -1,9 +1,9 @@
 # 流程里程碑：沿用骨架整合
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 32 節：流程里程碑：沿用骨架整合。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 35 節：流程里程碑：沿用骨架整合。**
 > 前面八節各自做好了一塊：引用驗證、副作用政策、重試與冪等、trace、分支、HITL。各自的測試都通過，不代表接在一起還對。核心主張：**里程碑不是重寫，而是直接載入前面各節的程式接成一條流程，用固定案例證明「正常、unknown、拒絕、工具失敗」四類都走對、拒絕時副作用為零、失敗也留下紀錄，並誠實列出還沒涵蓋的風險。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：流程里程碑：沿用骨架整合
 
@@ -64,6 +64,56 @@ flowchart TD
 3. **trace 是否涵蓋每條結束路徑**：Workshop 會看到它沒有。
 
 ## 三、可執行 Demo
+
+### Session 1：整合圖與跨課節點接線
+
+**系統層：沿用課程模組串起整合圖**
+
+```mermaid
+flowchart LR
+    A[輸入案件] --> B[build(world, script_case)]
+    B --> C[LangGraph 整合流程]
+    C --> D[課程模組：RAG / policy / retry / trace]
+    D --> E[結果與節點紀錄]
+```
+
+**函式內部：`build` 建圖並注入依賴**
+
+```mermaid
+flowchart TD
+    A[build(world, script_case)] --> B[設定節點與 state]
+    B --> C[連接正常路徑]
+    C --> D[連接 unknown / error 分支]
+    D --> E[編譯 graph]
+    E --> F[回傳可執行 graph]
+```
+
+### Session 2：正常、unknown 與錯誤結果觀察
+
+**系統層：三類情境經同一整合入口**
+
+```mermaid
+flowchart LR
+    A[scenario case] --> B[run_case]
+    B --> C{情境}
+    C -- normal --> N[正常完成]
+    C -- unknown --> U[資訊不足 / 人工處置]
+    C -- error --> X[錯誤與安全收尾]
+    N --> T[檢視 trace]
+    U --> T
+    X --> T
+```
+
+**函式內部：`run_case` 執行並收集結果**
+
+```mermaid
+flowchart TD
+    A[run_case(case, unmasked)] --> B[建立 World]
+    B --> C[build]
+    C --> D[invoke graph]
+    D --> E[擷取 final state]
+    E --> F[回傳結果供 main 報告]
+```
 
 需要 `langgraph==1.2.12`，不需要模型；語料讀 MariaDB 課的 `data/sop_corpus.json` 與 `data/search_cases.json`（同第 24 節）。
 

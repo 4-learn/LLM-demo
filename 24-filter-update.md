@@ -1,20 +1,21 @@
 # Metadata 過濾與版本更新
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 22 節：Metadata 過濾與版本更新。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 24 節：Metadata 過濾與版本更新。**
 > 第 21 節把向量存進 MariaDB，排名與精確 baseline 相同。資料會變：文件改版、有人補了沒審過的內容、模型要換。本節用同一張表、同一組 Python 介面（`upsert`、`search`、`set_status`、`delete`、`versions`），不寫 SQL，做五件事：比較**前過濾與後過濾**、**更新一段文字**（新版上線、舊版撤下）、擋住**未覆核**的段落、**刪除**、**換模型時不混查**。最後把資料表還原，可以重跑。核心主張：**過濾要在排序之前；更新要撤掉舊版本；權限與覆核是兩件事；每一個情境都要有更新前後的查詢測試。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Metadata 過濾與版本更新
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E08_filter_update.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[還原初始版本資料] --> B[查詢前套用 allowed／review／status／model revision]
+    B --> C[過濾後排序並比較前過濾／後過濾]
+    C --> D[更新文字：新版本 active、舊版 retired]
+    D --> E[驗證更新前後結果與舊版不殘留]
+    E --> F[測試 pending 不可檢索及刪除]
+    F --> G[檢查新舊 embedding revision 不混查]
+    G --> H[還原資料並輸出驗證結果]
 ```
 
 ## 學習目標與時間

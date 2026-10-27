@@ -1,20 +1,20 @@
 # 量化與 CPU 實驗
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 46 節：量化與 CPU 實驗。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 E07 節：量化與 CPU 實驗。**
 > 「量化會更省、更快，品質差不多」是常見說法。本節在示範機的 CPU 上，用同一個 Qwen2.5-0.5B、同一份提示與解碼，只改精度：float32、bfloat16、torch 內建的 int8 動態量化（全部 Linear），以及看過激活值統計後才決定的「跳過 down_proj」版本。每個條件在**獨立子程序**裡跑，才量得到各自的峰值記憶體。結果和常見說法**大多不符**：bfloat16 省一半記憶體但 TTFT 慢 6 倍；int8 全部量化之後 25 筆有 24 筆連標籤都解析不出來，而且峰值記憶體一點都沒省。核心主張：**量化的效果要在你的硬體、你的 runtime、你的任務上實測；失敗也要完整記錄，不能只報成功的條件。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：量化與 CPU 實驗
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_quant_cpu.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[固定 prompt 與 CPU 環境] --> B[分離 worker 測量條件]
+    B --> C[載入 float32/bf16/int8 變體]
+    C --> D[同一輸入生成與品質檢查]
+    D --> E[測量時間、峰值記憶體、版本]
+    E --> F[依條件彙整 latency/resource/accuracy]
+    F --> G[比較量化取捨，不推廣到不同硬體]
 ```
 
 ## 學習目標與時間
@@ -46,6 +46,54 @@ flowchart TD
 ## 二、可執行 Demo
 
 預設重播示範機的紀錄，只需要標準函式庫；同資料夾要有第 39、45 節的程式（`NN_*.py` 或講義）與 `data/eval-set.json`、`data/46-quant-record.json`。`--live` 需要 `torch`、`transformers` 與第 07 節的 Qwen 快取，四個條件各開一個子程序，示範機約 6 分鐘。每個條件上限 600 秒，逾時或失敗只記錄、不重試。峰值 RSS 用 `resource` 模組讀，Windows 沒有這個模組（同第 07 節）。
+
+### Call session 1：CPU 精度變體公平比較
+
+**System layer**
+```mermaid
+flowchart TD
+    A[CONDITIONS 四種精度] --> B[measure 為每條件啟動獨立 worker 子程序]
+    B --> C[worker 載入同 revision、tokenizer、prompt]
+    C --> D[同評測集生成與 latency 測量]
+    D --> E[收集 RSS、載入、TTFT/ITL、accuracy]
+    E --> F[report 彙整成功/逾時/失敗]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[worker(condition)] --> B[載入 float32/bfloat16 base]
+    B --> C{condition 是 int8？}
+    C -- 是 --> D[quantize_dynamic 指定 Linear]
+    C -- 否 --> E[保留 dtype]
+    D --> F[generate 固定 prompt/greedy]
+    E --> F
+    F --> G[記錄 RSS 與 Stamps 時間]
+```
+
+### Call session 2：量化失敗與 down_proj 激活值診斷
+
+**System layer**
+```mermaid
+flowchart LR
+    A[float32 baseline hooks 記錄激活值] --> B[比較 int8-dynamic 輸出與解析]
+    B --> C[識別異常層與 outlier]
+    C --> D[事後測試 int8-skip-down]
+    D --> E[對照品質/記憶體/延遲]
+    E --> F[完整保留失敗/改善條件]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[condition float32 註冊 forward hooks] --> B[hook 記錄 max/median 絕對輸入]
+    C[condition.startswith int8] --> D[選擇排除 lm_head 或 down_proj]
+    D --> E[torch.ao.quantization.quantize_dynamic]
+    B --> F[輸出 activation_top]
+    E --> G[generate 標籤及延遲]
+    F --> H[report 解讀量化與 outlier]
+    G --> H
+```
 
 <!-- demo: E07_quant_cpu.py -->
 ```python

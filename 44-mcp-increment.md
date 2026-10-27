@@ -1,20 +1,22 @@
 # MCP 增量整合里程碑
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 40 節：MCP 增量整合里程碑。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 44 節：MCP 增量整合里程碑。**
 > 第 32 節把 RAG、政策、HITL、重試、trace 接成一條流程；第 33～37 節做了 MCP server 與 client。本節**不另建系統**：直接載入第 32 節的流程，graph、政策、HITL、重試、trace 一行都不改，只把「開單服務」換成一個 stdio MCP server。換之前、換之後跑同一組 9 個案例，對照輸出契約與副作用。核心主張：**換 transport 是增量，不是重寫；驗收是「同一組案例、同一份契約」，不是「MCP 跑起來了」。但契約裡有些東西（例如冪等）不會自動跟著搬過去，要在新的那一側重新驗證。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：MCP 增量整合里程碑
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 51_mcp_increment.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[建立 ticket MCP tool 與 idempotency key] --> B[client 發 JSON-RPC 呼叫]
+    B --> C[注入暫時/永久故障]
+    C --> D{錯誤可重試？}
+    D -- 是 --> E[有限重試]
+    D -- 否 --> F[回報根因]
+    E --> G[以相同冪等鍵建立工單]
+    G --> H[統計副作用與重複工單]
+    F --> H
 ```
 
 ## 學習目標與時間
@@ -51,6 +53,56 @@ flowchart TD
 ## 二、可執行 Demo
 
 需要 `langgraph==1.2.12`、`mcp==2.3.0`。同資料夾要有第 24、26、29、31、32 節的程式（`NN_*.py` 或講義 `NN-*.md`），以及 `data/sop_corpus.json`、`data/search_cases.json`（同第 24 節）。示範機約 22 秒，大部分時間在等 I-RETRY 的逾時（每案例各一次，3 秒）。
+
+### Call session 1：MCP transport 替換與契約對照
+
+**System layer**
+```mermaid
+flowchart TD
+    A[run_case 建立同一案例] --> B[L31.build 建立既有 graph]
+    B --> C[world.tickets 選本地或 McpTickets]
+    C --> D[app.invoke 執行流程]
+    D --> E[summary 收集結果、副作用、trace]
+    E --> F[比較替換前後契約]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[McpTickets.create] --> B[Client.call_tool create_ticket]
+    B --> C{回應/例外}
+    C -- timeout/連線 --> D[翻譯為 RETRY.TransientError]
+    C -- 401 --> E[翻譯為 RETRY.PermanentError]
+    C -- 429 --> D
+    C -- success --> F[解析 JSON 回傳]
+    D --> G[L31 graph 有限重試]
+```
+
+### Call session 2：逾時後寫入與冪等鍵
+
+**System layer**
+```mermaid
+flowchart LR
+    A[run_case I-RETRY] --> B[McpTickets 呼叫 server]
+    B --> C[server 寫入票券]
+    C --> D[timeout_after_write 延遲回應]
+    D --> E[client 重試同一案例]
+    E --> F[讀 tickets 實際副作用]
+    F --> G[對照遵守/不遵守冪等]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[create_ticket 讀故障事件] --> B{429/401/timeout_after_write?}
+    B -- 429 --> C[ToolError 限流]
+    B -- 401 --> D[ToolError 未授權]
+    B -- write timeout --> E[寫 STORE 後 sleep]
+    B -- ok --> F[檢查 HONOUR 與 idempotency_key]
+    F --> G{已存在且遵守？}
+    G -- 是 --> H[回傳原票券]
+    G -- 否 --> I[建立、寫入新票券]
+```
 
 <!-- demo: 51_mcp_increment.py -->
 ```python

@@ -1,21 +1,31 @@
 # Trace 觀測與本地免費備援
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 31 節：Trace 觀測與本地免費備援。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 34 節：Trace 觀測與本地免費備援。**
 > 流程出錯時，要能回答三件事：**錯在哪一步、時間花在哪裡、紀錄裡有沒有不該留下的個資**。本節用 Python 標準函式庫寫一個本地 tracer：每一步記一個 span，寫成 JSONL，再載入 SQLite 查詢。**不需要 LangSmith 帳號，也不上傳任何資料。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Trace 觀測與本地免費備援
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 51_local_trace.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
-```
+    A[請求] --> B[建立 root trace span]
+    B --> C[retrieve span]
+    C --> D[generate span：劇本輸出]
+    D --> E[policy span：角色授權檢查]
+    E -- 拒絕 --> F[結束 root 為 denied]
+    E -- 允許 --> G[tool span]
+    G --> H[attempt span：工具呼叫]
+    H --> I{工具成功？}
+    I -- 否且可重試 --> H
+    I -- 連續失敗 --> J[tool/root 記錄 error]
+    I -- 是 --> K[tool/root 記錄 ok]
+    F --> L[遮罩敏感內容並寫 JSONL spans]
+    J --> L
+    K --> L
+    L --> M[載入 SQLite 查詢狀態、父子關係與故障位置]
+    M --> N{比較遮罩與 parent 連結設定}
+    N --> O[檢視個資洩漏及孤兒 span]
 
 ## 學習目標與時間
 

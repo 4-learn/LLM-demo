@@ -3,18 +3,26 @@
 > **新版正文：20E07-E03-05｜對應新版 LLM 第 16 節：原生 Function Calling 完整工具回合。**
 > 不用任何 orchestration 框架，親手跑完一個工具回合：**模型提出 → 程式決定 → 執行 → 結果回模型 → 最終答覆**。核心主張：**模型不執行函式，應用程式才執行。** 必做路徑只用 Python 標準函式庫與協定重播（fixtures）；另提供選做 NVIDIA Build live 對照，實際工具執行仍由本機程式控制。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：原生 Function Calling 完整工具回合
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E03_tool_round.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[使用者問題與工具 schema] --> B[模型回覆 assistant tool_call]
+    B --> C[檢查 call 結構與唯一 ID]
+    C -- 協定錯誤 --> X[停止，不執行工具]
+    C -- 合法 --> D[execute 解析 JSON 並檢查 allowlist/schema]
+    D --> E{參數有效？}
+    E -- 否 --> F[回傳 tool error 並保留 call_id]
+    E -- 是 --> G[本機唯讀 executor count_events]
+    G --> H[回傳 tool result 並保留 call_id]
+    F --> I[將結果附回 messages]
+    H --> I
+    I --> J{是否有回合預算？}
+    J -- 有 --> K[再呼叫模型，取得 final 或下一個 tool_call]
+    J -- 無 --> L[停止並揭露尚無 final]
+    K --> M[展示結果與事件紀錄]
 ```
 
 ## 學習目標與時間
@@ -85,6 +93,63 @@ flowchart TD
 為什麼先用重播？因為**應用程式這一側的邏輯（驗證、allowlist、上限、ID 配對）跟模型無關**，而且是最常寫錯的部分。先把它寫對、寫測試，再接上真的模型。
 
 ## 五、可執行 Demo
+
+### Session 1：工具 schema 與提議轉執行契約
+
+**系統層：schema 到本機執行器的邊界**
+
+```mermaid
+flowchart LR
+    Q[使用者問題] --> M[ScriptedModel 或 NVIDIA Chat Completions]
+    S[TOOLS schema] --> M
+    M -->|tool_calls| H[應用程式 host]
+    H --> V[validate_args]
+    V --> X[execute]
+    X --> T[count_events 唯讀工具]
+```
+
+**函式內部：`validate_args` 與 `execute`**
+
+```mermaid
+flowchart TD
+    A[execute(call)] --> B[解析 function name 與 arguments]
+    B --> C{JSON 是 object 且工具在 TOOLS?}
+    C -- 否 --> E[回傳拒絕結果，不執行]
+    C -- 是 --> D[validate_args]
+    D --> F{參數有效?}
+    F -- 否 --> E
+    F -- 是 --> G[呼叫 TOOLS[name]]
+```
+
+### Session 2：工具結果回填、呼叫 ID 與回合上限
+
+**系統層：工具結果回到模型後的閉環**
+
+```mermaid
+flowchart LR
+    M[模型提出 tool_call] --> H[host 驗證與執行]
+    H --> R[tool result]
+    R -->|相同 call_id| C[messages]
+    C --> B{MAX_TOOL_ROUNDS 尚未耗盡?}
+    B -- 是 --> N[再次呼叫模型]
+    B -- 否 --> S[停止並報告無 final]
+    N --> F[final 或下一個 tool_call]
+```
+
+**函式內部：`run_turn`、`call_ids_match`**
+
+```mermaid
+flowchart TD
+    A[run_turn(model, question)] --> B[取得模型回覆]
+    B --> C{tool_calls 為空?}
+    C -- 是 --> D[記錄 final]
+    C -- 否 --> E[逐 call 呼叫 execute]
+    E --> F[附加帶 tool_call_id 的結果]
+    F --> G[call_ids_match 檢查配對]
+    G --> H{仍有回合預算?}
+    H -- 是 --> B
+    H -- 否 --> I[停止]
+```
 
 情境：一個唯讀的合成事件查詢工具 `count_events`。四個情境：完整協定重播、無效參數、要求不在 allowlist 的工具、模型不會自己停。完整回合中的最終答覆為預錄 fixture，不是模型根據工具輸出現場生成。回合上限情境會在最後一組工具結果後停止，該結果尚未再送模型，故沒有最終答覆。
 

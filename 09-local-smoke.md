@@ -1,4 +1,4 @@
-# 07｜工地電腦跑得動嗎？
+# 09｜工地電腦跑得動嗎？
 
 > **定位**：選好模型後，下載到自己的電腦（沒有 GPU）跑跑看：證明它跑得動，或清楚說出為什麼跑不動。
 
@@ -384,7 +384,7 @@ HF_HUB_OFFLINE=1 python E02_cpu_smoke.py --ram-mib 2000 --record smoke-small.jso
 寫一支 `E02_workshop.py`，用本機的 Qwen2.5-0.5B-Instruct 把下面這筆事件寫成一句報告：
 
 ```python
-EVENT = {"event_id": "EVT-0042", "time": "20E07-E01-03 09:12", "site": "B 棟 3F",
+EVENT = {"event_id": "EVT-0042", "time": "2026-11-03 09:12", "site": "B 棟 3F",
          "detector": "camera-07", "label": "no_helmet", "confidence": 0.82,
          "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
 ```

@@ -1,20 +1,22 @@
 # MariaDB Vector 持久化銜接
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 21 節：MariaDB Vector 持久化銜接。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 23 節：MariaDB Vector 持久化銜接。**
 > 第 20 節的精確檢索把 16 段向量放在 Python 的記憶體裡，程式一結束就沒了。本節把同一批向量存進 MariaDB 的 `VECTOR(512)` 欄位，**關掉連線、開一個新的程序再查**，排名要與第 20 節逐題相同。這一梯次的學員在 MariaDB 課第 18–20 節已經學過 schema、入庫與向量索引，本節**不重教 SQL**：資料表由教師預先建立，學員用只能讀寫的 `course_app` 帳號，透過一個 Python 介面（`upsert`、`search`）操作。沒有資料庫時，同一個介面改用記憶體 fixtures，**輸出會明講「沒有測到持久化」**。核心主張：**持久化要用「新程序看得到」來證明；換了儲存層，排名要和精確 baseline 對得上。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：MariaDB Vector 持久化銜接
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_vector_store.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[向量檔與 metadata] --> B[載入並核對模型/revision/hash/dimension]
+    B --> C[統一 FixtureStore 或 MariaStore 介面]
+    C --> D[以穩定 key upsert 與版本標記]
+    D --> E[查詢時套用 active/approved/revision 篩選]
+    E --> F[向量相似度排序]
+    F --> G[與記憶體 exact baseline 比對]
+    G --> H[關閉後以 query_only 子程序驗證持久化]
+    H -. Fixture 不宣稱持久化 .-> I[報告錯誤/拒絕路徑]
 ```
 
 ## 學習目標與時間
@@ -75,6 +77,53 @@ CREATE TABLE llm_chunk_vectors (
 距離用 cosine：向量已正規化，所以 `1 − 距離` 就是第 20 節的內積分數。本節**不建向量索引**（16 筆，全量計算就是精確結果）；索引與 `EXPLAIN` 在 MariaDB 課第 20 節，近似檢索會讓排名可能與精確 baseline 不同，要另外量 recall。
 
 ## 三、可執行 Demo
+
+### Session 1：向量來源與資料列 provenance
+
+**系統層：語料、embedding 與持久化記錄**
+
+```mermaid
+flowchart LR
+    C[corpus 與 cases] --> E[encode 或讀取 frozen vectors]
+    E --> R[rows_from]
+    R --> S[FixtureStore 或 MariaStore]
+    S --> P[chunk / embedding / source metadata]
+```
+
+**函式內部：`rows_from` 建構來源可追溯的資料列**
+
+```mermaid
+flowchart TD
+    A[rows_from(corpus, chunks)] --> B[逐 chunk 讀取來源欄位]
+    B --> C[text_hash 與 embedding]
+    C --> D[組合持久化 row]
+    D --> E[回傳 rows]
+```
+
+### Session 2：Upsert、查詢與跨程序持久化
+
+**系統層：資料庫寫入到獨立查詢程序**
+
+```mermaid
+flowchart LR
+    A[open_store] --> B[MariaStore 或 FixtureStore]
+    B --> C[upsert vectors]
+    C --> D[commit 與持久化]
+    D --> E[獨立 query-only 執行]
+    E --> F[run_queries]
+    F --> G[依 provenance 回報命中]
+```
+
+**函式內部：`query_only` 選擇 store 並執行查詢**
+
+```mermaid
+flowchart TD
+    A[query_only(force_fixtures)] --> B[open_store]
+    B --> C[load corpus / cases / queries]
+    C --> D[run_queries]
+    D --> E[ranking 與來源 metadata]
+    E --> F[關閉 store]
+```
 
 需要：同資料夾第 20 節的程式（`E07_*.py` 或講義）、`data/sop_corpus.json`、`data/search_cases.json`、`data/21-vectors.json`（示範機用第 17、20 節同一模型與 revision 算好的向量，所以不必載入模型）。
 
