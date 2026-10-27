@@ -1,19 +1,23 @@
-# 進階 LLM/RAG 評估、Judge 校準與回歸測試
+# 11｜進階 LLM/RAG 評估、Judge 校準與回歸測試
 
 > **正文改版：2026-04-16｜對應新版 LLM 第 11 節：進階 LLM/RAG 評估、Judge 校準與回歸測試。**本節以小型標註資料示範分類指標、裁判校準與回歸比較；本節不是用少量合成案例證明系統可部署。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：進階 LLM/RAG 評估、Judge 校準與回歸測試
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 11_llm_evaluation.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[truth 與 predicted 標籤] --> B{非空且長度相等？}
+    B -- 否 --> X[ValueError]
+    B -- 是 --> C{標籤皆為整數 0/1？}
+    C -- 否 --> X
+    C -- 是 --> D[累計 TP FP FN]
+    D --> E[precision：分母為零則回 0]
+    D --> F[recall：分母為零則回 0]
+    E --> G[回傳指標 tuple]
+    F --> G
+    H[課程延伸：人工雙評與 Judge 校準] -. 不由本 demo 實作 .-> I[固定案例回歸及逐案差異]
 ```
 
 ## 學習目標與時間

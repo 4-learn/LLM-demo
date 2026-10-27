@@ -2,19 +2,30 @@
 
 > **正文改版：2026-10-24｜對應新版 LLM 第 41 節：Agent 設計模式與記憶。**本節以純標準庫的模擬執行器辨認 workflow 與 agent 的分界，並實作停止條件及有來源、可拒收的記憶；本節不是自主模型或生產代理框架實測。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Agent 設計模式與記憶
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 41_agent_patterns.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
-```
+    A[輸入 observations 與記憶] --> B{選擇模式}
+    B -- 固定 workflow --> C[依預定步驟執行]
+    B -- 受限 agent --> D[觀察當前輸入]
+    D --> E{完成／步數上限？}
+    E -- 否 --> F[依固定政策選 lookup 或 summarize]
+    F --> G{工具在 allowlist？}
+    G -- 否 --> H[停止：blocked]
+    G -- 是 --> I[執行工具並記錄 trace]
+    I --> D
+    E -- 是且完成 --> J[停止：done]
+    E -- 達上限 --> K[停止：limit]
+    L[新增記憶] --> M{來源可信且已核實？}
+    M -- 否 --> N[拒收記憶]
+    M -- 是 --> O[保存來源與核實狀態]
+    C --> P[比較固定路徑與 agent 選擇／停止結果]
+    H --> P
+    J --> P
+    K --> P
 
 ## 學習目標與時間
 

@@ -1,19 +1,21 @@
-# OWASP LLM Top 10 與 Guardrails
+# 13｜OWASP LLM Top 10 與 Guardrails
 
 > **正文改版：2026-04-16｜對應新版 LLM 第 13 節：OWASP LLM Top 10 與 Guardrails。**本節以純 Python 的規則分類器示範輸入檢查、拒絕與人工作業邊界；本節不是完整 OWASP 清單，也不是生產級安全防護。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：OWASP LLM Top 10 與 Guardrails
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 13_llm_guardrails.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[不可信輸入] --> B[檢查輸入型別為字串]
+    B -- 否 --> X[TypeError]
+    B -- 是 --> C[casefold 正規化]
+    C --> D{命中封鎖字串？}
+    D -- 是 --> E[review 人工覆核]
+    D -- 否 --> F[allow 規則通過]
+    G[零寬字元/變體] --> H[展示規則可被繞過]
+    H -. 不代表完整防護 .-> I[下游仍需權限及輸出驗證]
 ```
 
 ## 學習目標與時間

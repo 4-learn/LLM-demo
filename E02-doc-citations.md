@@ -1,20 +1,23 @@
 # 文件摘要、來源與頁碼
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 12 節：文件摘要、來源與頁碼。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 E02 節：VLM 文件摘要、來源與頁碼。**
 > 摘要的每一點都要能回到原文：哪份文件、哪一版、哪一頁、哪一句。本節用一份合成的手冊掃描檔（3 頁，印刷頁碼 6、7、9，**缺第 8 頁**，第 2 頁模糊），比較兩條讀取路徑：直接用文字層、讓本地 SmolVLM 看圖轉寫；再用程式逐點核對一份摘要草稿的頁碼與原文片段。核心主張：**頁碼與片段必須能被程式驗證；PDF 頁序不是印刷頁碼；看不清的頁要標出來，不能讓模型補寫。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：VLM 文件摘要、來源與頁碼
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E02_doc_citations.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[PDF 頁面圖像與頁面文字真值] --> B[VLM 逐頁轉寫/裁切提問]
+    B --> C[抽取答案主張與引用頁碼]
+    C --> D[檢查頁碼、snippet 與原文相似度]
+    D --> E{證據支持引用？}
+    E -- 否 --> F[標示不支持/拒答]
+    E -- 是 --> G[接受引用主張]
+    H[文件/影像 hash 與 replay] --> I[產生可核查報告]
+    F --> I
+    G --> I
 ```
 
 ## 學習目標與時間
@@ -56,6 +59,53 @@ flowchart TD
 ## 三、可執行 Demo
 
 重播只需要標準函式庫；`--live` 需求同第 10 節。`--pages pages/` 存下 3 張頁面圖。
+
+### Call session 1：文件版本、PDF 頁序與印刷頁碼對照
+
+**System layer**
+```mermaid
+flowchart TD
+    A[PAGES 文字真值與掃描圖] --> B[run_model VLM 逐頁轉寫/切塊比較]
+    A --> C[doc_hash 建立版本識別]
+    B --> D[建立轉寫與頁碼對照]
+    C --> E[check_point 驗證摘要草稿]
+    D --> E
+    E --> F[列出通過/退回與原因]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[printed_to_pdf 建映射] --> B[check_point 讀 printed_page]
+    B --> C{印刷頁碼存在？}
+    C -- 否 --> D[退回缺頁/錯把 PDF 頁序當頁碼]
+    C -- 是 --> E[定位 pages_text 對應 PDF 頁]
+    E --> F{quote 原文完全存在？}
+    F -- 是 --> G[通過]
+    F -- 否 --> H[similarity 找最接近原文並退回]
+```
+
+### Call session 2：片段驗證與模糊頁不補寫
+
+**System layer**
+```mermaid
+flowchart LR
+    A[摘要草稿含頁碼與 quote] --> B[驗證頁碼存在與映射]
+    B --> C[逐字檢查 quote]
+    C --> D[對不符片段計相似度]
+    D --> E[對照文字層與 VLM 轉寫]
+    E --> F[模糊頁降低信任並標示未知]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[draw(pdf_page) 建掃描圖] --> B[image_hash 核對圖像]
+    B --> C[processor.apply_chat_template 與圖片生成轉寫]
+    C --> D[missing_lines 比對漏行]
+    D --> E[similarity 計算整頁相似度]
+    E --> F[check_point 驗 quote 與頁碼]
+```
 
 <!-- demo: E02_doc_citations.py -->
 ```python

@@ -1,21 +1,32 @@
 # MCP 角色與工具參數契約
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 33 節：MCP 角色與工具參數契約。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 36 節：MCP 角色與工具參數契約。**
 > MCP（Model Context Protocol）讓工具能用同一種格式被不同的應用程式發現與呼叫。常見誤解是「接上 MCP，模型就能用那些工具了」，好像權限跟著協定一起來。核心主張：**MCP 是互通協定，不是授權機制。schema 只擋格式，授權要在 server 端由程式檢查，身分由連線決定、不能由參數宣稱；工具說明與 annotations 是 server 的自我宣稱，對 host 而言是不可信輸入。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：MCP 角色與工具參數契約
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E08_mcp_contract.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
-```
+    A[Host 建立 MCP Client 與 Server 連線] --> B[Initialize／能力協商]
+    B --> C[Client 列出 tools 與 input schema]
+    C --> D[Host 套用工具 allowlist]
+    D --> E[提交工具名稱與 arguments]
+    E --> F{工具在 allowlist？}
+    F -- 否 --> G[Host 拒絕，不轉送]
+    F -- 是 --> H[Client 傳送 tools/call]
+    H --> I[Server 依 schema 驗證 arguments]
+    I --> J{格式有效？}
+    J -- 否 --> K[Server 拒絕參數]
+    J -- 是 --> L[Server 以連線身分檢查角色與政策]
+    L --> M{角色允許？}
+    M -- 否 --> N[Server 拒絕授權]
+    M -- 是 --> O[執行工具並回傳結果]
+    G --> P[Host 呈現拒絕／結果]
+    K --> P
+    N --> P
+    O --> P
 
 ## 學習目標與時間
 

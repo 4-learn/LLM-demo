@@ -1,10 +1,10 @@
 # 讀真實檔案的 MCP Server
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 36 節：真實檔案資料來源的 MCP Server。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 39 節：真實檔案資料來源的 MCP Server。**
 > 第 33～35 節的工具都讀寫在程式裡的資料。本節讓 MCP server 每次呼叫都去讀磁碟上的檔案：改了檔案，結果就跟著變，並附上來源雜湊。核心主張：**「讀真檔案」就要處理路徑。模型（或任何呼叫者）給的路徑都不可信，要先 `resolve()` 解開 `..` 與符號連結，再確認仍在允許的目錄內。字串比字首、只消去 `..` 都擋不完。**
 > 「真資料來源」指的是真的做磁碟 I/O，**不是**使用真實個資。本節所有檔案都是程式當場寫出的合成資料。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：真實檔案資料來源的 MCP Server
 
@@ -91,6 +91,58 @@ server 有四個唯讀工具：
 ```
 
 Windows 建立符號連結需要系統管理員權限或開發人員模式；沒有的話這段會在建立目錄時失敗。請在示範機或 WSL 上跑。
+
+### Session 1：允許的資料根目錄與唯讀讀取
+
+**系統層：工具只能讀取明確 sandbox root**
+
+```mermaid
+flowchart LR
+    A[build_workspace(base)] --> B[data root 與合成檔案]
+    B --> C[MCP server tools]
+    C --> D[list_sources / count_events / get_doc]
+    D --> E[read_file 路徑檢查]
+    E --> F[唯讀內容與 source hash]
+```
+
+**函式內部：`read_file` 驗證路徑再讀檔**
+
+```mermaid
+flowchart TD
+    A[read_file(path)] --> B[locate(path)]
+    B --> C{解析後是否位於允許 root?}
+    C -- 否 --> D[拒絕路徑]
+    C -- 是 --> E{檔案存在且可讀?}
+    E -- 否 --> F[回傳明確錯誤]
+    E -- 是 --> G[讀取 bytes]
+    G --> H[sha 與長度上限]
+    H --> I[回傳內容及來源資訊]
+```
+
+### Session 2：攻擊路徑與隔離測試
+
+**系統層：惡意路徑與索引路徑都走同一防護**
+
+```mermaid
+flowchart LR
+    A[使用者相對路徑] --> C[read_file]
+    B[index.json 指向路徑] --> D[get_doc]
+    D --> C
+    C --> E{safe root?}
+    E -- 否 --> X[拒絕 traversal / absolute / prefix / symlink]
+    E -- 是 --> R[唯讀回傳]
+```
+
+**函式內部：`locate` 正規化並限制 root**
+
+```mermaid
+flowchart TD
+    A[locate(relative)] --> B[拒絕絕對路徑]
+    B --> C[resolve 相對於 base]
+    C --> D{resolved path 在 base 下?}
+    D -- 否 --> E[拒絕]
+    D -- 是 --> F[回傳安全路徑]
+```
 
 <!-- demo: E08_mcp_file_source.py -->
 ```python

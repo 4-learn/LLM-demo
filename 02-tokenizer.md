@@ -313,7 +313,7 @@ CORPUS = [
 MERGE_COUNT = 6
 EVENT = {
     "event_id": "EVT-0042",
-    "time": "20E07-E01-03 09:12",
+    "time": "2026-11-03 09:12",
     "site": "B 棟 3F",
     "detector": "camera-07",
     "label": "no_helmet",
@@ -467,7 +467,7 @@ tiny window: fixed overhead does not fit in the context window
 ```python
 EVENT = {
     "event_id": "EVT-0042",
-    "time": "20E07-E01-03 09:12",
+    "time": "2026-11-03 09:12",
     "site": "B 棟 3F",
     "detector": "camera-07",
     "label": "no_helmet",
@@ -499,7 +499,7 @@ pip install transformers
 先建立 `event.txt`，內容如下（不要加 Markdown code fence）：
 
 ```json
-{"event_id": "EVT-0042", "time": "20E07-E01-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
+{"event_id": "EVT-0042", "time": "2026-11-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
 ```
 
 程式讀取這份檔案，再用 Qwen tokenizer 計數：
@@ -520,7 +520,7 @@ for filename in ("event.txt", "event-compact.txt"):
 精簡版也用同樣方式處理：把 A 題 `compact(EVENT)` 的結果轉成 JSON，存成 `event-compact.txt`，再計算一次。請建立 `event-compact.txt`，內容如下（不要加 Markdown code fence）：
 
 ```json
-{"id": "EVT-0042", "t": "20E07-E01-03 09:12", "s": "B 棟 3F", "l": "no_helmet", "c": 0.82, "n": "疑似有一人未戴安全帽"}
+{"id": "EVT-0042", "t": "2026-11-03 09:12", "s": "B 棟 3F", "l": "no_helmet", "c": 0.82, "n": "疑似有一人未戴安全帽"}
 ```
 
 你也可以直接用前一題程式裡的 `EVENT` 產生兩個檔案：`json.dumps(EVENT, ensure_ascii=False)` 寫入 `event.txt`，`json.dumps(compact(EVENT), ensure_ascii=False)` 寫入 `event-compact.txt`。第一次執行需要下載 tokenizer 檔；如果課堂環境不能連外，改用老師提供的本地快取或跳過這一小題，不要把網路下載當成唯一完成條件。
@@ -552,8 +552,8 @@ for filename in ("event.txt", "event-compact.txt"):
 ### 預期輸出
 
 ```text
-original: {"event_id": "EVT-0042", "time": "20E07-E01-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
-compact:  {"id": "EVT-0042", "t": "20E07-E01-03 09:12", "s": "B 棟 3F", "l": "no_helmet", "c": 0.82, "n": "疑似有一人未戴安全帽"}
+original: {"event_id": "EVT-0042", "time": "2026-11-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
+compact:  {"id": "EVT-0042", "t": "2026-11-03 09:12", "s": "B 棟 3F", "l": "no_helmet", "c": 0.82, "n": "疑似有一人未戴安全帽"}
 original chars=184 toy_tokens=165
 compact  chars=106 toy_tokens=91
 saved: 44.8% OK

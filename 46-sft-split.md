@@ -1,20 +1,21 @@
 # SFT 資料與按來源拆分
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 42 節：SFT 資料與按來源拆分。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 46 節：SFT 資料與按來源拆分。**
 > 微調之前，先把**資料**做對：train／validation／test 要**按來源**拆，不是逐筆隨機拆；拆完還要用近重複檢查抓「換了編號的複製品」與「同一個模板」；最後凍結 test manifest。本節只用 Python 標準函式庫，**不訓練任何模型**——洩漏在訓練之前就已經發生，也在訓練之前就能檢查。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：SFT 資料與按來源拆分
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_sft_split.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[原始語料] --> B[建立樣本與來源/模板群組]
+    B --> C[樣本級隨機切分]
+    B --> D[按來源群組切分 train/dev/holdout]
+    C --> E[leakage 檢查]
+    D --> E
+    E --> F[manifest 記錄每筆歸屬]
+    F --> G[比較重疊率與切分計數]
 ```
 
 ## 學習目標與時間
@@ -60,6 +61,52 @@ flowchart TD
 這三類分別代表真實資料裡最常見的三種洩漏來源：**同一段落的多種問法**、**共用模板的回覆**、**二手整理的複製品**。
 
 ## 三、可執行 Demo
+
+### Call session 1：隨機切分對照來源群組切分
+
+**System layer**
+```mermaid
+flowchart TD
+    A[load sop_corpus.json] --> B[build_samples 加入拒答與 FAQ 複製]
+    B --> C[split_by_sample 與 split_by_group 兩條基線]
+    C --> D[show_counts 與 show_leaks]
+    D --> E[比較來源重疊及近重複]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[build_samples 產生多問法及拒答樣本] --> B[faq_copy 加入 derived_from 樣本]
+    B --> C{切分方法}
+    C -- sample --> D[split_by_sample 隨機逐筆分配]
+    C -- group --> E[split_by_group 以 group_of 分群]
+    D --> F[leakage 檢查來源與 bigram Jaccard]
+    E --> F
+```
+
+### Call session 2：修正來源與凍結 test manifest
+
+**System layer**
+```mermaid
+flowchart LR
+    A[發現 FAQ 更換編號/模板近重複] --> B[use_derived 歸回來源群組]
+    B --> C[檢查拒答樣本與跨集合近重複]
+    C --> D[採用有內容依據的拒答樣本]
+    D --> E[凍結 test manifest]
+    E --> F[更改目標回覆驗證 digest 改變]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[group_of sample] --> B{use_derived?}
+    B -- 是 --> C[取 derived_from 或 group]
+    B -- 否 --> D[取 group]
+    C --> E[split_by_group 產生 assign]
+    D --> E
+    E --> F[manifest 排序 test ID 與訊息 hash]
+    F --> G[計算 digest]
+```
 
 <!-- demo: E07_sft_split.py -->
 ```python

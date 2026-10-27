@@ -2,18 +2,18 @@
 
 > **正文改版：2026-10-24｜對應新版 LLM 第 04 節：Transformer、Attention、MoE 與推理模型。**本節用可檢查的純 Python 玩具注意力，理解 Transformer 如何依上下文混合資訊，並辨認 MoE 與推理模型的概念；本節不是訓練大型模型，也不模擬真實模型效能。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Transformer、Attention、MoE 與推理模型
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 04_transformer_attention.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[輸入 Q K V 向量] --> B[計算 QK 相容分數]
+    B --> C[穩定 softmax 正規化]
+    C --> D[得到注意力權重]
+    D --> E[對 V 加權求和]
+    E --> F[觀察玩具結果與限制]
+    F -. 非完整 Transformer/MoE .-> G[概念比較，不作效能推論]
 ```
 
 ## 學習目標與時間

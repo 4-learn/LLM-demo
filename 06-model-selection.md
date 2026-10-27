@@ -1,4 +1,4 @@
-# 05｜該用哪個模型？
+# 06｜該用哪個模型？
 
 > **定位**：主管給了三個條件：可商用、能放在工地電腦（無 GPU、16 GB）、看得懂中文。這一節用可查核的資料，把候選模型一個一個篩過，留下選擇或淘汰的理由。
 
@@ -348,7 +348,7 @@ meta-llama/Llama-3.2-1B-Instruct  不適用／算不出來：config 不可讀
 
 ```text
 請用一句繁體中文，告訴工地安全人員這筆事件要做什麼：
-{"event_id": "EVT-0042", "time": "20E07-E01-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
+{"event_id": "EVT-0042", "time": "2026-11-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
 ```
 
 注意：

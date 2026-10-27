@@ -1,21 +1,22 @@
 # Multi-Agent、固定 Workflow 與 Reducer
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 38 節：Multi-Agent、固定 Workflow 與 Reducer。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 42 節：Multi-Agent、固定 Workflow 與 Reducer。**
 > 舊教材的 supervisor 範例照抄執行，`completed_agents` 沒有 reducer，**跑不完**：每個代理都把清單蓋成只剩自己，supervisor 永遠看不到全部完成，一直來回派工直到遞迴上限。本節先把這個 bug 跑出來，再修；接著用固定 workflow 做同一件事，比較步數。核心主張：**任務的順序事先知道時，固定 workflow 比 supervisor 更短、更好測。多代理不是升級，是有代價的選擇。不管用哪一種，都要有停止條件，而且收尾要看 state 裡的結果，不能只看路由器說「done」。**
 > 本節的代理都是固定字串，不呼叫模型；第五段「會亂派工的路由器」是教師構造的決定序列，用來模擬 LLM supervisor 可能的輸出。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Multi-Agent、固定 Workflow 與 Reducer
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_multi_agent.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[同一工作任務] --> B[固定 workflow workers]
+    A --> C[Supervisor 動態選擇 specialist]
+    B --> D[regulation/report/notification 更新]
+    C --> E[router 受 budget/終止條件限制]
+    D --> F[比較 overwrite 與 union reducer 合併]
+    E --> F
+    F --> G[檢查缺漏、迭代與結果差異]
 ```
 
 ## 學習目標與時間
@@ -78,6 +79,81 @@ supervisor 會回到自己，所以一定要有停止條件。本節示範四層
 第 4 層最常被省略，Demo 第五段最後一個情境就是例子：路由器跳過法規直接說 done，報告裡的法規依據是「尚未查詢」。
 
 ## 四、可執行 Demo
+
+### Session 1：Reducer 與固定 workflow
+
+**系統層：平行代理更新集中到 reducer state**
+
+```mermaid
+flowchart LR
+    A[初始 state] --> B[regulation]
+    A --> C[report]
+    B --> D[union reducer]
+    C --> D
+    D --> E[notification]
+    E --> F[固定 workflow 結果]
+```
+
+**函式內部：`union` 合併追加欄位並去重**
+
+```mermaid
+flowchart TD
+    A[union(current, update)] --> B[讀取既有欄位]
+    B --> C[加入 update 項目]
+    C --> D[按穩定識別值去重]
+    D --> E[回傳合併 state]
+```
+
+### Session 2：固定與 supervisor 路由、步數預算
+
+**系統層：固定 workflow 與動態路由對照**
+
+```mermaid
+flowchart LR
+    A[start] --> B[build_fixed / build_supervisor]
+    B --> C[run(app, limit)]
+    C --> D{路由決策}
+    D -- fixed --> E[固定節點順序]
+    D -- supervisor --> F[make_router script]
+    E --> G[final state]
+    F --> G
+```
+
+**函式內部：`make_router` 執行受預算限制的決策**
+
+```mermaid
+flowchart TD
+    A[make_router(script, budget)] --> B[讀取下一個 scripted decision]
+    B --> C[扣除/檢查 budget]
+    C --> D{決策是否合法?}
+    D -- 未知節點 --> E[記錄錯誤並停止]
+    D -- done --> F[完成]
+    D -- 合法代理 --> G[派送節點]
+    G --> B
+```
+
+### Session 3：完成度診斷與缺漏檢查
+
+**系統層：最終 state 另行驗證，不信任路由器 done**
+
+```mermaid
+flowchart LR
+    A[graph final state] --> B[missing]
+    B --> C{必要結果齊全?}
+    C -- 否 --> D[diagnosis: 列缺少的代理結果]
+    C -- 是 --> E[describe 完整結果]
+```
+
+**函式內部：`missing` 對照必要欄位**
+
+```mermaid
+flowchart TD
+    A[missing(final)] --> B[檢查 regulation]
+    B --> C[檢查 report]
+    C --> D[檢查 notification]
+    D --> E[收集空缺欄位]
+    E --> F[回傳缺漏清單]
+```
 
 需要 `langgraph==1.2.12`，不需要模型。
 

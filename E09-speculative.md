@@ -1,20 +1,22 @@
 # 推測解碼與服務端推論
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 49 節：推測解碼與服務端推論。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 E09 節：推測解碼與服務端推論。**
 > 推測解碼（speculative decoding）讓 decode 一次前進好幾個 token：先用便宜的方法**猜**接下來幾個 token，再讓目標模型**一次 forward 驗證**全部候選，接受從頭開始連續猜對的部分。本節在示範機 CPU 上真的實作一個最小版本：draft 不是另一個模型，而是「在輸入裡找相同的片段」（prompt lookup），驗證規則是 greedy。重點是**輸出與一般 greedy 逐 token 相同**，加速多少完全取決於接受率。第二部分用標準函式庫模擬服務端的 continuous batching。核心主張：**推測解碼是 token 級的猜測＋驗證，不是小模型先答、大模型再審；效益取決於接受率、配對、batch 與硬體，要量了才知道。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：推測解碼與服務端推論
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E09_speculative.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[上下文 token] --> B[lookup_draft 提出 n-gram 草稿]
+    B --> C[Target logits/KV 驗證草稿 token]
+    C --> D{前綴 token 符合 greedy target？}
+    D -- 是 --> E[接受連續匹配前綴]
+    D -- 否 --> F[拒絕並使用 target token 修正]
+    E --> G[保持 greedy 輸出等價]
+    F --> G
+    H[另行模擬 static/continuous batching] -. 服務排程比較 .-> I[不等同解碼接受演算法]
 ```
 
 ## 學習目標與時間
@@ -60,6 +62,51 @@ flowchart TD
 ## 二、可執行 Demo
 
 預設重播示範機的紀錄，只需要標準函式庫；同資料夾要有 `data/49-speculative-record.json`。`--live` 需要 `torch`、`transformers`、第 07 節的 Qwen 快取與第 39 節的程式（`E07_*.py` 或講義），示範機約 1 分 30 秒。
+
+### Call session 1：Draft 提案、Target greedy 驗證與 cache 修剪
+
+**System layer**
+```mermaid
+flowchart TD
+    A[tokenized prompt] --> B[plain greedy baseline]
+    A --> C[speculative prompt lookup draft]
+    C --> D[target 一次 forward 驗證候選]
+    D --> E[比較 plain/speculative token 序列]
+    E --> F[報告接受數、呼叫次數與時間]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[lookup_draft 從 prompt+tokens 找 n-gram] --> B[model forward 加 last 與 draft]
+    B --> C[logits argmax 產生 target_choices]
+    C --> D[accept 取連續一致前綴與修正 token]
+    D --> E[past.crop 丟棄拒絕候選 cache]
+    E --> F[累積 tokens/proposed/accepted]
+```
+
+### Call session 2：獨立理解 batching 排程模擬
+
+**System layer**
+```mermaid
+flowchart LR
+    A[REQUESTS 與 SLOTS] --> B[static_schedule 靜態批次]
+    A --> C[continuous_schedule 連續排程]
+    B --> D[比較完成步數與等待時間]
+    C --> D
+    D --> E[說明這是排程模擬，非 speculative 驗證]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[REQUESTS 與 slots] --> B[static_schedule 依 batch max 長度推進]
+    A --> C[continuous_schedule 每步填入空位]
+    C --> D[更新 running 剩餘 token]
+    B --> E[回傳 done/step/busy]
+    D --> E
+    E --> F[與 token 級 lookup_draft/accept 流程分開報告]
+```
 
 <!-- demo: E09_speculative.py -->
 ```python

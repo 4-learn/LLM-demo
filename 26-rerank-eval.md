@@ -3,18 +3,19 @@
 > **新版正文：20E07-E03-05｜對應新版 LLM 第 26 節：Reranking 與 Retrieval Evaluation。**
 > 檢索分兩段：先撈**候選**，再**重排**。本節的主張：**兩段要分開量**——重排只能調整候選內的順序，救不回沒進候選的段落；而「調整規則後分數變好」只有在**沒看過的題目**上成立才算數。只用 Python 標準函式庫；兩個階段都**不是神經網路**，它們只是站在 bi-encoder 與 cross-encoder 的位置上，讓評測方法可以在沒有模型的教室裡完整跑一遍。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Reranking 與 Retrieval Evaluation
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_rerank_eval.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[查詢與語料] --> B[候選檢索：lexical index 取前 k]
+    B --> C[量候選 Recall@k]
+    C --> D[只對候選套用 rerank 規則]
+    D --> E[量重排前後 MRR／nDCG]
+    E --> F[僅用 dev 分析失敗並調整]
+    F --> G[凍結設定後評估 holdout]
+    G --> H[報告候選漏召回與重排效益]
 ```
 
 ## 學習目標與時間

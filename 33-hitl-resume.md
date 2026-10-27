@@ -1,9 +1,9 @@
 # HITL：真正拒絕與恢復
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 30 節：HITL：真正拒絕與恢復。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 33 節：HITL：真正拒絕與恢復。**
 > 「人在迴圈中」常被做成一個會跳出來的確認框：按什麼都繼續跑，或者通知早就寄出去了才問。核心主張：**人工的回答必須真正決定下一步——拒絕就不執行；流程中斷後，換一個程序也要能從存檔接著走；而 resume 會重跑節點，所以副作用要放在核准之後，而且要冪等。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：HITL：真正拒絕與恢復
 
@@ -63,6 +63,58 @@ LangGraph 恢復時，會**從 interrupt 所在節點的開頭重新執行**，�
 正確做法：副作用放在**核准之後的獨立節點**（`execute`），並用冪等鍵（第 29 節）擋重複。
 
 ## 四、可執行 Demo
+
+### Session 1：中斷點、核准與拒絕路徑
+
+**系統層：interrupt 暫停副作用，等待人工決策**
+
+```mermaid
+flowchart LR
+    S[start(conn, report_id)] --> G[LangGraph 節點]
+    G --> I[interrupt 等待核准]
+    I --> H[人工核准或拒絕]
+    H --> R[resume(conn, report_id, answer)]
+    R --> X{核准?}
+    X -- 是 --> E[execute 寫入 outbox]
+    X -- 否 --> Z[結束，不執行副作用]
+```
+
+**函式內部：`build` 把 interrupt 與 execute 分開**
+
+```mermaid
+flowchart TD
+    A[build(conn, unsafe)] --> B[建立核准前節點]
+    B --> C[interrupt 取得決策]
+    C --> D{answer 核准?}
+    D -- 是 --> E[獨立 execute 節點]
+    D -- 否 --> F[記錄拒絕，不執行 send]
+    E --> G[send(store, key, body)]
+```
+
+### Session 2：checkpoint 恢復與副作用冪等檢查
+
+**系統層：持久化 checkpoint 後用同一 thread 恢復**
+
+```mermaid
+flowchart LR
+    A[connect SQLite] --> B[start]
+    B --> C[checkpoint at interrupt]
+    C --> D[保留 thread config]
+    D --> E[resume]
+    E --> F[outbox / attempts]
+    F --> G[outbox_count 驗證]
+```
+
+**函式內部：`resume` 以 `config` 定位中斷執行**
+
+```mermaid
+flowchart TD
+    A[resume(conn, report_id, answer)] --> B[config(report_id)]
+    B --> C[載入 checkpoint]
+    C --> D[傳入 resume answer]
+    D --> E[續跑 graph]
+    E --> F[檢查 Store 與 outbox_count]
+```
 
 需要 `langgraph==1.2.12` 與 `langgraph-checkpoint-sqlite==3.1.1`；不需要模型。「寄出通知」寫進本機 SQLite 的 `outbox` 表，不會真的寄信。`attempts` 表記錄每一次**嘗試**寄出，用來看出重複。
 

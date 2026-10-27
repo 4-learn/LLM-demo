@@ -1,20 +1,23 @@
 # 可核對的圖像描述
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 11 節：可核對的圖像描述。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 E01 節：可核對的圖像描述。**
 > 第 10 節處理「看不出來」。本節處理「說得出來，但說的對不對」。一段流暢的圖像描述裡，常常混著看得到的、看不到的與位置錯的內容。本節用程式畫一張合成工地圖，**每個物件的框在畫圖時就記下來**，於是每句話都能回到圖上核對。讓本地 SmolVLM-500M 自由描述、回答結構化問題、分區域描述，最後請它自報信心分數。核心主張：**描述要拆成可以回到圖上圈選的主張；結構化問題比自由描述好核對；模型自述的信心不是機率。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：可核對的圖像描述
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E01_grounded_caption.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[合成影像與標註框] --> B[VLM caption / 問答 / region 提問]
+    B --> C[解析主張與信心]
+    C --> D[比對已知物件與座標證據]
+    D --> E{主張有標註支持？}
+    E -- 是 --> F[標記 supported]
+    E -- 否 --> G[標記 absent/wrong]
+    H[影像 hash 與 replay/live] --> I[輸出可重現核對報告]
+    F --> I
+    G --> I
 ```
 
 ## 學習目標與時間
@@ -58,6 +61,51 @@ flowchart TD
 ## 四、可執行 Demo
 
 重播只需要標準函式庫（有 Pillow 會重畫核對雜湊）；`--live` 需求與第 10 節相同。`--image scene.png` 把圖存下來給你圈選。
+
+### Call session 1：自由描述拆主張並回到區域證據
+
+**System layer**
+```mermaid
+flowchart TD
+    A[draw 產生合成影像與 OBJECTS 標註] --> B[Live 或 Replay 取得模型回答]
+    B --> C[主張拆解/結構化答案比對]
+    C --> D[依已知物件框與區域核證]
+    D --> E[輸出 supported、absent、wrong 與遺漏]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[run_live 建立 processor/model] --> B[ask 傳 image 與 question]
+    B --> C[generate 回答文字]
+    C --> D[parse 與 confidence 解析答案及自述分數]
+    D --> E[objects_in 與 OBJECTS/ABSENT 核對主張]
+    E --> F[報告證據狀態，不以自述信心代替正確率]
+```
+
+### Call session 2：結構化問題與區域提問的互補
+
+**System layer**
+```mermaid
+flowchart LR
+    A[run_model 取得 record] --> B[QUESTIONS 結構化問答]
+    A --> C[REGIONS 左/中/右提問]
+    A --> D[confidence 問答]
+    B --> E[parse 比對 expected answer]
+    C --> F[objects_in 區域標註核對]
+    D --> G[confidence 解析與人工主張核證]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[region crop] --> B[ask(image, question)]
+    C[QUESTION expected answer] --> D[ask 整圖問題]
+    B --> E[normalize/判讀輸出]
+    D --> F[結構化解析]
+    E --> G[與區域或全圖標註比較]
+    F --> G
+```
 
 <!-- demo: E01_grounded_caption.py -->
 ```python

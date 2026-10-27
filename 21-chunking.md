@@ -1,20 +1,24 @@
 # Chunk 與來源資料模型
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 19 節：Chunk 與來源資料模型。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 21 節：Chunk 與來源資料模型。**
 > 你在 MariaDB 課已經把 `sop-v1` 的 16 段文字入庫過——那 16 段是**教師預先切好的**。本節回頭問：如果切法由你決定，怎麼切？每個 chunk 要帶哪些欄位，才能被**引用**、被**更新**、又不會**混用向量空間**？核心主張：**chunk 不是一段文字，是一段文字加上能回到原文的座標。** 只用 Python 標準函式庫，不計算向量。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：Chunk 與來源資料模型
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_chunking.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[文件與 source_version] --> B[依全文建立穩定來源座標]
+    B --> C{選擇切分策略}
+    C --> D[固定長度]
+    C --> E[固定長度＋overlap]
+    C --> F[依段落切分]
+    D --> G[以 start/end 從原文擷取 chunk]
+    E --> G
+    F --> G
+    G --> H[附 chunk_id／版本／hash／embedding_revision]
+    H --> I[量跨段與關鍵詞切斷並驗證引用]
 ```
 
 ## 學習目標與時間

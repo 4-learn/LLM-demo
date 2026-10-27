@@ -1,21 +1,22 @@
 # LLM 與 MCP 的完整工具回合
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 35 節：LLM 與 MCP 完整工具回合。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 38 節：LLM 與 MCP 完整工具回合。**
 > 第 14 節用劇本扮演模型，第 33、34 節只有 MCP、沒有模型。本節把兩邊接起來，模型是示範機上的 Qwen2.5-0.5B-Instruct：**模型看到工具 → 提出呼叫 → host 檢查 → MCP server 執行 → 結果回到模型 → 模型寫最終答覆**。核心主張：**工具結果要回到模型，不是直接印給使用者；模型拿到錯誤或不完整的結果，仍可能寫出很肯定的答案，所以 host 對最終答覆也要檢查。**
 > 本節不是「本機小模型可以上線」的證明：0.5B 模型在本節就示範了它會答錯、會回簡體字。
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：LLM 與 MCP 完整工具回合
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_mcp_tool_round.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[建立 MCP server 與工具 schema] --> B[轉為模型工具宣告]
+    B --> C[Replay/LocalQwen 統一介面請求]
+    C --> D[解析模型 tool call]
+    D --> E[驗證後呼叫 MCP 工具]
+    E --> F[以 call_id 配對工具結果並回填]
+    F --> G[模型生成 final answer]
+    G --> H[檢查回答、配對與錯誤案例]
 ```
 
 ## 學習目標與時間
@@ -85,6 +86,57 @@ MCP 回傳 `CallToolResult`：`content` 是一串內容區塊，`is_error` 說�
 這三個檢查用的是正則，會漏也會誤判，**它們不是驗證器，是「這份答覆不能直接給使用者」的警示燈**。沒通過的答覆，本節標成「完成，但答覆未通過檢查」。實務上要改成重問、退回給人，或只回工具結果加固定說明。
 
 ## 五、可執行 Demo
+
+### Session 1：MCP tools 與模型 adapter
+
+**系統層：MCP server 能力轉成模型工具描述**
+
+```mermaid
+flowchart LR
+    A[build_server(events)] --> B[MCP tools]
+    B --> C[to_model_tools]
+    C --> D[LocalQwen / Replay / Scripted adapter]
+    D --> E[模型協定回覆]
+```
+
+**函式內部：`to_model_tools` 映射 MCP schema**
+
+```mermaid
+flowchart TD
+    A[to_model_tools(mcp_tools)] --> B[逐項讀取 MCP tool]
+    B --> C[取名稱與描述]
+    C --> D[複製 inputSchema]
+    D --> E[組成模型 tools 定義]
+```
+
+### Session 2：工具回合、結果配對與答覆檢查
+
+**系統層：Host 驗證、MCP 執行、回填結果**
+
+```mermaid
+flowchart LR
+    A[model response] --> B[parse_reply]
+    B --> C[host 檢查與呼叫 MCP]
+    C --> D[serialize result]
+    D --> E[依 call ID 回填 messages]
+    E --> F[下一次模型回合或停止]
+    F --> G[check_answer / ids_paired]
+```
+
+**函式內部：`run_turn` 控制回合與 ID 配對**
+
+```mermaid
+flowchart TD
+    A[run_turn(client, model, question, trace)] --> B[模型 adapter 回覆]
+    B --> C{解析 tool calls}
+    C -- 無 --> D[檢查 final answer]
+    C -- 有 --> E[呼叫 MCP tool]
+    E --> F[serialize 並附回 tool_call_id]
+    F --> G[更新 messages / trace]
+    G --> H{回合預算還有?}
+    H -- 是 --> B
+    H -- 否 --> I[停止並報告未配對項]
+```
 
 情境沿用第 14 節：合成的工地事件，10 筆。server 有三個工具，host 只開放兩個唯讀工具給模型。
 

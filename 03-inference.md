@@ -22,7 +22,7 @@
 你把一筆事件丟給 AI，請它寫一句給安全人員的處理建議：
 
 ```python
-event = {"event_id": "EVT-0042", "time": "20E07-E01-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
+event = {"event_id": "EVT-0042", "time": "2026-11-03 09:12", "site": "B 棟 3F", "detector": "camera-07", "label": "no_helmet", "confidence": 0.82, "note": "疑似有一人未戴安全帽", "image": "evt-0042.jpg"}
 ```
 
 主管試了兩次，看完問你：

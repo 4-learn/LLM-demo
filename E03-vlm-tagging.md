@@ -1,20 +1,23 @@
 # VLM 打標與 Metadata 品質
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 16 節：VLM 打標與 Metadata 品質。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 E03 節：VLM 打標與 Metadata 品質。**
 > 第 10–12 節逐張檢查模型看圖的結果。實務上圖片有幾千張，會讓模型批次打標籤，再用標籤做檢索過濾（第 22 節）。本節對 10 張合成工地圖批次打 3 個標籤，把結果寫成**帶來源的 metadata**（image ID、雜湊、產生方式、模型 revision、提示版本、覆核狀態），做 schema 檢查、與人工標註比對、覆核修正；並示範兩個常見錯誤：**未覆核就拿來過濾**、**把 unknown 默認為 no**。核心主張：**模型標籤是待覆核的提議，不是真值；unknown 是一個值，不是 no；每筆 metadata 都要說得出它從哪裡來。**
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 流程圖：VLM 打標與 Metadata 品質
 
 ```mermaid
 flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E03_vlm_tagging.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
+    A[影像與人工真值] --> B[VLM 產生標籤]
+    B --> C[to_record 轉為結構資料]
+    C --> D[schema 與 unknown 檢查]
+    D --> E[人工覆核/隔離不確定樣本]
+    E --> F{是否核可？}
+    F -- 否 --> G[排除於檢索]
+    F -- 是 --> H[加入可用標籤]
+    G --> I[報告安全帽案例結果]
+    H --> I
 ```
 
 ## 學習目標與時間
@@ -54,6 +57,52 @@ flowchart TD
 ## 三、可執行 Demo
 
 需要同資料夾第 10 節的程式（畫圖函式與把關規則）。重播只需要標準函式庫（有 Pillow 會重畫核對雜湊）；`--live` 需求同第 10 節，10 張圖 40 個問題，示範機約 1 分 20 秒。
+
+### Call session 1：VLM 回答轉 metadata、schema 與 review
+
+**System layer**
+```mermaid
+flowchart TD
+    A[BATCH 合成圖與人工真值] --> B[run_model 提問取得答案]
+    B --> C[to_record 正規化並記來源]
+    C --> D[schema_errors 檢查欄位/列舉/revision]
+    D --> E[review 對照人工真值並修正]
+    E --> F[輸出修正清單與 JSONL metadata]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[run_model.ask 對圖提問] --> B[normalize 原始回答]
+    B --> C[to_record 組 tags/raw/provenance]
+    C --> D[L09.gated 以 visible 決定 helmet]
+    D --> E[schema_errors 檢查]
+    E --> F[review 標 approved/corrected/quarantined]
+```
+
+### Call session 2：unknown 與覆核狀態的檢索過濾
+
+**System layer**
+```mermaid
+flowchart LR
+    A[metadata 記錄] --> B[比較 only_reviewed 過濾]
+    A --> C[比較 unknown_as_no 錯誤假設]
+    B --> D[filter_no_helmet 結果]
+    C --> D
+    D --> E[檢查 unknown 是否被錯納入沒戴集合]
+    E --> F[只讓 approved/corrected 標籤進檢索]
+```
+
+**Internal function flow**
+```mermaid
+flowchart TD
+    A[filter_no_helmet 遍歷 record] --> B{only_reviewed 且 review 未核可？}
+    B -- 是 --> C[略過]
+    B -- 否 --> D[讀 tags.helmet]
+    D --> E{no，或 unknown_as_no 且 unknown？}
+    E -- 是 --> F[加入 image_id]
+    E -- 否 --> G[不加入]
+```
 
 <!-- demo: E03_vlm_tagging.py -->
 ```python
