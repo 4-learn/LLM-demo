@@ -32,7 +32,7 @@ ASR 把聲音轉成文字，代理依文字與上下文決定回覆或呼叫工�
 
 ## 四、可執行 Demo
 
-本程式只用標準函式庫，輸入是教師準備的合成文字轉錄，不錄音、不連線、不呼叫 ASR/TTS。它模擬三種辨識結果：明確的讀取請求、信心不足的危險操作、以及確認後的危險操作。需注意：這個簡化例子不實作語者驗證或正式身分授權。
+本程式只用標準函式庫，輸入是教師準備的合成文字轉錄，不錄音、不連線、不呼叫 ASR/TTS。它模擬低信心時（無論讀取或操作意圖）先重問、高信心讀取、信心不足的危險操作、以及確認後的危險操作。需注意：這個簡化例子不實作語者驗證或正式身分授權。低信心閘門在意圖分流前執行。
 
 <!-- demo: E05_voice_agents.py -->
 ```python
@@ -55,6 +55,8 @@ def handle(transcript, confidence, confirmed, request_id, confirmation, effects,
         raise ValueError("request_id 必須為 1–128 字元且不含控制字元")
     if not isinstance(effects, list) or not isinstance(completed, set):
         raise ValueError("effects/completed 必須是本機示範用 list/set")
+    if confidence < 0.85:
+        return "請重說：辨識信心不足，未執行任何操作。"
     if confirmation is not None and confirmation != (request_id, "關閉泵浦"):
         return "確認無效：request_id 或操作不符；未執行。"
     if request_id in completed:
@@ -62,8 +64,6 @@ def handle(transcript, confidence, confirmed, request_id, confirmation, effects,
     if transcript == "查詢泵浦狀態":
         return "TTS 模擬：泵浦狀態正常（唯讀）"
     if transcript in ("關閉泵浦", "不要關閉泵浦"):
-        if confidence < 0.85:
-            return "請重說：辨識信心不足，未執行任何操作。"
         if transcript == "不要關閉泵浦":
             return "已理解為禁止關閉；未執行操作。"
         if not confirmed or confirmation != (request_id, "關閉泵浦"):
@@ -78,6 +78,7 @@ def main():
     effects, completed = [], set()
     request_id = "req-close-1"
     cases = [
+        ("查詢泵浦狀態", 0.40, False, "req-read-low", None),
         ("查詢泵浦狀態", 0.99, False, "req-read", None),
         ("關閉泵浦", 0.62, True, request_id, (request_id, "關閉泵浦")),
         ("關閉泵浦", 0.97, False, request_id, None),
@@ -92,12 +93,18 @@ def main():
 
 
 if __name__ == "__main__":
+    effects, completed = [], set()
+    assert handle("查詢泵浦狀態", 0.40, False, "req-read-low", None, effects, completed) == "請重說：辨識信心不足，未執行任何操作。"
+    assert effects == [] and completed == set()
+    assert handle("查詢泵浦狀態", 0.99, False, "req-read", None, effects, completed) == "TTS 模擬：泵浦狀態正常（唯讀）"
+    assert effects == [] and completed == set()
     main()
 ```
 
 執行：`python3 E05_voice_agents.py`。關鍵輸出（本次本機實測）：
 
 ```text
+ASR文字=查詢泵浦狀態｜信心=0.40｜request_id=req-read-low｜確認=False → 請重說：辨識信心不足，未執行任何操作。
 ASR文字=查詢泵浦狀態｜信心=0.99｜request_id=req-read｜確認=False → TTS 模擬：泵浦狀態正常（唯讀）
 ASR文字=關閉泵浦｜信心=0.62｜request_id=req-close-1｜確認=True → 請重說：辨識信心不足，未執行任何操作。
 ASR文字=關閉泵浦｜信心=0.97｜request_id=req-close-1｜確認=False → 待確認：請取得綁定本 request_id 與操作的一次性確認；尚未執行。

@@ -1,6 +1,6 @@
 """第 16 節：原生 Function Calling 的完整工具回合（只用 Python 標準函式庫）。
 
-一個完整回合有四步，少一步都不算：
+一個成功完整回合有四步，少一步都不算；協定重播若達回合上限，工具結果不會再送模型，不會有最終答覆：
   1. 模型提出 tool call（名稱＋參數＋call ID）
   2. **應用程式**決定要不要執行：allowlist、參數驗證、權限
   3. 執行，把結果連同**同一個 call ID** 回給模型
@@ -54,6 +54,11 @@ EXECUTORS = {"count_events": count_events}
 
 
 def validate_args(name, args):
+    """Validate the JSON value's object shape and the tool's declared schema."""
+    if name not in TOOLS:
+        return [f"工具 {name!r} 不在 allowlist"]
+    if not isinstance(args, dict):
+        return ["arguments 必須是 JSON object（JSON 物件）"]
     spec = TOOLS[name]["parameters"]
     errors = [f"缺少必填參數 {k}" for k in spec["required"] if k not in args]
     for key, value in args.items():
@@ -75,11 +80,20 @@ def execute(call):
     else:
         try:
             args = json.loads(call["function"]["arguments"])
-        except json.JSONDecodeError as error:
-            args, content = None, {"error": f"參數不是合法 JSON：{error.msg}"}
-        if args is not None:
+        except (json.JSONDecodeError, TypeError) as error:
+            detail = error.msg if isinstance(error, json.JSONDecodeError) else str(error)
+            content = {"error": f"參數不是合法 JSON：{detail}"}
+        else:
             problems = validate_args(name, args)
-            content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
+            if problems:
+                content = {"error": "；".join(problems)}
+            else:
+                try:
+                    content = EXECUTORS[name](**args)
+                except (TypeError, ValueError) as error:
+                    # Keep malformed arguments inside the tool protocol instead of
+                    # crashing the host application's request loop.
+                    content = {"error": f"工具參數或值無效：{error}"}
     return {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(content, ensure_ascii=False)}
 
 
@@ -114,13 +128,28 @@ def run_turn(model, question):
     messages = [{"role": "user", "content": question}]
     for _ in range(MAX_TOOL_ROUNDS):
         reply = model(messages)
-        messages.append(reply)
+        if not isinstance(reply, dict) or reply.get("role") != "assistant":
+            return messages, "協定錯誤：模型回覆格式無效，停止執行"
         calls = reply.get("tool_calls") or []
+        if not isinstance(calls, list):
+            return messages, "協定錯誤：tool_calls 必須是清單，停止執行"
         if not calls:
+            messages.append(reply)
             return messages, "完成"
+        validated = []
+        seen_ids = set()
         for call in calls:
-            messages.append(execute(call))
-    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止"
+            if (not isinstance(call, dict) or not isinstance(call.get("id"), str)
+                    or not call["id"] or call["id"] in seen_ids
+                    or not isinstance(call.get("function"), dict)
+                    or not isinstance(call["function"].get("name"), str)
+                    or not isinstance(call["function"].get("arguments"), str)):
+                return messages, "協定錯誤：tool call 結構或 ID 無效，停止執行"
+            seen_ids.add(call["id"])
+            validated.append(call)
+        messages.append(reply)
+        messages.extend(execute(call) for call in validated)
+    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止；最後工具結果未再送回模型，尚無最終答覆"
 
 
 def nvidia_model(messages):
