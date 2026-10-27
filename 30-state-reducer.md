@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：LangGraph State 與 Reducer
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E08_state_reducer.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 24 節（RAG 引用）、第 26 節（副作用政策）。第 28 節的條件分支、第 30 節的 HITL 都建立在本節的 state 上。

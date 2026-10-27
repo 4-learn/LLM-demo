@@ -6,6 +6,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：單／多 Agent 品質、延遲與成本比較
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E08_agent_compare.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 08 節（評測集、dev／holdout）、第 15 節（token 成本）、第 31 節（trace 與延遲）、第 38 節（三種分工）。

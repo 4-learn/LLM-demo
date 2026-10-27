@@ -6,6 +6,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：Streamable HTTP MCP 服務與部署
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 51_mcp_http.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 33～36 節。課前安裝：`fastapi==0.142.2`（Uvicorn、Starlette 已隨 `mcp==2.3.0` 安裝）。

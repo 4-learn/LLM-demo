@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：Orchestration 與 LangChain LCEL
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 51_lcel.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 14 節（工具回合）、第 15 節（供應商介面）、第 24 節（RAG 引用與查無答案）。

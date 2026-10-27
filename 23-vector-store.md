@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：MariaDB Vector 持久化銜接
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E07_vector_store.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 19 節（chunk）、第 20 節（精確檢索 baseline，fingerprint `b57e402af0a1c19f`）。本梯次已修 MariaDB 課第 10 節（Python 連線、私人設定檔）、第 18–20 節（向量欄位、排序、索引）；**單獨開班時不要求修過 MariaDB**，用 fixtures 模式。

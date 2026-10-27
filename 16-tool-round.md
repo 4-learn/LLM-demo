@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：原生 Function Calling 完整工具回合
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E03_tool_round.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 12 節的權限邊界與第 15 節的 schema 驗證。
