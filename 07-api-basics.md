@@ -97,8 +97,7 @@ API（Application Programming Interface）是程式依照約定向服務提出�
 import json
 import os
 import sys
-import urllib.error
-import urllib.request
+# openai SDK is imported lazily for the explicit --live path only.
 
 NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 NVIDIA_MODEL = "meta/llama-3.1-8b-instruct"
@@ -125,18 +124,30 @@ def make_request(messages=SYNTHETIC_MESSAGES, model="fixture-model-not-a-real-pr
 
 def call_nvidia(request, api_key):
     """選做真實傳輸；只接受由呼叫端提供的金鑰，不列印或保存。"""
-    body = json.dumps(request).encode("utf-8")
-    req = urllib.request.Request(
-        NVIDIA_BASE_URL + "/chat/completions", data=body, method="POST",
-        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
-    )
     try:
-        with urllib.request.urlopen(req, timeout=45) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        raise RuntimeError(f"API 回傳 HTTP {exc.code}；不要貼出含憑證的請求或錯誤內容") from None
-    except urllib.error.URLError:
-        raise RuntimeError("連線失敗或逾時；不要自動重試，服務可能已收到請求") from None
+        from openai import OpenAI
+    except ImportError:
+        raise RuntimeError("選做 live 需安裝 openai SDK；fixture 不需要") from None
+    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=api_key, timeout=45, max_retries=0)
+    try:
+        result = client.chat.completions.create(
+            model=request["model"],
+            messages=request["messages"],
+            max_tokens=request["max_tokens"],
+        )
+    except Exception as exc:
+        raise RuntimeError(f"API 呼叫失敗（{type(exc).__name__}）；不自動重試") from None
+    if not result.choices:
+        raise RuntimeError("response 缺少 choices")
+    choice = result.choices[0]
+    message = choice.message
+    if message is None or not isinstance(message.content, str):
+        raise RuntimeError("response 缺少文字 content")
+    return {
+        "choices": [{"message": {"role": "assistant", "content": message.content},
+                     "finish_reason": choice.finish_reason}],
+        "usage": result.usage.model_dump() if result.usage else None,
+    }
 
 
 def parse_response(response):
