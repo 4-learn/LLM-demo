@@ -22,10 +22,10 @@
 | 14 | 多模態輸入、證據與未知 | `E03_vision_unknown.py` | Pillow 可選；缺 Pillow 時凍結輸出不同 |
 | 15 | Structured Output：語法、Schema 與語義 | `E07_structured_output.py` | — |
 | 16 | 原生 Function Calling 完整工具回合 | `E03_tool_round.py` | — |
-| 17 | 多供應商介面、LiteLLM 與 API 成本 | `E07_provider_contract.py` | 資料快照日期含舊 lesson code，凍結輸出需同步修正 |
+| 17 | 多供應商介面、LiteLLM 與 API 成本 | `E07_provider_contract.py` | **歷史快照：2026-10-06；非現價/即時能力。** 資料沿用舊 lesson code，凍結輸出需同步修正；使用前重查官方來源 |
 | 18 | Embedding 概念 | `E07_embedding_lab.py` | — |
 | 19 | 相似度、失敗案例與門檻評測 | `E07_similarity_eval.py` | torch、sentence-transformers 與模型快取 |
-| 20 | 20｜文件證據抽取（PDF 解析／OCR／版面表格待補） | `20_document_parsing.py` | — |
+| 20 | 20｜文件證據抽取（文字型 PDF／OCR stub；版面表格待補） | `20_document_parsing.py` | 可選依賴 `pypdf`；OCR 僅 stub，無辨識引擎 |
 | 21 | Chunk 與來源資料模型 | `E07_chunking.py` | — |
 | 22 | 記憶體精確檢索 Baseline | `E08_exact_topk.py` | torch、sentence-transformers 與模型快取 |
 | 23 | MariaDB Vector 持久化銜接 | `E07_vector_store.py` | MariaDB 模式需 mariadb==1.1.14 與設定檔 |
