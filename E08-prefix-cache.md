@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：KV Cache 與 Prefix Cache
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E08_prefix_cache.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 02 節（token）、第 45 節（prefill 與 decode）、第 46 節（記憶體量測）；第 05 節的 KV cache 記憶體公式。

@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：VLM 打標與 Metadata 品質
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E03_vlm_tagging.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 10 節（unknown 與把關）、第 13 節（schema 檢查）、第 15 節（版本紀錄）。後接第 22 節（metadata 過濾）。

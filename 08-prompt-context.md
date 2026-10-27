@@ -4,6 +4,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：Prompt 與 Context Engineering
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 08_prompt_context.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先備：能讀 Python 字串與列表；知道模型輸入會受上下文長度限制。50 分鐘：概念 20 分、Demo 10 分、Workshop 15 分、回顧 5 分。完成後能組織明確提示、區分可信指令與引用資料、以假計數器檢查輸入預算。

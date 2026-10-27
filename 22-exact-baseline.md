@@ -5,6 +5,18 @@
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
+## 流程圖：記憶體精確檢索 Baseline
+
+```mermaid
+flowchart TD
+    A[輸入：課程情境與資料] --> B[執行 E08_exact_topk.py]
+    B --> C{輸入與前置條件有效？}
+    C -- 否 --> D[回報錯誤或拒絕處理]
+    C -- 是 --> E[依本課流程執行核心步驟]
+    E --> F[檢查結果與證據]
+    F --> G[輸出可核對結果]
+```
+
 ## 學習目標與時間
 
 先修第 18 節（cosine 與正規化）、第 19 節（chunk 與來源欄位）。勞動部梯次已在 MariaDB 第 19 節用 SQL `VEC_DISTANCE_COSINE` 做過同一件事；本節用 Python 在記憶體裡重做一次，讓你**不靠資料庫**也能核對資料庫的結果。
