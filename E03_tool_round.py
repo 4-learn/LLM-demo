@@ -15,8 +15,7 @@ import json
 # 只有 --nvidia-live 路徑才會使用；預設重播不載入任何網路依賴。
 import os
 import sys
-import urllib.error
-import urllib.request
+# Lazy import in nvidia_model keeps fixture/replay usable without the SDK.
 
 # 合成事件資料，唯讀。
 EVENTS = (
@@ -160,33 +159,34 @@ def nvidia_model(messages):
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
         raise RuntimeError("選做 live 需在本機設定 NVIDIA_API_KEY；不可寫入程式或命令列")
-    request_body = {
-        "model": "meta/llama-3.1-8b-instruct",
-        "messages": messages,
-        "tools": [{"type": "function", "function": {"name": name,
-                   "description": spec["description"], "parameters": spec["parameters"]}}
-                  for name, spec in TOOLS.items()],
-        "tool_choice": "auto",
-        "temperature": 0,
-        "max_tokens": 160,
-    }
-    req = urllib.request.Request(
-        "https://integrate.api.nvidia.com/v1/chat/completions",
-        data=json.dumps(request_body).encode("utf-8"), method="POST",
-        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
+    try:
+        from openai import OpenAI
+    except ImportError:
+        raise RuntimeError("選做 live 需安裝 openai SDK（pip install 'openai>=1,<3'）；重播不需要") from None
+    client = OpenAI(
+        base_url="https://integrate.api.nvidia.com/v1",
+        api_key=api_key,
+        timeout=45,
+        max_retries=0,
     )
     try:
-        with urllib.request.urlopen(req, timeout=45) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        raise RuntimeError(f"NVIDIA API 回傳 HTTP {exc.code}；勿貼出憑證或完整請求") from None
-    except urllib.error.URLError:
-        raise RuntimeError("NVIDIA API 連線失敗或逾時；不自動重試，以免重複請求") from None
-    choices = payload.get("choices")
-    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+        response = client.chat.completions.create(
+            model="meta/llama-3.1-8b-instruct",
+            messages=messages,
+            tools=[{"type": "function", "function": {"name": name,
+                    "description": spec["description"], "parameters": spec["parameters"]}}
+                   for name, spec in TOOLS.items()],
+            tool_choice="auto",
+            temperature=0,
+            max_tokens=160,
+        )
+    except Exception as exc:
+        # Avoid echoing request headers, credentials, or full provider payloads.
+        raise RuntimeError(f"NVIDIA API 呼叫失敗（{type(exc).__name__}）；不自動重試") from None
+    if not response.choices:
         raise RuntimeError("API 回應缺少 choices；未執行任何工具")
-    message = choices[0].get("message")
-    if not isinstance(message, dict):
+    message = response.choices[0].message
+    if message is None:
         raise RuntimeError("API 回應缺少 assistant message；未執行任何工具")
     # 不原樣執行：將供應商訊息轉成本教材狹窄協定形狀；再由 run_turn/execute 驗證。
     normalized = {"role": "assistant", "content": message.get("content")}

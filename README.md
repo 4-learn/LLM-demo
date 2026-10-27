@@ -21,7 +21,7 @@
 | 13 | OWASP LLM Top 10 與 Guardrails | `13_llm_guardrails.py` | — |
 | 14 | 多模態輸入、證據與未知 | `E03_vision_unknown.py` | Pillow 可選；缺 Pillow 時凍結輸出不同 |
 | 15 | Structured Output：語法、Schema 與語義 | `E07_structured_output.py` | — |
-| 16 | 原生 Function Calling 完整工具回合 | `E03_tool_round.py` | — |
+| 16 | 原生 Function Calling 完整工具回合 | `E03_tool_round.py` | OpenAI SDK（僅 `--nvidia-live`） |
 | 17 | 多供應商介面、LiteLLM 與 API 成本 | `E07_provider_contract.py` | **歷史快照：2026-10-06；非現價/即時能力。** 資料沿用舊 lesson code，凍結輸出需同步修正；使用前重查官方來源 |
 | 18 | Embedding 概念 | `E07_embedding_lab.py` | — |
 | 19 | 相似度、失敗案例與門檻評測 | `E07_similarity_eval.py` | torch、sentence-transformers 與模型快取 |
