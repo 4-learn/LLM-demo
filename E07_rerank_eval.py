@@ -1,4 +1,4 @@
-"""第 23 節：Reranking 與 Retrieval Evaluation（只用 Python 標準函式庫）。
+"""第 26 節：Reranking 與 Retrieval Evaluation（只用 Python 標準函式庫）。
 
 語料與標註都沿用 MariaDB 課：`sop_corpus.json`（16 段）與 `search_cases.json`（8 題 qrels）。
 

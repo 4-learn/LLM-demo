@@ -1,6 +1,6 @@
 # Reranking 與 Retrieval Evaluation
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 23 節：Reranking 與 Retrieval Evaluation。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 26 節：Reranking 與 Retrieval Evaluation。**
 > 檢索分兩段：先撈**候選**，再**重排**。本節的主張：**兩段要分開量**——重排只能調整候選內的順序，救不回沒進候選的段落；而「調整規則後分數變好」只有在**沒看過的題目**上成立才算數。只用 Python 標準函式庫；兩個階段都**不是神經網路**，它們只是站在 bi-encoder 與 cross-encoder 的位置上，讓評測方法可以在沒有模型的教室裡完整跑一遍。
 
 [回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
@@ -46,7 +46,7 @@
 
 <!-- demo: E07_rerank_eval.py -->
 ```python
-"""第 23 節：Reranking 與 Retrieval Evaluation（只用 Python 標準函式庫）。
+"""第 26 節：Reranking 與 Retrieval Evaluation（只用 Python 標準函式庫）。
 
 語料與標註都沿用 MariaDB 課：`sop_corpus.json`（16 段）與 `search_cases.json`（8 題 qrels）。
 
