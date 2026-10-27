@@ -12,7 +12,7 @@
 | 04 | Transformer、Attention、MoE 與推理模型 | `04_transformer_attention.py` | — |
 | 05 | 04｜報告要穩定，還是要活潑？ | `E02_sampling.py` | — |
 | 06 | 05｜該用哪個模型？ | `E02_model_selection.py` | 快照 JSON 日期由資料檔決定；凍結輸出需同步日期 |
-| 07 | 06｜用 API 請模型回答 | `E02_api_basics.py` | — |
+| 07 | 07｜用 API 請模型回答 | `E02_api_basics.py` | OpenAI SDK（僅 `--live`） |
 | 08 | Prompt 與 Context Engineering | `08_prompt_context.py` | — |
 | 09 | 07｜工地電腦跑得動嗎？ | `E02_cpu_smoke.py` | torch、transformers 與 Qwen2.5-0.5B 權重 |
 | 10 | 08｜AI 到底幾分？ | `E03_evaluation.py` | 標準函式庫；--live 需相關模型 |
