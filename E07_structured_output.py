@@ -1,4 +1,4 @@
-"""第 13 節：Structured Output——語法、Schema 與語義（只用 Python 標準函式庫）。
+"""第 15 節：Structured Output——語法、Schema 與語義（只用 Python 標準函式庫）。
 
 三層驗證缺一不可：
   第 1 層 語法：這段字串是不是合法 JSON？

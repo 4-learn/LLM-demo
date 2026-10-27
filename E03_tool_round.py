@@ -1,4 +1,4 @@
-"""第 14 節：原生 Function Calling 的完整工具回合（只用 Python 標準函式庫）。
+"""第 16 節：原生 Function Calling 的完整工具回合（只用 Python 標準函式庫）。
 
 一個完整回合有四步，少一步都不算：
   1. 模型提出 tool call（名稱＋參數＋call ID）
@@ -6,11 +6,17 @@
   3. 執行，把結果連同**同一個 call ID** 回給模型
   4. 模型根據結果寫出最終答覆
 
-模型在這裡由 `ScriptedModel` 扮演：它照劇本回傳訊息，訊息格式仿照
-常見的原生 tool calling 協定。**這是協定重播（fixtures），不是即時模型。**
+預設路徑的模型由 `ScriptedModel` 扮演：它照劇本回傳訊息，訊息格式仿照
+常見的原生 tool calling 協定。**這是協定重播（fixtures），不是即時模型。** 第三節另有明確選做的 NVIDIA Build live 路徑，只傳送這裡的合成問題；live 路徑需網路與 `NVIDIA_API_KEY`，但不會把模型輸出的工具呼叫直接執行。
 """
 
 import json
+
+# 只有 --nvidia-live 路徑才會使用；預設重播不載入任何網路依賴。
+import os
+import sys
+import urllib.error
+import urllib.request
 
 # 合成事件資料，唯讀。
 EVENTS = (
@@ -117,6 +123,63 @@ def run_turn(model, question):
     return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止"
 
 
+def nvidia_model(messages):
+    """以 NVIDIA Build OpenAI 相容 Chat Completions API 呼叫工具。
+
+    僅送合成資料；模型只提出呼叫，回傳訊息由本機 host 驗證後才執行。
+    """
+    api_key = os.environ.get("NVIDIA_API_KEY")
+    if not api_key:
+        raise RuntimeError("選做 live 需在本機設定 NVIDIA_API_KEY；不可寫入程式或命令列")
+    request_body = {
+        "model": "meta/llama-3.1-8b-instruct",
+        "messages": messages,
+        "tools": [{"type": "function", "function": {"name": name,
+                   "description": spec["description"], "parameters": spec["parameters"]}}
+                  for name, spec in TOOLS.items()],
+        "tool_choice": "auto",
+        "temperature": 0,
+        "max_tokens": 160,
+    }
+    req = urllib.request.Request(
+        "https://integrate.api.nvidia.com/v1/chat/completions",
+        data=json.dumps(request_body).encode("utf-8"), method="POST",
+        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=45) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"NVIDIA API 回傳 HTTP {exc.code}；勿貼出憑證或完整請求") from None
+    except urllib.error.URLError:
+        raise RuntimeError("NVIDIA API 連線失敗或逾時；不自動重試，以免重複請求") from None
+    choices = payload.get("choices")
+    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+        raise RuntimeError("API 回應缺少 choices；未執行任何工具")
+    message = choices[0].get("message")
+    if not isinstance(message, dict):
+        raise RuntimeError("API 回應缺少 assistant message；未執行任何工具")
+    # 不原樣執行：將供應商訊息轉成本教材狹窄協定形狀；再由 run_turn/execute 驗證。
+    normalized = {"role": "assistant", "content": message.get("content")}
+    calls = message.get("tool_calls") or []
+    if not isinstance(calls, list):
+        raise RuntimeError("tool_calls 型別錯誤；未執行任何工具")
+    normalized_calls = []
+    for index, call in enumerate(calls, 1):
+        if not isinstance(call, dict) or not isinstance(call.get("function"), dict):
+            raise RuntimeError("tool call 結構錯誤；未執行任何工具")
+        function = call["function"]
+        name = function.get("name")
+        arguments = function.get("arguments")
+        if not isinstance(name, str) or not isinstance(arguments, str):
+            raise RuntimeError("tool name/arguments 型別不符；未執行任何工具")
+        normalized_calls.append({"id": call.get("id") or f"nvidia_call_{index}",
+                                 "type": "function", "function": {"name": name, "arguments": arguments}})
+    if normalized_calls:
+        normalized["tool_calls"] = normalized_calls
+    return normalized
+
+
 def call_ids_match(messages):
     asked = [c["id"] for m in messages if m["role"] == "assistant" for c in m.get("tool_calls") or []]
     answered = [m["tool_call_id"] for m in messages if m["role"] == "tool"]
@@ -157,7 +220,17 @@ SCENARIOS = (
 )
 
 
-def main():
+def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--nvidia-live" in argv:
+        if os.environ.get("NVIDIA_API_KEY") is None:
+            raise SystemExit("選做 live 需先在本機環境設定 NVIDIA_API_KEY；不可把 key 貼進對話、筆記或命令列")
+        question = "A 工地 10/04 起有幾次未戴安全帽？只可用唯讀工具查詢；若資料不足請說明。"
+        messages, status = run_turn(nvidia_model, question)
+        show("NVIDIA Build live（僅合成資料）", messages, status)
+        return
+    if argv:
+        raise SystemExit("用法：python3 E03_tool_round.py [--nvidia-live]")
     print(f"工具 allowlist：{sorted(TOOLS)}｜回合上限：{MAX_TOOL_ROUNDS}｜事件 {len(EVENTS)} 筆（合成、唯讀）")
     print()
     for title, question, script in SCENARIOS:
