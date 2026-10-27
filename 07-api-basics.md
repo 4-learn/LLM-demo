@@ -1,4 +1,4 @@
-# 06｜用 API 請模型回答
+# 07｜用 API 請模型回答
 
 > **定位**：用可檢查的 HTTP API 請求／回應格式，理解程式如何準備訊息並讀取模型服務的答覆；本節以離線 fixture 重播，不實際建立網路連線，也不需要帳號或金鑰。真實呼叫僅作概念延伸，不是本節的必做前提。
 
@@ -9,7 +9,7 @@
 - 從一筆合成事件建立 chat completion 請求，辨認輸入、輸出、usage 與錯誤
 - 在不洩漏憑證、不送真實個資、不把模型當成法規或工安判斷者的前提下，安全地描述真實 API 呼叫的條件
 
-[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 51 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 範例程式碼
 
@@ -248,7 +248,7 @@ unset NVIDIA_API_KEY
 - [Meta Llama 3.1 8B Instruct API 參考](https://docs.api.nvidia.com/nim/reference/meta-llama-3_1-8b-infer)
 - [NVIDIA Build 模型頁](https://build.nvidia.com/meta/llama-3.1-8b-instruct)
 
-本教材示例使用 NVIDIA NIM OpenAI 相容端點 `https://integrate.api.nvidia.com/v1/chat/completions` 和模型 ID `meta/llama-3.1-8b-instruct`。這些資訊以編寫時的官方文件為準；服務可能下架、限制帳號或更新端點，教師授課前須實際確認可用性與費用政策。未確認前，離線 fixture 仍是完整可執行的必做路徑。
+本教材示例使用 OpenAI Python SDK 的 `client.chat.completions.create`，設定 `base_url="https://integrate.api.nvidia.com/v1"` 和模型 ID `meta/llama-3.1-8b-instruct`。這些資訊以編寫時的官方文件為準；服務可能下架、限制帳號或更新端點，教師授課前須實際確認可用性與費用政策。未確認前，離線 fixture 仍是完整可執行的必做路徑。
 
 ---
 
