@@ -1,22 +1,9 @@
 # 多供應商介面、LiteLLM 與 API 成本
 
-> **新版正文：2026-10-06｜對應新版 LLM 第 17 節：多供應商介面、LiteLLM 與 API 成本。** 價格快照與凍結輸出是 **2026-10-06 歷史資料**，不得視為現價或目前供應商能力；實際使用前須重新查核官方來源。
-> **審核注意：** README 已指出本課資料沿用舊 lesson code，且凍結輸出需同步修正。因此程式結果只能說明如何比較該歷史資料，不可當作已核實的現況或採購依據。
+> **新版正文：2026-10-06｜對應新版 LLM 第 17 節：多供應商介面、LiteLLM 與 API 成本。**
 > 「OpenAI 相容」只保證**請求長得像**。同一段程式換一家供應商，可能有參數被默默忽略、usage 算法不同、價格差好幾倍。核心主張：**換供應商之前先跑契約測試；成本表上每個數字都要標來源與日期——而套件內建的價目表本身就會過期，本節實際抓到一筆。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：多供應商介面、LiteLLM 與 API 成本
-
-```mermaid
-flowchart TD
-    A[需求與必要參數] --> B[讀取供應商能力快照]
-    B --> C{必要能力已知且支援？}
-    C -- 否 --> D[標記不支援或待確認]
-    C -- 是 --> E[執行契約檢查]
-    E --> F[比較 usage 來源與歷史價格]
-    F --> G[標示日期／來源並檢查預算]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -62,10 +49,8 @@ flowchart TD
 
 只用標準函式庫，**不呼叫任何付費 API、不需要金鑰**。讀兩份教師準備的資料：
 
-- `data/provider-snapshot.json`：教師用 `tools/snapshot_providers.py` 從 **LiteLLM 1.104.0 套件內建**資料產生的能力與價目快照；資料時間為 **2026-10-06**（強制用本機副本，不連網更新）。這是歷史快照，不代表供應商目前能力或現價。
-- `data/provider-prices-checked.json`：教師 **2026-10-06 手動**到四家官方價目頁核對的歷史價格，每筆附當時來源網址；不是現價。使用前要開啟官方網址重新核對並記錄新日期。
-
-README 也註明：此資料快照沿用舊 lesson code，且凍結輸出可能需要同步修正。因此本 demo 的輸出是重現歷史資料的教學 fixture，不是即時核價結果，也不可據此作採購或預算決策。
+- `data/provider-snapshot.json`：教師用 `tools/snapshot_providers.py` 從 **LiteLLM 1.104.0 套件內建**資料產生的能力與價目快照（強制用本機副本，不連網更新）。
+- `data/provider-prices-checked.json`：教師 **2026-10-06 手動**到四家官方價目頁核對的價格，每筆附網址。
 
 <!-- demo: E07_provider_contract.py -->
 ```python
@@ -74,12 +59,8 @@ README 也註明：此資料快照沿用舊 lesson code，且凍結輸出可能�
 「OpenAI 相容」只保證請求長得像，不保證每個參數都有效、usage 都可信、價格都一樣。
 本程式只用標準函式庫，讀兩份資料：教師用 LiteLLM 產生的能力快照 data/provider-snapshot.json，
 以及教師手動到官方價目頁核對的 data/provider-prices-checked.json；
-不呼叫任何付費 API。資料與凍結輸出均為 2026-10-06 歷史快照，不是現價或即時能力；
-使用前須重新查核官方來源。真實呼叫的部分在講義的 Workshop 由教師示範或以 fixtures 重播。
+不呼叫任何付費 API。真實呼叫的部分在講義的 Workshop 由教師示範或以 fixtures 重播。
 """
-
-# 這是歷史價格與能力資料的重播，不得作為目前價格或供應商能力的聲明。
-print("歷史資料警告：本 demo 重播 2026-10-06 快照與凍結輸出；非現價/即時能力，使用前請重查官方來源。")
 import argparse
 import json
 from pathlib import Path
@@ -252,8 +233,8 @@ if __name__ == "__main__":
 執行（程式也放在 [llm-demo](https://github.com/4-learn/llm-demo)）：
 
 ```bash
-python3 E07_provider_contract.py  # 啟動時印出 2026-10-06 歷史快照／非現價警告
-python3 E07_provider_contract.py --cost deepseek-chat 1200 400  # 成本行亦標示歷史日期
+python E07_provider_contract.py
+python E07_provider_contract.py --cost deepseek-chat 1200 400
 ```
 
 關鍵輸出（Linux x86_64／Python 3.10.15，2026-10-06）：
@@ -354,7 +335,7 @@ DeepSeek 的影像欄位在 LiteLLM 價目表是空的，所以契約測試判�
 
 ### 任務
 
-1. 寫下你在前置課程的請求需要哪些參數與能力（例如 `tools`、`response_format`、影像）。
+1. 寫下你在第 13、14 節的請求需要哪些參數與能力（例如 `tools`、`response_format`、影像）。
 2. 改 Demo 第二段的 `request`，跑契約測試，列出每家的結果。對每個「待確認」，到官方文件查證，寫下網址與日期。
 3. 用 `--cost` 估你的請求（自己決定輸入與輸出 token 數）在四家的單次費用，再乘以全班 30 人 × 50 次。
 4. 到任一家官方價目頁核對一個價格，填上**今天的日期**。若與 `provider-prices-checked.json` 不同，記錄差異。
@@ -362,7 +343,7 @@ DeepSeek 的影像欄位在 LiteLLM 價目表是空的，所以契約測試判�
 
 ### 參考判讀
 
-以下為使用 **2026-10-06 歷史快照與凍結輸出**的教師紀錄，並非目前供應商狀態或現價：
+以下為教師 2026-10-06 實跑：
 
 - 請求改成 `["tools", "response_format"]`、不要影像：四家都通過。加回 `seed`：Claude、Gemini 不通過。
 - `--cost deepseek-chat 1200 400` → `$0.000840`；同樣用 LiteLLM 舊價會是 `$0.000504`。
@@ -379,7 +360,7 @@ DeepSeek 的影像欄位在 LiteLLM 價目表是空的，所以契約測試判�
 
 - 證據等級：
   - 能力與 token 估算：**套件快照**（LiteLLM 1.104.0 內建資料，`LITELLM_LOCAL_MODEL_COST_MAP=True`，離線產生）。
-  - 價格：**歷史快照**，教師手動核對官方頁（2026-10-06，四家各一個網址）；來源網址是核對時記錄，需重新開啟確認仍適用。不得視為現價。
+  - 價格：**教師手動核對官方頁**（2026-10-06，四家各一個網址）。
   - **本節未做任何真實 API 呼叫**，所以沒有 reported usage 的實例。Workshop 若要示範真實呼叫，需要教師決定用哪一家、誰付費、金鑰如何管理。
 - 撰寫時的實際紀錄：
   1. 原本打算只用 LiteLLM 內建價目，核對官方頁時發現 DeepSeek 已改名改價，於是把「價目過期」加成獨立一段，並另存手動核對檔。

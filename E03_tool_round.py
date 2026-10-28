@@ -1,6 +1,6 @@
 """第 16 節：原生 Function Calling 的完整工具回合（只用 Python 標準函式庫）。
 
-一個成功完整回合有四步，少一步都不算；協定重播若達回合上限，工具結果不會再送模型，不會有最終答覆：
+一個完整回合有四步，少一步都不算：
   1. 模型提出 tool call（名稱＋參數＋call ID）
   2. **應用程式**決定要不要執行：allowlist、參數驗證、權限
   3. 執行，把結果連同**同一個 call ID** 回給模型
@@ -15,7 +15,8 @@ import json
 # 只有 --nvidia-live 路徑才會使用；預設重播不載入任何網路依賴。
 import os
 import sys
-# Lazy import in nvidia_model keeps fixture/replay usable without the SDK.
+import urllib.error
+import urllib.request
 
 # 合成事件資料，唯讀。
 EVENTS = (
@@ -53,11 +54,6 @@ EXECUTORS = {"count_events": count_events}
 
 
 def validate_args(name, args):
-    """Validate the JSON value's object shape and the tool's declared schema."""
-    if name not in TOOLS:
-        return [f"工具 {name!r} 不在 allowlist"]
-    if not isinstance(args, dict):
-        return ["arguments 必須是 JSON object（JSON 物件）"]
     spec = TOOLS[name]["parameters"]
     errors = [f"缺少必填參數 {k}" for k in spec["required"] if k not in args]
     for key, value in args.items():
@@ -79,20 +75,11 @@ def execute(call):
     else:
         try:
             args = json.loads(call["function"]["arguments"])
-        except (json.JSONDecodeError, TypeError) as error:
-            detail = error.msg if isinstance(error, json.JSONDecodeError) else str(error)
-            content = {"error": f"參數不是合法 JSON：{detail}"}
-        else:
+        except json.JSONDecodeError as error:
+            args, content = None, {"error": f"參數不是合法 JSON：{error.msg}"}
+        if args is not None:
             problems = validate_args(name, args)
-            if problems:
-                content = {"error": "；".join(problems)}
-            else:
-                try:
-                    content = EXECUTORS[name](**args)
-                except (TypeError, ValueError) as error:
-                    # Keep malformed arguments inside the tool protocol instead of
-                    # crashing the host application's request loop.
-                    content = {"error": f"工具參數或值無效：{error}"}
+            content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
     return {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(content, ensure_ascii=False)}
 
 
@@ -127,28 +114,13 @@ def run_turn(model, question):
     messages = [{"role": "user", "content": question}]
     for _ in range(MAX_TOOL_ROUNDS):
         reply = model(messages)
-        if not isinstance(reply, dict) or reply.get("role") != "assistant":
-            return messages, "協定錯誤：模型回覆格式無效，停止執行"
-        calls = reply.get("tool_calls") or []
-        if not isinstance(calls, list):
-            return messages, "協定錯誤：tool_calls 必須是清單，停止執行"
-        if not calls:
-            messages.append(reply)
-            return messages, "完成"
-        validated = []
-        seen_ids = set()
-        for call in calls:
-            if (not isinstance(call, dict) or not isinstance(call.get("id"), str)
-                    or not call["id"] or call["id"] in seen_ids
-                    or not isinstance(call.get("function"), dict)
-                    or not isinstance(call["function"].get("name"), str)
-                    or not isinstance(call["function"].get("arguments"), str)):
-                return messages, "協定錯誤：tool call 結構或 ID 無效，停止執行"
-            seen_ids.add(call["id"])
-            validated.append(call)
         messages.append(reply)
-        messages.extend(execute(call) for call in validated)
-    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止；最後工具結果未再送回模型，尚無最終答覆"
+        calls = reply.get("tool_calls") or []
+        if not calls:
+            return messages, "完成"
+        for call in calls:
+            messages.append(execute(call))
+    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止"
 
 
 def nvidia_model(messages):
@@ -159,34 +131,33 @@ def nvidia_model(messages):
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
         raise RuntimeError("選做 live 需在本機設定 NVIDIA_API_KEY；不可寫入程式或命令列")
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise RuntimeError("選做 live 需安裝 openai SDK（pip install 'openai>=1,<3'）；重播不需要") from None
-    client = OpenAI(
-        base_url="https://integrate.api.nvidia.com/v1",
-        api_key=api_key,
-        timeout=45,
-        max_retries=0,
+    request_body = {
+        "model": "meta/llama-3.1-8b-instruct",
+        "messages": messages,
+        "tools": [{"type": "function", "function": {"name": name,
+                   "description": spec["description"], "parameters": spec["parameters"]}}
+                  for name, spec in TOOLS.items()],
+        "tool_choice": "auto",
+        "temperature": 0,
+        "max_tokens": 160,
+    }
+    req = urllib.request.Request(
+        "https://integrate.api.nvidia.com/v1/chat/completions",
+        data=json.dumps(request_body).encode("utf-8"), method="POST",
+        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
     )
     try:
-        response = client.chat.completions.create(
-            model="meta/llama-3.1-8b-instruct",
-            messages=messages,
-            tools=[{"type": "function", "function": {"name": name,
-                    "description": spec["description"], "parameters": spec["parameters"]}}
-                   for name, spec in TOOLS.items()],
-            tool_choice="auto",
-            temperature=0,
-            max_tokens=160,
-        )
-    except Exception as exc:
-        # Avoid echoing request headers, credentials, or full provider payloads.
-        raise RuntimeError(f"NVIDIA API 呼叫失敗（{type(exc).__name__}）；不自動重試") from None
-    if not response.choices:
+        with urllib.request.urlopen(req, timeout=45) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"NVIDIA API 回傳 HTTP {exc.code}；勿貼出憑證或完整請求") from None
+    except urllib.error.URLError:
+        raise RuntimeError("NVIDIA API 連線失敗或逾時；不自動重試，以免重複請求") from None
+    choices = payload.get("choices")
+    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
         raise RuntimeError("API 回應缺少 choices；未執行任何工具")
-    message = response.choices[0].message
-    if message is None:
+    message = choices[0].get("message")
+    if not isinstance(message, dict):
         raise RuntimeError("API 回應缺少 assistant message；未執行任何工具")
     # 不原樣執行：將供應商訊息轉成本教材狹窄協定形狀；再由 run_turn/execute 驗證。
     normalized = {"role": "assistant", "content": message.get("content")}

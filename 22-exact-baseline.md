@@ -1,22 +1,9 @@
 # 記憶體精確檢索 Baseline
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 22 節：記憶體精確檢索 Baseline。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 20 節：記憶體精確檢索 Baseline。**
 > 在用資料庫或索引加速之前，先做出一個**每一筆都算過**的版本：16 段向量放進一個矩陣，查詢時全部乘完再排序。它慢、但可以逐筆核對，所以它是之後所有近似方法的**標準答案**。核心主張：**精確 baseline 要能證明自己是精確的——自我查詢、逐筆核對、固定同分順序、記下模型與資料版本。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：記憶體精確檢索 Baseline
-
-```mermaid
-flowchart TD
-    A[語料與查詢] --> B[Tokenizer／Embedding 產生正規化向量]
-    B --> C[建立記憶體 ExactIndex]
-    C --> D[按權限／active metadata 先過濾]
-    D --> E[對合格向量全部計分並排序]
-    E --> F[依穩定同分規則取 top-k]
-    F --> G[自我查詢與逐筆計算核對]
-    G --> H[輸出排名、分數與版本 fingerprint]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

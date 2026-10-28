@@ -1,26 +1,9 @@
 # LangGraph State 與 Reducer
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 30 節：LangGraph State 與 Reducer。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 27 節：LangGraph State 與 Reducer。**
 > 第一次用 LangGraph。graph 裡每個節點只回傳「要更新哪些欄位」，**怎麼把更新併回 state 由 reducer 決定**。核心主張：**同一個 graph、同一份輸入，只差一行 reducer，結果就從「默默丟資料」「當掉」變成「正確合併」；而框架不會替你擋欄位打錯字。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：LangGraph State 與 Reducer
-
-```mermaid
-flowchart TD
-    A[初始 TypedDict state] --> B[vision 節點回傳部分 findings 更新]
-    A --> C[text 節點回傳部分 findings 更新]
-    B --> D[欄位 reducer 合併更新]
-    C --> D
-    D --> E{比較 reducer 規則}
-    E --> F[Overwrite：後值覆蓋／並行衝突]
-    E --> G[Append：串接但重跑可能重複]
-    E --> H[merge_by_id：依穩定 id 合併排序]
-    F --> I[對照循序／並行 state 結果]
-    G --> I
-    H --> I
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

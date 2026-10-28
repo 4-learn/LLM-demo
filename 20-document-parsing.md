@@ -1,26 +1,12 @@
-# 20｜文件證據抽取（文字型 PDF、OCR 分流與人工覆核示例）
+# 20｜文件證據抽取（PDF 解析／OCR／版面表格待補）
 
-> **正文改版：2026-10-28｜對應新版 LLM 第 20 節：文件證據抽取（可選性 PDF 文字抽取；OCR／版面表格待補）。**本節用 `pypdf` 對合成文字型 PDF 做實際文字抽取並保留 1-based 頁碼；不宣稱通用 PDF parser。空文字頁可交給注入的 OCR stub 展示分流，但未包含 OCR 引擎；OCR 結果標記為需人工覆核。版面表格、掃描品質與真實文件準確率仍未驗證。
+> **正文改版：2026-10-24｜對應新版 LLM 第 20 節：真實文件解析。**本節以合成頁面文字教授欄位抽取與證據定位，並可產生含可選取文字的 PDF fixture；未使用 PDF parser、未辨識版面表格或 OCR，也不模擬掃描辨識率。完整實際文件流程仍待補。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：文件證據抽取（可選性 PDF 文字抽取；OCR／版面表格待補）
-
-```mermaid
-flowchart TD
-    A[PDF 文件] --> B[逐頁抽取文字層並保留 1-based 頁碼]
-    B --> C{頁面有可抽文字？}
-    C -- 是 --> D[保留原文行與頁面 provenance]
-    C -- 否 --> E[送 OCR seam／stub 並標記待覆核]
-    D --> F[欄位與證據抽取]
-    E --> F
-    F --> G[版面／表格能力未涵蓋，需核對原頁]
-    G --> H[輸出欄位值、頁碼、原文證據與狀態]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
-先備：能讀懂 Python 字典、字串與條件判斷；不需模型或網路。建議 50 分鐘：概念 30 分鐘（頁面文字與來源 10、抽取 10、OCR/覆核界線 10），Workshop 20 分鐘。標準函式庫測試可直接執行；實際讀取 PDF 文字需安裝可選依賴 `python3 -m pip install pypdf`。程式遇到缺少 `pypdf` 時會給明確安裝錯誤；單元測試會對該依賴測試標記 skip。
+先備：能讀懂 Python 字典、字串與條件判斷；不需 OCR、模型或網路。建議 50 分鐘：概念 35 分鐘（頁面結構 10、證據抽取 15、限制與錯誤 10），Workshop 15 分鐘。若要執行 PDF 解析片段，另需教師或學生自行安裝 `pypdf`；核心同源 Demo 仍只依賴標準函式庫。
 
 ## 一、頁面不是一串欄位
 
@@ -36,28 +22,20 @@ flowchart TD
 
 ## 四、可執行 Demo
 
-<!-- demo: tools/demo_document_parsing.py -->
+同源 Demo 只用合成文字證據，示範「工單編號」欄標籤抽取、來源保留與候選歧義拒答；執行：`python3 20_document_parsing.py`。另有兩段**可選擇性 PDF 操作（不屬同源測試涵蓋）**：先執行 `python3 tools/demo_document_parsing.py /tmp/work-order.pdf` 產生可選取文字的合成 PDF，再以 `pypdf` 讀取頁面文字並交給同一欄位抽取函式。這只驗證文字型 PDF 可抽出文字，不是 OCR、版面表格或任意 PDF 解析；安裝/版本差異需另行記錄。
 
-同源 Demo 保留了手動輸入頁面行的欄位抽取案例；另外現在有可執行 PDF 路徑，會用 `pypdf` 逐頁抽取文字並保留 1-based 頁碼。執行：
-
-```bash
-python3 tools/demo_document_parsing.py /tmp/work-order.pdf
-python3 20_document_parsing.py /tmp/work-order.pdf
-# The CLI supplies an explicitly labelled OCR stub for pages with no text layer.
-python3 -m unittest tools.test_demo_document_parsing -v
+```python
+# 可選操作片段；同源 test_lessons.py 不會執行本區塊。
+from pypdf import PdfReader
+reader = PdfReader("/tmp/work-order.pdf")
+pages = [(i, (page.extract_text() or "").splitlines())
+         for i, page in enumerate(reader.pages, 1)]
+print(extract_ticket(pages))
 ```
 
-若缺少 `pypdf`，第二個命令會以明確錯誤提示安裝方式；測試中的 parser integration case 會標記 skip，其餘測試仍可跑。解析僅限 PDF 文字層可抽取的內容，並非通用 parser，不會推斷複雜閱讀順序或表格結構。空文字頁可以送到注入的 OCR callable；本教材測試只用 stub 回傳固定行，`source=ocr_fixture` 且 `needs_review=True`，**不是 OCR 結果，也不是準確率證據**。真實 OCR 要保留原頁影像、辨識引擎/版本/設定與逐頁輸出，核對欄位、頁碼、否定詞、數字與表格後才可採用；低信心、缺頁、歧義或無法回指原文時須人工覆核，不可讓模型補造證據。
-
-<!-- demo: 20_document_parsing.py; full file is shown here, PDF CLI above -->
+<!-- demo: 20_document_parsing.py -->
 ```python
-"""Extract ticket evidence from page text; PDF support is limited to pypdf text layer.
-
-This is a small teaching example, not a general document parser. It does not
-understand layout/tables or perform OCR.
-"""
 import re
-from pathlib import Path
 
 PAGES = [
     (1, ["維修紀錄", "工單編號：WO-2048", "日期：2026-04-02"]),
@@ -88,50 +66,9 @@ def extract_ticket(pages):
     return {"status": "ok", **candidates[0]}
 
 
-def extract_pdf_pages(path):
-    """Return [(1-based page number, [text lines])]; requires optional pypdf.
-
-    Empty text is kept as an empty page so callers can route it to OCR. Encrypted,
-    malformed, image-only and layout-heavy PDFs require separate handling.
-    """
-    try:
-        from pypdf import PdfReader
-    except ImportError as exc:
-        raise RuntimeError("PDF 文字抽取需要可選依賴 pypdf：pip install pypdf") from exc
-    reader = PdfReader(str(Path(path)))
-    pages = []
-    for page_no, page in enumerate(reader.pages, 1):
-        text = page.extract_text() or ""
-        pages.append((page_no, text.splitlines()))
-    return pages
-
-
-def route_pages_for_review(pages, ocr):
-    """Keep text-layer pages; send empty pages to an injected OCR callable.
-
-    `ocr(page_no)` is only a seam for a provider/fixture. No OCR engine is
-    bundled and OCR output must be reviewed against the original page image.
-    """
-    routed = []
-    for page_no, lines in pages:
-        if any(line.strip() for line in lines):
-            routed.append({"page": page_no, "source": "text_layer", "lines": list(lines), "needs_review": False})
-        else:
-            ocr_lines = ocr(page_no)
-            routed.append({"page": page_no, "source": "ocr_fixture", "lines": list(ocr_lines), "needs_review": True})
-    return routed
-
-
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) > 1:
-        pdf_pages = extract_pdf_pages(sys.argv[1])
-        routed = route_pages_for_review(pdf_pages, lambda page_no: [f"OCR stub: page {page_no} requires human review"] )
-        text_pages = [(item["page"], item["lines"]) for item in routed]
-        print({"pages": routed, "ticket": extract_ticket(text_pages)})
-    else:
-        print(extract_ticket(PAGES))
-        print(extract_ticket([(1, ["維修紀錄", "日期：2026-04-02"])]))
+    print(extract_ticket(PAGES))
+    print(extract_ticket([(1, ["維修紀錄", "日期：2026-04-02"])]))
 ```
 
 關鍵輸出（本次實際執行；標準函式庫、合成 fixtures）：
@@ -143,8 +80,8 @@ if __name__ == "__main__":
 
 ## Workshop
 
-20 分鐘：確認文字型 PDF 逐頁保留頁碼；再用注入的固定 OCR stub 處理空文字頁，確認該頁標記 `source=ocr_fixture` 與 `needs_review=True`，明白它不是辨識結果。單筆、缺失與多筆工單案例分別應回傳 `ok`、`missing`、`ambiguous`。
+15 分鐘：前 5 分鐘把第二個頁面增加一行工單編號；接著 5 分鐘再增加另一個不同編號；最後 5 分鐘可選執行 PDF fixture 產生器與 `pypdf` 抽取片段，觀察原文行交給同一抽取函式的結果。參考判讀：單筆應為 `ok`，沒有標籤為 `missing`，多筆不得任選其一，應為 `ambiguous`；PDF 解析片段只適用含可抽取文字的此 fixture。可執行驗收：複製 Demo 後新增 `assert extract_ticket([(3, ["工單編號：WO-3001"])])["value"] == "WO-3001"`、`assert extract_ticket([])["status"] == "missing"`，並確認兩筆候選回傳 `ambiguous` 且 evidence 長度為 2；執行 `python3` 檔案時三項斷言皆通過。
 
 ## 教師紀錄與下一步
 
-本次驗證範圍：由標準函式庫產生的單頁文字型 PDF fixture；實際 pypdf parser integration 測試在未安裝 pypdf 的環境標記 skip，缺依賴錯誤提示另有測試。無 OCR 引擎、掃描文件、版面表格或真實文件準確率測試；OCR 僅以注入 stub 示範分流，需人工對照原頁覆核。不得外推為通用 PDF/OCR 能力。尚未實班試教，沒有學生實測結果。
+證據級別：本次實際執行教材內嵌程式，日期 2026-10-24；環境 Linux Ubuntu 20.04 x86_64、Python 3.11.2、standard library；模型不適用；量測方式為直接執行並抄錄 stdout。合成 fixtures 僅測結構化頁面輸入的規則抽取；另有標準函式庫產生之文字型 PDF fixture，可選用 `pypdf` 解析其可選取文字，但不是通用 PDF 抽取驗證。未涵蓋掃描 PDF、OCR、版面配置、表格合併、手寫辨識、文件語言變異或準確率評估；不得外推至真文件。尚未實班試教，沒有學生實測結果。下一節可銜接切塊與證據索引；舊教材連結僅供歷史參照，未宣稱同步。

@@ -1,23 +1,10 @@
 # LLM 與 MCP 的完整工具回合
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 38 節：LLM 與 MCP 完整工具回合。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 35 節：LLM 與 MCP 完整工具回合。**
 > 第 14 節用劇本扮演模型，第 33、34 節只有 MCP、沒有模型。本節把兩邊接起來，模型是示範機上的 Qwen2.5-0.5B-Instruct：**模型看到工具 → 提出呼叫 → host 檢查 → MCP server 執行 → 結果回到模型 → 模型寫最終答覆**。核心主張：**工具結果要回到模型，不是直接印給使用者；模型拿到錯誤或不完整的結果，仍可能寫出很肯定的答案，所以 host 對最終答覆也要檢查。**
 > 本節不是「本機小模型可以上線」的證明：0.5B 模型在本節就示範了它會答錯、會回簡體字。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：LLM 與 MCP 完整工具回合
-
-```mermaid
-flowchart TD
-    A[建立 MCP server 與工具 schema] --> B[轉為模型工具宣告]
-    B --> C[Replay/LocalQwen 統一介面請求]
-    C --> D[解析模型 tool call]
-    D --> E[驗證後呼叫 MCP 工具]
-    E --> F[以 call_id 配對工具結果並回填]
-    F --> G[模型生成 final answer]
-    G --> H[檢查回答、配對與錯誤案例]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -87,7 +74,14 @@ MCP 回傳 `CallToolResult`：`content` 是一串內容區塊，`is_error` 說�
 
 ## 五、可執行 Demo
 
-### Session 1：MCP tools 與模型 adapter
+情境沿用第 14 節：合成的工地事件，10 筆。server 有三個工具，host 只開放兩個唯讀工具給模型。
+
+- 情境 1～5：**錄製**。示範機實際跑 Qwen2.5-0.5B-Instruct（greedy 解碼，不抽樣）產生的輸出，凍結在 `data/35-tool-round-fixtures.json`。重播時以「完整提示的雜湊」查表，host 改了任何一則訊息，就會查不到並報錯，不會悄悄用舊答案。
+- 情境 6～8：**構造**。教師手寫的模型輸出，用來測 host 的分支（模型不太會自己做這些事）。
+
+預設是重播，只需要 `mcp==2.3.0`。加 `--live` 就真的載入本機模型（需要第 07 節的套件與權重，示範機 4-learn 約 49 秒）。
+
+### Call session 1：MCP tools 與模型 adapter
 
 **系統層：MCP server 能力轉成模型工具描述**
 
@@ -109,7 +103,7 @@ flowchart TD
     D --> E[組成模型 tools 定義]
 ```
 
-### Session 2：工具回合、結果配對與答覆檢查
+### Call session 2：工具回合、結果配對與答覆檢查
 
 **系統層：Host 驗證、MCP 執行、回填結果**
 

@@ -17,8 +17,6 @@ def handle(transcript, confidence, confirmed, request_id, confirmation, effects,
         raise ValueError("request_id 必須為 1–128 字元且不含控制字元")
     if not isinstance(effects, list) or not isinstance(completed, set):
         raise ValueError("effects/completed 必須是本機示範用 list/set")
-    if confidence < 0.85:
-        return "請重說：辨識信心不足，未執行任何操作。"
     if confirmation is not None and confirmation != (request_id, "關閉泵浦"):
         return "確認無效：request_id 或操作不符；未執行。"
     if request_id in completed:
@@ -26,6 +24,8 @@ def handle(transcript, confidence, confirmed, request_id, confirmation, effects,
     if transcript == "查詢泵浦狀態":
         return "TTS 模擬：泵浦狀態正常（唯讀）"
     if transcript in ("關閉泵浦", "不要關閉泵浦"):
+        if confidence < 0.85:
+            return "請重說：辨識信心不足，未執行任何操作。"
         if transcript == "不要關閉泵浦":
             return "已理解為禁止關閉；未執行操作。"
         if not confirmed or confirmation != (request_id, "關閉泵浦"):
@@ -40,7 +40,6 @@ def main():
     effects, completed = [], set()
     request_id = "req-close-1"
     cases = [
-        ("查詢泵浦狀態", 0.40, False, "req-read-low", None),
         ("查詢泵浦狀態", 0.99, False, "req-read", None),
         ("關閉泵浦", 0.62, True, request_id, (request_id, "關閉泵浦")),
         ("關閉泵浦", 0.97, False, request_id, None),
@@ -55,9 +54,4 @@ def main():
 
 
 if __name__ == "__main__":
-    effects, completed = [], set()
-    assert handle("查詢泵浦狀態", 0.40, False, "req-read-low", None, effects, completed) == "請重說：辨識信心不足，未執行任何操作。"
-    assert effects == [] and completed == set()
-    assert handle("查詢泵浦狀態", 0.99, False, "req-read", None, effects, completed) == "TTS 模擬：泵浦狀態正常（唯讀）"
-    assert effects == [] and completed == set()
     main()

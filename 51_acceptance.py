@@ -137,7 +137,7 @@ def main(argv=()):
     rows = manifest()
     if not rows:
         sys.exit("找不到 NN-*.md 講義；請在教材資料夾執行，而非只有程式的 llm-demo")
-    print(f"教材資料夾：第 51 節驗收前置必修 01–50 中已撰寫講義 {len(rows)} 節（提案與本節不列入掃描）")
+    print(f"教材資料夾：必修第 01–50 節中已撰寫講義 {len(rows)} 節（提案與本節不列入掃描）")
     print("\n== 一、來源 manifest（節次｜程式｜證據等級｜資料檔雜湊） ==")
     for r in rows:
         data = "、".join(f"{k}@{v}" for k, v in r["data"].items()) or "—"

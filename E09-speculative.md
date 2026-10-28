@@ -1,23 +1,9 @@
 # 推測解碼與服務端推論
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 E09 節：推測解碼與服務端推論。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 49 節：推測解碼與服務端推論。**
 > 推測解碼（speculative decoding）讓 decode 一次前進好幾個 token：先用便宜的方法**猜**接下來幾個 token，再讓目標模型**一次 forward 驗證**全部候選，接受從頭開始連續猜對的部分。本節在示範機 CPU 上真的實作一個最小版本：draft 不是另一個模型，而是「在輸入裡找相同的片段」（prompt lookup），驗證規則是 greedy。重點是**輸出與一般 greedy 逐 token 相同**，加速多少完全取決於接受率。第二部分用標準函式庫模擬服務端的 continuous batching。核心主張：**推測解碼是 token 級的猜測＋驗證，不是小模型先答、大模型再審；效益取決於接受率、配對、batch 與硬體，要量了才知道。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：推測解碼與服務端推論
-
-```mermaid
-flowchart TD
-    A[上下文 token] --> B[lookup_draft 提出 n-gram 草稿]
-    B --> C[Target logits/KV 驗證草稿 token]
-    C --> D{前綴 token 符合 greedy target？}
-    D -- 是 --> E[接受連續匹配前綴]
-    D -- 否 --> F[拒絕並使用 target token 修正]
-    E --> G[保持 greedy 輸出等價]
-    F --> G
-    H[另行模擬 static/continuous batching] -. 服務排程比較 .-> I[不等同解碼接受演算法]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

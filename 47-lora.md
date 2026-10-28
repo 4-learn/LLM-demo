@@ -1,26 +1,9 @@
 # LoRA 低秩權重與訓練紀錄判讀
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 47 節：LoRA 低秩權重與教師訓練紀錄。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 43 節：LoRA 低秩權重與教師訓練紀錄。**
 > LoRA 不改 base 模型，只在指定的線性層旁邊加一個低秩更新 `ΔW = B A`。本節先用小矩陣看 rank 與參數量，再用 Qwen2.5-0.5B 的**真實 config** 算不同設定要訓練多少參數，最後判讀三份訓練紀錄。**本節不訓練任何模型**；三份紀錄是**為教學編的合成資料**，不是實訓結果。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：LoRA 低秩權重與教師訓練紀錄
-
-```mermaid
-flowchart TD
-    A[選定 base 模型與 revision] --> B[凍結 base 權重 W]
-    B --> C[選 target modules 與 rank r]
-    C --> D[初始化低秩矩陣 A、B；ΔW = B A]
-    D --> E[訓練資料前向：W x + ΔW x]
-    E --> F[只更新 LoRA A／B，base 保持凍結]
-    F --> G[按 train 更新參數並記錄 train loss]
-    G --> H[定期用 validation 評估並保存 checkpoint]
-    H --> I{有更佳 validation checkpoint？}
-    I -- 是 --> J[選用最佳 checkpoint]
-    I -- 否 --> G
-    J --> K[計算參數量與有效更新 ΔW]
-    K --> L[評估 held-out/test；檢查效果與過擬合]
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

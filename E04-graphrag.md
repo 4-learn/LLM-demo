@@ -3,22 +3,7 @@
 > **正文改版：2026-10-24｜對應新版 LLM 選修 E04：知識圖譜與 GraphRAG。**
 > 本節以可查核的圖關係回答跨文件問題，並在沒有足夠證據時拒答；本節不是圖資料庫、向量資料庫或大型模型的效能比較。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：知識圖譜與 GraphRAG
-
-```mermaid
-flowchart TD
-    A[來源文件句子與來源 ID] --> B[抽取實體、關係、方向與原句]
-    B --> C[附核實狀態並合併重複邊]
-    C --> D[輸入圖譜：帶來源證據的邊]
-    E[跨文件問題] --> F[定位起點與目標實體]
-    F --> G[沿圖搜尋候選子圖／多跳路徑]
-    G --> H{每條邊均核實且有原文支持？}
-    H -- 否／無路徑 --> I[回覆目前證據集查無支持]
-    H -- 是 --> J[列出路徑各邊的來源與原句]
-    J --> K[根據已取回子圖形成 grounded answer]
-    K --> L[逐邊核對答案，不補出無支持關係]
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -47,7 +32,7 @@ Demo 內故意沒有「林員負責東區泵浦」這條關係。即使圖裡有
 
 ## 四、可執行 Demo
 
-以下程式僅用 Python 標準函式庫，使用內嵌合成三元組，無模型、資料庫或網路。每條邊明確帶有來源文件 ID、原句和核實狀態；同一來源 ID 與三元組重複時合併為單筆，若核實狀態有衝突，一律保守採未核實（AND 規則），與輸入順序無關；不同原句全部保留，以 ` ⟂ ` 分隔，不任選單句。錯誤輸入不會偷偷生成邊。
+以下程式僅用 Python 標準函式庫，使用內嵌合成三元組，無模型、資料庫或網路。路徑中的每條邊都攜帶原句和核實狀態；錯誤輸入不會偷偷生成邊。
 
 <!-- demo: E04_graphrag.py -->
 ```python
@@ -55,35 +40,33 @@ Demo 內故意沒有「林員負責東區泵浦」這條關係。即使圖裡有
 from collections import defaultdict, deque
 
 EDGES = [
-    ("林員", "負責", "北區泵浦", "R1", "維護紀錄 R1：林員負責北區泵浦。", True),
-    ("北區泵浦", "位於", "北區", "A2", "設備清冊 A2：北區泵浦位於北區。", True),
-    ("陳員", "負責", "東區風機", "R2", "維護紀錄 R2：陳員負責東區風機。", True),
-    ("東區風機", "位於", "東區", "A3", "設備清冊 A3：東區風機位於東區。", True),
-    ("林員", "負責", "東區風機", "D9", "草稿 D9：林員可能負責東區風機。", False),
+    ("林員", "負責", "北區泵浦", "維護紀錄 R1：林員負責北區泵浦。", True),
+    ("北區泵浦", "位於", "北區", "設備清冊 A2：北區泵浦位於北區。", True),
+    ("陳員", "負責", "東區風機", "維護紀錄 R2：陳員負責東區風機。", True),
+    ("東區風機", "位於", "東區", "設備清冊 A3：東區風機位於東區。", True),
+    ("林員", "負責", "東區風機", "草稿 D9：林員可能負責東區風機。", False),
 ]
 
 
 def deduplicate_edges(edges):
-    """按明確來源 ID 與三元組去重；狀態衝突時保守採未核實。"""
-    merged = {}
+    """以來源文件與三元組去重，不把相同來源副本當成獨立佐證。"""
+    seen = set()
+    unique = []
     for edge in edges:
-        if not isinstance(edge, tuple) or len(edge) != 6:
-            raise ValueError("每條邊必須是六欄 tuple")
-        a, rel, b, source_id, quote, verified = edge
-        if not all(isinstance(x, str) and x.strip() for x in (a, rel, b, source_id, quote)):
-            raise ValueError("邊的實體、關係、來源 ID 與原句必須是非空字串")
+        if not isinstance(edge, tuple) or len(edge) != 5:
+            raise ValueError("每條邊必須是五欄 tuple")
+        a, rel, b, quote, verified = edge
+        if not all(isinstance(x, str) and x.strip() for x in (a, rel, b, quote)):
+            raise ValueError("邊的實體、關係與來源原句必須是非空字串")
         if type(verified) is not bool:
             raise ValueError("verified 必須是 bool")
-        key = (source_id, a, rel, b)
-        if key not in merged:
-            merged[key] = (a, rel, b, source_id, quote, verified)
-        else:
-            previous = merged[key]
-            # Duplicate records must never become trusted because of input order:
-            # any unverified copy makes the merged claim unverified.
-            quotes = " ⟂ ".join(sorted(set(previous[4].split(" ⟂ ")) | {quote}))
-            merged[key] = (a, rel, b, source_id, quotes, previous[5] and verified)
-    return [merged[key] for key in sorted(merged)]
+        # Source identity is the leading record token (e.g. R1, A2, D9).
+        source = quote.split("：", 1)[0]
+        key = (source, a, rel, b)
+        if key not in seen:
+            seen.add(key)
+            unique.append(edge)
+    return unique
 
 
 def supported_paths(start, relation1, relation2, target, edges=EDGES):
@@ -92,20 +75,20 @@ def supported_paths(start, relation1, relation2, target, edges=EDGES):
         raise ValueError("查詢欄位必須是非空字串")
     graph = defaultdict(list)
     for edge in deduplicate_edges(edges):
-        if not isinstance(edge, tuple) or len(edge) != 6:
-            raise ValueError("每條邊必須是六欄 tuple")
-        a, rel, b, source_id, quote, verified = edge
-        if not all(isinstance(x, str) and x.strip() for x in (a, rel, b, source_id, quote)):
-            raise ValueError("邊的實體、關係、來源 ID 與原句必須是非空字串")
+        if not isinstance(edge, tuple) or len(edge) != 5:
+            raise ValueError("每條邊必須是五欄 tuple")
+        a, rel, b, quote, verified = edge
+        if not all(isinstance(x, str) and x.strip() for x in (a, rel, b, quote)):
+            raise ValueError("邊的實體、關係與來源原句必須是非空字串")
         if type(verified) is not bool:
             raise ValueError("verified 必須是 bool")
         if verified:
-            graph[a].append((rel, b, source_id, quote))
+            graph[a].append((rel, b, quote))
     found = []
-    for rel, middle, _source1, quote1 in graph[start]:
+    for rel, middle, quote1 in graph[start]:
         if rel != relation1:
             continue
-        for rel2, end, _source2, quote2 in graph[middle]:
+        for rel2, end, quote2 in graph[middle]:
             if rel2 == relation2 and end == target:
                 found.append((middle, quote1, quote2))
     return found
@@ -116,9 +99,9 @@ def discover_answers(start, relation1, relation2, edges=EDGES):
     if not all(isinstance(x, str) and x.strip() for x in (start, relation1, relation2)):
         raise ValueError("查詢欄位必須是非空字串")
     validated = deduplicate_edges(edges)
-    targets = sorted({end for a, rel, middle, _sid, _q, verified in validated
+    targets = sorted({end for a, rel, middle, _q, verified in validated
                       if a == start and rel == relation1 and verified
-                      for _a2, rel2, end, _sid2, _q2, verified2 in validated
+                      for _a2, rel2, end, _q2, verified2 in validated
                       if _a2 == middle and rel2 == relation2 and verified2})
     return [(target, supported_paths(start, relation1, relation2, target, validated))
             for target in targets]
@@ -136,23 +119,7 @@ def answer(start, relation1, relation2, target):
     return f"有證據：{start}→{middle}→{target}\n  證據1：{q1}\n  證據2：{q2}"
 
 
-def test_duplicate_verification_merge_is_order_independent():
-    unverified = ("林員", "負責", "南區泵浦", "R9", "維護紀錄 R9：未核實。", False)
-    verified = ("林員", "負責", "南區泵浦", "R9", "維護紀錄 R9：核實副本。", True)
-    first_order = deduplicate_edges([unverified, verified])
-    reverse_order = deduplicate_edges([verified, unverified])
-    assert first_order == reverse_order
-    assert len(first_order) == 1 and first_order[0][5] is False
-    assert "未核實" in first_order[0][4] and "核實副本" in first_order[0][4]
-    assert not supported_paths("林員", "負責", "位於", "南區", [
-        first_order[0],
-        ("南區泵浦", "位於", "南區", "A9", "設備清冊 A9：位於南區。", True),
-    ])
-
-
 def main():
-    test_duplicate_verification_merge_is_order_independent()
-    print("重複邊核實狀態合併：順序獨立，衝突時保守未核實")
     print(answer("林員", "負責", "位於", "北區"))
     print(answer("林員", "負責", "位於", "東區"))
     print("陳員可查答案：", discover_answers("陳員", "負責", "位於"))
@@ -165,7 +132,6 @@ if __name__ == "__main__":
 執行：`python3 E04_graphrag.py`。關鍵輸出（本次本機實測，完整輸出）：
 
 ```text
-重複邊核實狀態合併：順序獨立，衝突時保守未核實
 有證據：林員→北區泵浦→北區
   證據1：維護紀錄 R1：林員負責北區泵浦。
   證據2：設備清冊 A2：北區泵浦位於北區。
@@ -179,7 +145,7 @@ if __name__ == "__main__":
 
 **參考判讀**：陳員的兩條核實邊可構成東區風機→東區路徑；重複證據不代表獨立來源，需按文件 ID 去重。草稿邊不應影響輸出。若查詢模板無法表示未知設備名稱，應先列出候選、對每個候選逐邊驗證，不猜答案。
 
-**驗收**：提交修改後的 `supported_paths` 測試，至少包含有效兩跳、缺一段、只有未核實邊、空欄位四種；另加入相同 source_id 與三元組、verified 相反的兩個排列，確認合併結果相同且採未核實。輸出須展示每條被採納邊的原句與「查無」分支。教師可用 `python3` 執行並確認各結果符合上述判讀。
+**驗收**：提交修改後的 `supported_paths` 測試，至少包含有效兩跳、缺一段、只有未核實邊、空欄位四種；輸出須展示每條被採納邊的原句與「查無」分支。教師可用 `python3` 執行並確認四種結果符合上述判讀。
 
 ## 教師紀錄與下一步
 

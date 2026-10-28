@@ -1,24 +1,9 @@
 # Prefill、Decode 與 Token 成本
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 49 節：Prefill、Decode 與 Token 成本。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 45 節：Prefill、Decode 與 Token 成本。**
 > 一次生成分成兩段：**prefill** 一次處理整段輸入，產生第一個 token；**decode** 之後一個一個產生。本節在示範機的 CPU 上，用 Qwen2.5-0.5B 量出每個 token 出現的時間，固定輸出 32 token、只改輸入長度，看哪一段跟著變慢；冷載入另外記，不混進生成時間。最後用第 15 節教師核對的價目，算同樣的 token 數在雲端怎麼計費。核心主張：**先講清楚量的是哪一段、在什麼環境、重複幾次，數字才能比較；單次數值不是穩定效能。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Prefill、Decode 與 Token 成本
-
-```mermaid
-flowchart TD
-    A[載入 CPU Qwen 與 tokenizer] --> B[建立短／中／長 prompt]
-    B --> C[套用 chat template 並記錄輸入 token 數]
-    C --> D[開始計時並 generate 固定 32 tokens]
-    D --> E[Streamer 記錄每個 token 時間戳]
-    E --> F[第一個 token 時間 - 開始 = TTFT／prefill 指標]
-    E --> G[相鄰 token 時間差 = ITL／decode 指標]
-    F --> H[重複量測：分開冷載入、暖機與後續樣本]
-    G --> H
-    H --> I[依 prompt 長度比較 TTFT、ITL 與端到端時間]
-    I --> J[依相同 token 數計算教師核對的雲端成本]
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

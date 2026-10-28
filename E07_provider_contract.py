@@ -1,8 +1,8 @@
 """第 17 節：多供應商介面、契約測試與 API 成本。
 
 「OpenAI 相容」只保證請求長得像，不保證每個參數都有效、usage 都可信、價格都一樣。
-本程式只用標準函式庫，讀兩份 2026-10-06 歷史快照：LiteLLM 能力／內建價格快照 data/provider-snapshot.json，
-以及教師手動核價 data/provider-prices-checked.json；它們不得視為現價或即時能力狀態。
+本程式只用標準函式庫，讀兩份資料：教師用 LiteLLM 產生的能力快照 data/provider-snapshot.json，
+以及教師手動到官方價目頁核對的 data/provider-prices-checked.json；
 不呼叫任何付費 API。真實呼叫的部分在講義的 Workshop 由教師示範或以 fixtures 重播。
 """
 import argparse
@@ -90,9 +90,8 @@ class Budget:
 
 def show(snapshot, checked):
     models = snapshot["models"]
-    print("能力快照（歷史資料，非現況）:", snapshot["source"])
-    print("litellm:", snapshot["environment"]["litellm"], "｜ 官方價目歷史核對日期:", checked["checked_on"])
-    print("警告：下列價格、能力及凍結輸出僅反映 2026-10-06 快照，不得視為現價；使用前須重新查核官方來源。")
+    print("能力快照:", snapshot["source"])
+    print("litellm:", snapshot["environment"]["litellm"], "｜ 官方價目核對日期:", checked["checked_on"])
 
     print("\n== 一、能力矩陣（有／無／?=價目表沒寫）==")
     header = ["代號", "工具", "schema", "影像", "seed", "logprobs", "n", "輸入上限"]
@@ -166,7 +165,7 @@ def main(argv=None):
         alias, tin, tout = args.cost[0], int(args.cost[1]), int(args.cost[2])
         price = checked["models"][alias]
         print(f"{alias} 輸入 {tin}、輸出 {tout} → ${cost_usd(price, tin, tout):.6f}"
-              f"（estimated，歷史價格快照 {checked['checked_on']}；非現價）")
+              f"（estimated，官方價 {checked['checked_on']}）")
         return
     show(snapshot, checked)
 

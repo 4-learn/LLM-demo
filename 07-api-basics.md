@@ -1,21 +1,6 @@
-# 07｜用 API 請模型回答
+# 06｜用 API 請模型回答
 
 > **定位**：用可檢查的 HTTP API 請求／回應格式，理解程式如何準備訊息並讀取模型服務的答覆；本節以離線 fixture 重播，不實際建立網路連線，也不需要帳號或金鑰。真實呼叫僅作概念延伸，不是本節的必做前提。
-
-## 流程圖：API 呼叫：HTTP、JSON 與安全金鑰
-
-```mermaid
-flowchart TD
-    A[使用者訊息] --> B{模式}
-    B -- 預設 --> C[Fixture 回放]
-    B -- 選擇 live --> D[以 SDK 與環境金鑰送請求]
-    D --> E{HTTP 與 JSON 成功？}
-    E -- 否 --> F[顯示可理解錯誤]
-    E -- 是 --> G[擷取 completion 文字]
-    C --> H[展示與比較輸出]
-    F --> H
-    G --> H
-```
 
 ## 學習目標
 
@@ -24,7 +9,7 @@ flowchart TD
 - 從一筆合成事件建立 chat completion 請求，辨認輸入、輸出、usage 與錯誤
 - 在不洩漏憑證、不送真實個資、不把模型當成法規或工安判斷者的前提下，安全地描述真實 API 呼叫的條件
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 範例程式碼
 
@@ -112,7 +97,8 @@ API（Application Programming Interface）是程式依照約定向服務提出�
 import json
 import os
 import sys
-# openai SDK is imported lazily for the explicit --live path only.
+import urllib.error
+import urllib.request
 
 NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 NVIDIA_MODEL = "meta/llama-3.1-8b-instruct"
@@ -139,30 +125,18 @@ def make_request(messages=SYNTHETIC_MESSAGES, model="fixture-model-not-a-real-pr
 
 def call_nvidia(request, api_key):
     """選做真實傳輸；只接受由呼叫端提供的金鑰，不列印或保存。"""
+    body = json.dumps(request).encode("utf-8")
+    req = urllib.request.Request(
+        NVIDIA_BASE_URL + "/chat/completions", data=body, method="POST",
+        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
+    )
     try:
-        from openai import OpenAI
-    except ImportError:
-        raise RuntimeError("選做 live 需安裝 openai SDK；fixture 不需要") from None
-    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=api_key, timeout=45, max_retries=0)
-    try:
-        result = client.chat.completions.create(
-            model=request["model"],
-            messages=request["messages"],
-            max_tokens=request["max_tokens"],
-        )
-    except Exception as exc:
-        raise RuntimeError(f"API 呼叫失敗（{type(exc).__name__}）；不自動重試") from None
-    if not result.choices:
-        raise RuntimeError("response 缺少 choices")
-    choice = result.choices[0]
-    message = choice.message
-    if message is None or not isinstance(message.content, str):
-        raise RuntimeError("response 缺少文字 content")
-    return {
-        "choices": [{"message": {"role": "assistant", "content": message.content},
-                     "finish_reason": choice.finish_reason}],
-        "usage": result.usage.model_dump() if result.usage else None,
-    }
+        with urllib.request.urlopen(req, timeout=45) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"API 回傳 HTTP {exc.code}；不要貼出含憑證的請求或錯誤內容") from None
+    except urllib.error.URLError:
+        raise RuntimeError("連線失敗或逾時；不要自動重試，服務可能已收到請求") from None
 
 
 def parse_response(response):
@@ -274,7 +248,7 @@ unset NVIDIA_API_KEY
 - [Meta Llama 3.1 8B Instruct API 參考](https://docs.api.nvidia.com/nim/reference/meta-llama-3_1-8b-infer)
 - [NVIDIA Build 模型頁](https://build.nvidia.com/meta/llama-3.1-8b-instruct)
 
-本教材示例使用 OpenAI Python SDK 的 `client.chat.completions.create`，設定 `base_url="https://integrate.api.nvidia.com/v1"` 和模型 ID `meta/llama-3.1-8b-instruct`。這些資訊以編寫時的官方文件為準；服務可能下架、限制帳號或更新端點，教師授課前須實際確認可用性與費用政策。未確認前，離線 fixture 仍是完整可執行的必做路徑。
+本教材示例使用 NVIDIA NIM OpenAI 相容端點 `https://integrate.api.nvidia.com/v1/chat/completions` 和模型 ID `meta/llama-3.1-8b-instruct`。這些資訊以編寫時的官方文件為準；服務可能下架、限制帳號或更新端點，教師授課前須實際確認可用性與費用政策。未確認前，離線 fixture 仍是完整可執行的必做路徑。
 
 ---
 

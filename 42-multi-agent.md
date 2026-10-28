@@ -1,23 +1,10 @@
 # Multi-Agent、固定 Workflow 與 Reducer
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 42 節：Multi-Agent、固定 Workflow 與 Reducer。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 38 節：Multi-Agent、固定 Workflow 與 Reducer。**
 > 舊教材的 supervisor 範例照抄執行，`completed_agents` 沒有 reducer，**跑不完**：每個代理都把清單蓋成只剩自己，supervisor 永遠看不到全部完成，一直來回派工直到遞迴上限。本節先把這個 bug 跑出來，再修；接著用固定 workflow 做同一件事，比較步數。核心主張：**任務的順序事先知道時，固定 workflow 比 supervisor 更短、更好測。多代理不是升級，是有代價的選擇。不管用哪一種，都要有停止條件，而且收尾要看 state 裡的結果，不能只看路由器說「done」。**
 > 本節的代理都是固定字串，不呼叫模型；第五段「會亂派工的路由器」是教師構造的決定序列，用來模擬 LLM supervisor 可能的輸出。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Multi-Agent、固定 Workflow 與 Reducer
-
-```mermaid
-flowchart TD
-    A[同一工作任務] --> B[固定 workflow workers]
-    A --> C[Supervisor 動態選擇 specialist]
-    B --> D[regulation/report/notification 更新]
-    C --> E[router 受 budget/終止條件限制]
-    D --> F[比較 overwrite 與 union reducer 合併]
-    E --> F
-    F --> G[檢查缺漏、迭代與結果差異]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -80,7 +67,9 @@ supervisor 會回到自己，所以一定要有停止條件。本節示範四層
 
 ## 四、可執行 Demo
 
-### Session 1：Reducer 與固定 workflow
+需要 `langgraph==1.2.12`，不需要模型。
+
+### Call session 1：Reducer 與固定 workflow
 
 **系統層：平行代理更新集中到 reducer state**
 
@@ -104,7 +93,7 @@ flowchart TD
     D --> E[回傳合併 state]
 ```
 
-### Session 2：固定與 supervisor 路由、步數預算
+### Call session 2：固定與 supervisor 路由、步數預算
 
 **系統層：固定 workflow 與動態路由對照**
 
@@ -132,7 +121,7 @@ flowchart TD
     G --> B
 ```
 
-### Session 3：完成度診斷與缺漏檢查
+### Call session 3：完成度診斷與缺漏檢查
 
 **系統層：最終 state 另行驗證，不信任路由器 done**
 

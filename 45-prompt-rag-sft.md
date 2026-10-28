@@ -1,23 +1,9 @@
 # Prompt、RAG 與 SFT 的選擇
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 45 節：Prompt、RAG 與 SFT 的選擇。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 41 節：Prompt、RAG 與 SFT 的選擇。**
 > 「模型答錯，所以要微調」常常跳過了中間幾步。本節在同一個任務（第 08 節的安全帽通報分類，25 筆）上，先把**不用訓練**的做法做到合理：zero-shot、固定 few-shot、檢索 few-shot（RAG）、不生成的 embedding 分類器。全部用同一個 Qwen2.5-0.5B、同樣的解碼與解析規則；範例只能來自 dev，評 dev 時排除案例本身。核心主張：**先判斷錯誤屬於知識、格式、行為還是流程，再決定方法；微調要跟合理的 baseline 比，不能跟刻意寫差的提示比。** 本節不訓練模型，最後產出的是「還剩哪些錯，SFT 可能有幫助」的假說，交給第 42～44 節驗證。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Prompt、RAG 與 SFT 的選擇
-
-```mermaid
-flowchart TD
-    A[相同任務與評估資料] --> B[Prompt baseline / few-shot]
-    A --> C[RAG few-shot：檢索 dev 範例]
-    A --> D[SFT：訓練成本與資料需求分析]
-    B --> E[同一評估集比較品質]
-    C --> E
-    D --> F[比較準備成本、可更新性與部署取捨]
-    E --> G[報告準確率與錯誤]
-    F --> G
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

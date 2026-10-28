@@ -1,21 +1,9 @@
 # Structured Output：語法、Schema 與語義
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 15 節：Structured Output：語法、Schema 與語義。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 15 節：Structured Output——語法、Schema 與語義。**
 > 本節要讓程式的輸入可以被信任。核心主張：**「是合法 JSON」「符合 schema」「內容有依據」是三件不同的事，而且前兩件通過完全不代表第三件。** 本節只用 Python 標準函式庫。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Structured Output：語法、Schema 與語義
-
-```mermaid
-flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E07_structured_output.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

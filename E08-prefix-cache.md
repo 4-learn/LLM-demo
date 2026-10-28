@@ -1,24 +1,9 @@
 # KV Cache 與 Prefix Cache 的機制與局限
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 E08 節：KV Cache 與 Prefix Cache。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 47 節：KV Cache 與 Prefix Cache 的機制與局限。**
 > 兩個名字很像、常被混為一談的機制。核心主張：**兩者都只省 prefill（處理輸入），都不是答案快取；命中不代表答案免推論，更不代表品質。** 本節不跑模型，只用 Python 標準函式庫**數**每個請求有多少 token 需要計算。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：KV Cache 與 Prefix Cache
-
-```mermaid
-flowchart TD
-    A[請求 prompt 與模型／執行設定] --> B[Tokenize 並計算 prefix cache key]
-    B --> C[Key 包含租戶／隔離範圍、模型及相容設定]
-    C --> D{相同 token prefix 的完整區塊命中？}
-    D -- 命中 --> E[重用 prefix K/V，剩餘 prompt 繼續 prefill]
-    D -- miss --> F[完整 prompt 做 prefill，建立可快取 prefix K/V]
-    E --> G[對本次請求執行 decode 生成答案]
-    F --> G
-    G --> H[回傳本次輸出，不重用其他請求答案]
-    H --> I[比較命中／未命中 token 計算量與輸出一致性]
-    J[租戶或模型設定不相容] --> K[隔離快取，不共享 K/V]
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

@@ -1,21 +1,9 @@
 # Embedding 概念
 
-> **正文改版：20E07-E02-14（20E07-E03-06 修訂：程式改名 `E07_embedding_lab.py`、改由 llm-demo 取得；同版本離線重跑分數不變）｜對應新版 LLM 第 18 節：Embedding 原理與中文適配。**
+> **正文改版：20E07-E02-14（20E07-E03-06 修訂：程式改名 `E07_embedding_lab.py`、改由 llm-demo 取得；同版本離線重跑分數不變）｜對應新版 LLM 第 17 節：Embedding 原理與中文適配。**
 > 本節真正執行一個中文預訓練模型，在 CPU 上把文字轉為 512 維向量，再比較檢索排名。不使用聊天 API，不需要先懂 SQL；它也是後續 MariaDB Vector 與 RAG 的起點。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Embedding 原理與中文適配
-
-```mermaid
-flowchart TD
-    A[中文查詢與文件] --> B[Tokenizer 切分 token]
-    B --> C[編碼器產生 token 表示]
-    C --> D[依模型訓練方式 pooling]
-    D --> E[輸出 512 維句向量並正規化]
-    E --> F[計算 cosine 排序候選]
-    F --> G[檢視否定／條件錯配與中文適配]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

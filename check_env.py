@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LLM 51 節必修＋9 節選修環境檢核（只用 Python 標準函式庫）。
+"""LLM 50 節環境檢核（只用 Python 標準函式庫）。
 
 設計原則：**本檔不 import 任何第三方套件**，所以在 `pip install` 之前就能跑。
 它不會修改任何東西、不會安裝套件、預設也不會連線（要連線需自己加 `--network`）。
@@ -424,7 +424,7 @@ def print_report(results: list) -> None:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
-        description="LLM 51 節必修＋9 節選修環境檢核（唯讀，不安裝任何東西）",
+        description="LLM 50 節環境檢核（唯讀，不安裝任何東西）",
     )
     parser.add_argument("--full", action="store_true",
                         help="加上虛擬環境、package 版本、模型快取檢查")

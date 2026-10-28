@@ -1,7 +1,7 @@
-"""Generate a tiny deterministic text-layer PDF fixture (standard library only).
+"""Generate a tiny deterministic PDF fixture for lesson 20 (standard library only).
 
-This fixture is for parser integration tests; it is not a parser, OCR sample,
-scanned PDF, layout/table sample, or evidence of general PDF compatibility.
+The fixture has selectable ASCII text. It is not a PDF parser, layout-table,
+scanned-image, or OCR sample. All offsets and stream lengths are self-contained.
 """
 from pathlib import Path
 

@@ -1,24 +1,9 @@
 # MCP Client 生命週期與 Async
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 37 節：MCP Client Lifecycle 與 Async。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 34 節：MCP Client Lifecycle 與 Async。**
 > 第 33 節的 server 和 client 在同一個程序裡。實際使用時 server 常是另一個程序，透過 stdio 或網路連線。這時最常見的錯誤不是協定，而是 async：忘了 await、沒關連線、把逾時當成「沒做」。核心主張：**用 `async with` 管理連線，離開時子程序一定要結束；每個呼叫都要 await；逾時只代表 client 不等了——server 端可能還是做完了，所以寫入類工具必須搭配冪等（第 29 節）。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：MCP Client Lifecycle 與 Async
-
-```mermaid
-flowchart TD
-    A[async with Client(stdio server)] --> B[啟動 server 子程序並 await initialize]
-    B --> C[await list_tools]
-    C --> D[await call_tool]
-    D --> E{正常結果、錯誤或逾時？}
-    E -- 正常 --> F[處理 CallToolResult]
-    E -- 逾時／取消 --> G[記錄 client 停止等待；server 端效果需確認]
-    F --> H[離開 async with]
-    G --> H
-    H --> I[await 關閉 session 與 transport]
-    I --> J[關閉 stdin 並確認子程序結束]
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
