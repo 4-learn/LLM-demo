@@ -1,5 +1,6 @@
 scores = [1, 2]
 values = [10, 20]
-weights = [score / sum(scores) for score in scores]
-result = sum(w * value for w, value in zip(weights, values))
+total = scores[0] + scores[1]
+weights = [scores[0] / total, scores[1] / total]
+result = weights[0] * values[0] + weights[1] * values[1]
 print(weights, result)
