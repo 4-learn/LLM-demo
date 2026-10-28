@@ -26,7 +26,7 @@ old_id,new_id,track,title,status
 20,22,core,記憶體精確檢索 Baseline,existing
 21,23,core,MariaDB Vector 持久化銜接,existing
 22,24,core,Metadata 過濾與版本更新,existing
-,25,core,混合檢索｜用關鍵字找候選文件,new_written
+,25,core,關鍵字檢索｜用關鍵字找候選文件,new_written
 23,26,core,Reranking 與 Retrieval Evaluation,existing
 24,27,core,RAG 引用與查無答案,existing
 25,28,core,Orchestration 與 LangChain LCEL,existing

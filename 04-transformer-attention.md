@@ -10,31 +10,34 @@
 
 <!-- demo: 04_transformer_attention.py -->
 ```python
-def average(weights, values):
-    total_weight = 0
-    weighted_sum = 0
-    for i in range(len(weights)):
-        total_weight += weights[i]
-        weighted_sum += weights[i] * values[i]
-    return weighted_sum / total_weight
-
-weights = [0.25, 0.75]
+scores = [1, 2]
 values = [10, 20]
-print(average(weights, values))
+total = scores[0] + scores[1]
+weights = [scores[0] / total, scores[1] / total]
+result = weights[0] * values[0] + weights[1] * values[1]
+print(weights, result)
 ```
 
-輸出 `17.5`。加權平均要用「加權總和 ÷ 權重總和」。此例權重相加為 1；若權重不是 1，除以總和才能得到比例平均。例如 `[1, 1]` 的加權平均是 15，不是 30。
+本程式只用已學過的串列索引與加減乘除，不需要串列推導式、`zip` 或 `sum`。程式印出兩個權重與加權結果。若權重原本總和不是 1，通用加權平均須除以權重總和；Attention 通常用 softmax 正規化分數（把分數轉成總和為 1 的權重），再加權求和。
 
-## 這跟 LLM 的關係
+## 為什麼與 LLM 有關
 
-常見 Transformer attention 先用 softmax 正規化權重，再混合 token 資訊。本程式另外除以權重總和，是一般加權平均的寫法，不是所有 attention 變體都必然如此；權重也不保證答案正確。
+LLM 的 Attention 會依上下文計算各位置的權重，混合表示後供後續層使用。這不等於模型注意到的內容必然重要、正確或可解釋。
 
-## 動手試試
+## 練習與自我檢查
 
-把 `weights` 改成 `[0.75, 0.25]`；預期輸出 `12.5`，比原本更靠近 10。再試 `[1, 1]`；預期仍是 `15.0`，因為程式會除以權重總和 2。
+修改 `scores` 的兩個分數，觀察權重及結果如何變化；程式會用 `scores` 計算比例，用 `values` 表示要混合的數值，兩組資料用途不同。提交程式、輸出及一句觀察。
 
-## 自我檢查
+```mermaid
+flowchart LR
+    S[兩個分數：1、2] --> N[正規化成權重：1/3、2/3]
+    V[兩個值：10、20] --> M[依權重混合]
+    N --> M
+    M --> R[結果：約 16.67]
+```
 
-1. `[0.25, 0.75]` 權重總和是多少？2. `[1, 1]` 為什麼除以 2？3. 權重較大代表答案正確嗎？
+1. 哪個權重變大時，結果會更靠近哪個數值？
+2. 權重總和不是 1 時，為什麼需要正規化？
+3. 這個玩具結果能否證明模型理解輸入？
 
-**要點**：1；化成比例；不代表正確。
+答案提示：靠近對應數值；除以權重總和可取得比例；不能，這只是簡化計算示意。

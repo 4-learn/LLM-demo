@@ -1,9 +1,6 @@
-def average(weights, values):
-    total = 0
-    for i in range(len(weights)):
-        total += weights[i] * values[i]
-    return total
-
-weights = [0.25, 0.75]
+scores = [1, 2]
 values = [10, 20]
-print(average(weights, values))
+total = scores[0] + scores[1]
+weights = [scores[0] / total, scores[1] / total]
+result = weights[0] * values[0] + weights[1] * values[1]
+print(weights, result)
