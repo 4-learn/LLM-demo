@@ -6,6 +6,7 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 MAPPING=pathlib.Path('/home/dsh/workspace/swarm/hives/4-learn/course-plans/llm-restructure-mapping.csv')
 if not MAPPING.is_file(): MAPPING=ROOT.parent/'course-plans'/'llm-restructure-mapping.csv'
 LONG={'14','16','23','27','28','33','35','38','39','40','42','43','44','45','46','48','E01','E02','E03','E07','E09'}
+EXPECTED_SESSIONS={lesson_id:(3 if lesson_id=='42' else 2) for lesson_id in LONG}
 
 def main():
  rows=list(csv.DictReader(MAPPING.open(encoding='utf-8'))); errors=[]
@@ -31,6 +32,8 @@ def main():
   if not md: continue
   text=md.read_text(encoding='utf-8')
   sessions=list(re.finditer(r'^### (?:Call )?[Ss]ession\s+\d+[^\n]*',text,re.M))
+  expected=EXPECTED_SESSIONS[lid]
+  if len(sessions)!=expected: errors.append(f'{lid}: found {len(sessions)} sessions; expected {expected}')
   if not sessions: errors.append(f'{lid}: no call-session headings'); continue
   for i,match in enumerate(sessions):
    end=sessions[i+1].start() if i+1<len(sessions) else len(text)
