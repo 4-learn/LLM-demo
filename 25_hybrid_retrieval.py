@@ -4,7 +4,6 @@ documents = {
     "C": "充電器輸出功率",
 }
 query = "電池"
-
 for name in documents:
     if query in documents[name]:
         print(name, documents[name])
