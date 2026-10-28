@@ -1,22 +1,10 @@
 # Streamable HTTP MCP 服務
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 40 節：Streamable HTTP MCP 服務與部署。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 37 節：Streamable HTTP MCP 服務與部署。**
 > 第 34～36 節的 server 都是 client 開的子程序（stdio），只活在同一台機器的同一個使用者底下。本節把第 36 節讀檔的 server 掛進 FastAPI，用 Uvicorn 啟動成獨立的 HTTP 服務，再從另一個程序連進去。核心主張：**一旦走網路，server 就不再「只有啟動它的人能用」。驗證身分（token）、檢查來源（Origin／Host）、逾時與關閉，都要自己做，而且要用實際被拒絕的請求證明，不能只畫架構圖。**
 > 本節只綁 `127.0.0.1`，不對外公開。對外部署需要 TLS、正式的身分系統與教師受控的主機，列為**待驗證**。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Streamable HTTP MCP 服務與部署
-
-```mermaid
-flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 51_mcp_http.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -72,7 +60,9 @@ SDK 在 `host="127.0.0.1"` 時預設會開這個保護。本節仍然明確寫�
 
 ## 三、可執行 Demo
 
-### Session 1：FastAPI/MCP HTTP 服務生命週期
+服務是另一個程序（`python -m uvicorn app:app`），Demo 主程式是 client，兩者只透過 HTTP 溝通。服務直接載入第 36 節的 server（路徑防護用 `safe`），另外加一個慢工具 `slow_report` 來示範逾時。同資料夾要有 `E08_mcp_file_source.py` 或第 36 節講義（Markdown）。
+
+### Call session 1：FastAPI/MCP HTTP 服務生命週期
 
 **系統層：子程序服務啟動、健康檢查與資源清理**
 
@@ -100,7 +90,7 @@ flowchart TD
     F -- 否 --> H[記錄 log_lines 並回報啟動錯誤]
 ```
 
-### Session 2：HTTP client、錯誤情境與關閉
+### Call session 2：HTTP client、錯誤情境與關閉
 
 **系統層：client 呼叫、逾時/認證錯誤與清理**
 

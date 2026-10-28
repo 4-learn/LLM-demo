@@ -1,21 +1,9 @@
 # 微調前後評估與 Adapter 交付
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 48 節：微調前後評估與 Adapter 交付。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 44 節：微調前後評估與 Adapter 交付。**
 > 第 41 節留下一個假說：有些錯是「行為」，SFT 可能有幫助。本節在示範機（8 GB、無 GPU）上**真的訓練**一個很小的 LoRA（Qwen2.5-0.5B，q_proj／v_proj，r=8，訓練資料只有 dev 15 筆，約 100 秒），然後在公平條件下比較：base zero-shot、base 檢索 few-shot（第 41 節）、base＋adapter。另外檢查非分類問題有沒有退步、合併前後是否一致，最後寫出 artifact manifest。核心主張：**微調要跟合理的 baseline 比；交付的是「base revision＋adapter＋設定＋評估紀錄」這一組，少一樣就無法重現。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：微調前後評估與 Adapter 交付
-
-```mermaid
-flowchart TD
-    A[固定 holdout 與分類 prompt] --> B[評估 base 模型]
-    B --> C[訓練/載入 LoRA adapter]
-    C --> D[評估 adapter 模型]
-    D --> E[merge adapter 權重]
-    E --> F[比較 merged 與 adapter 輸出 parity]
-    F --> G[記錄 hash、指標與交付結果]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

@@ -1,23 +1,9 @@
 # MCP 增量整合里程碑
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 44 節：MCP 增量整合里程碑。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 40 節：MCP 增量整合里程碑。**
 > 第 32 節把 RAG、政策、HITL、重試、trace 接成一條流程；第 33～37 節做了 MCP server 與 client。本節**不另建系統**：直接載入第 32 節的流程，graph、政策、HITL、重試、trace 一行都不改，只把「開單服務」換成一個 stdio MCP server。換之前、換之後跑同一組 9 個案例，對照輸出契約與副作用。核心主張：**換 transport 是增量，不是重寫；驗收是「同一組案例、同一份契約」，不是「MCP 跑起來了」。但契約裡有些東西（例如冪等）不會自動跟著搬過去，要在新的那一側重新驗證。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：MCP 增量整合里程碑
-
-```mermaid
-flowchart TD
-    A[建立 ticket MCP tool 與 idempotency key] --> B[client 發 JSON-RPC 呼叫]
-    B --> C[注入暫時/永久故障]
-    C --> D{錯誤可重試？}
-    D -- 是 --> E[有限重試]
-    D -- 否 --> F[回報根因]
-    E --> G[以相同冪等鍵建立工單]
-    G --> H[統計副作用與重複工單]
-    F --> H
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

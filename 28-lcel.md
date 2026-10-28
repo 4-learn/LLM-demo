@@ -1,22 +1,9 @@
 # Orchestration 與 LangChain LCEL
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 28 節：Orchestration 與 LangChain LCEL。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 25 節：Orchestration 與 LangChain LCEL。**
 > 第 24 節的 RAG 流程（合格過濾 → 檢索 → 上下文 → 生成 → 驗證 → 處置）已經可以跑、有測試。本節**不改任何一步**，只換「串接方式」：一版是普通的 Python 函式依序呼叫，一版是 LangChain 的 LCEL（每一步包成 Runnable，用 `|` 接起來，`invoke` 執行）。同一組 9 個案例、同一份契約跑三次（第 24 節原本的 `handle()`、純 Python、LCEL），結果逐案相同。然後看框架**做了什麼、沒做什麼**：錯誤怎麼傳遞、權限誰負責。核心主張：**框架是串接工具，不會讓模型變好，也不會替你補上權限檢查；先有契約測試，再換串接方式。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Orchestration 與 LangChain LCEL
-
-```mermaid
-flowchart TD
-    A[相同輸入與 handler 契約] --> B[原生 Python 步驟鏈]
-    A --> C[LCEL runnable composition]
-    B --> D[retrieve → context → generate → disposition]
-    C --> E[組合等價 runnable 與錯誤恢復]
-    D --> F[run_all 執行正常/故障案例]
-    E --> F
-    F --> G[contract 比較輸出、狀態與呼叫次數]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -59,7 +46,9 @@ LCEL 本身**沒有**提示模板、模型、檢索的魔法；那些是其他�
 
 ## 三、可執行 Demo
 
-### Session 1：原生函式與 LCEL 共用步驟契約
+需要 `langchain-core==1.6.6`（安裝 `langgraph==1.2.12` 時已一起裝，不必另外裝）；同資料夾要有第 24 節的程式（`E08_filter_update.py` 或講義）與 MariaDB 課共用的 `data/sop_corpus.json`、`data/search_cases.json`。不需要模型、不需要 API key，約 1 秒。
+
+### Call session 1：原生函式與 LCEL 共用步驟契約
 
 **系統層：同一業務步驟、兩種 orchestration**
 
@@ -84,7 +73,7 @@ flowchart TD
     F --> G[回傳結果 state]
 ```
 
-### Session 2：LCEL 鏈建構、錯誤 fallback 與契約
+### Call session 2：LCEL 鏈建構、錯誤 fallback 與契約
 
 **系統層：build、invoke 與契約驗證**
 

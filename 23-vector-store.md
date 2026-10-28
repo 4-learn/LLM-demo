@@ -1,23 +1,9 @@
 # MariaDB Vector 持久化銜接
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 23 節：MariaDB Vector 持久化銜接。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 21 節：MariaDB Vector 持久化銜接。**
 > 第 20 節的精確檢索把 16 段向量放在 Python 的記憶體裡，程式一結束就沒了。本節把同一批向量存進 MariaDB 的 `VECTOR(512)` 欄位，**關掉連線、開一個新的程序再查**，排名要與第 20 節逐題相同。這一梯次的學員在 MariaDB 課第 18–20 節已經學過 schema、入庫與向量索引，本節**不重教 SQL**：資料表由教師預先建立，學員用只能讀寫的 `course_app` 帳號，透過一個 Python 介面（`upsert`、`search`）操作。沒有資料庫時，同一個介面改用記憶體 fixtures，**輸出會明講「沒有測到持久化」**。核心主張：**持久化要用「新程序看得到」來證明；換了儲存層，排名要和精確 baseline 對得上。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：MariaDB Vector 持久化銜接
-
-```mermaid
-flowchart TD
-    A[向量檔與 metadata] --> B[載入並核對模型/revision/hash/dimension]
-    B --> C[統一 FixtureStore 或 MariaStore 介面]
-    C --> D[以穩定 key upsert 與版本標記]
-    D --> E[查詢時套用 active/approved/revision 篩選]
-    E --> F[向量相似度排序]
-    F --> G[與記憶體 exact baseline 比對]
-    G --> H[關閉後以 query_only 子程序驗證持久化]
-    H -. Fixture 不宣稱持久化 .-> I[報告錯誤/拒絕路徑]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -78,7 +64,12 @@ CREATE TABLE llm_chunk_vectors (
 
 ## 三、可執行 Demo
 
-### Session 1：向量來源與資料列 provenance
+需要：同資料夾第 20 節的程式（`E07_*.py` 或講義）、`data/sop_corpus.json`、`data/search_cases.json`、`data/21-vectors.json`（示範機用第 17、20 節同一模型與 revision 算好的向量，所以不必載入模型）。
+
+- **MariaDB 模式**：`pip install mariadb==1.1.14`（MariaDB 課第 10 節同一版），以及私人設定檔 `~/mariadb-course-app.json`（`chmod 600`），教師已建好資料表。
+- **fixtures 模式**：只要標準函式庫。沒有資料庫時自動切換，輸出第一行會寫原因；也可以加 `--fixtures` 強制。
+
+### Call session 1：向量來源與資料列 provenance
 
 **系統層：語料、embedding 與持久化記錄**
 
@@ -100,7 +91,7 @@ flowchart TD
     D --> E[回傳 rows]
 ```
 
-### Session 2：Upsert、查詢與跨程序持久化
+### Call session 2：Upsert、查詢與跨程序持久化
 
 **系統層：資料庫寫入到獨立查詢程序**
 

@@ -3,27 +3,7 @@
 > **新版正文：20E07-E03-05｜對應新版 LLM 第 16 節：原生 Function Calling 完整工具回合。**
 > 不用任何 orchestration 框架，親手跑完一個工具回合：**模型提出 → 程式決定 → 執行 → 結果回模型 → 最終答覆**。核心主張：**模型不執行函式，應用程式才執行。** 必做路徑只用 Python 標準函式庫與協定重播（fixtures）；另提供選做 NVIDIA Build live 對照，實際工具執行仍由本機程式控制。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：原生 Function Calling 完整工具回合
-
-```mermaid
-flowchart TD
-    A[使用者問題與工具 schema] --> B[模型回覆 assistant tool_call]
-    B --> C[檢查 call 結構與唯一 ID]
-    C -- 協定錯誤 --> X[停止，不執行工具]
-    C -- 合法 --> D[execute 解析 JSON 並檢查 allowlist/schema]
-    D --> E{參數有效？}
-    E -- 否 --> F[回傳 tool error 並保留 call_id]
-    E -- 是 --> G[本機唯讀 executor count_events]
-    G --> H[回傳 tool result 並保留 call_id]
-    F --> I[將結果附回 messages]
-    H --> I
-    I --> J{是否有回合預算？}
-    J -- 有 --> K[再呼叫模型，取得 final 或下一個 tool_call]
-    J -- 無 --> L[停止並揭露尚無 final]
-    K --> M[展示結果與事件紀錄]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -38,7 +18,7 @@ flowchart TD
 | 35–42 分鐘 | 選做：以 NVIDIA Build 觀察真實工具提議，沿用本機 host 驗證與唯讀執行器 |
 | 42–50 分鐘 | Workshop：自己加一個工具並跑無效參數 |
 
-驗收能力：交付一份**含模型 tool call、程式結果、相符 call ID 與最終答覆**的完整紀錄——**不只印出函式名稱**。必做 fixture 只驗證應用程式協定流程；ScriptedModel 預先寫定每步訊息，不是模型依工具結果生成的閉環。
+驗收能力：交付一份**含模型 tool call、程式結果、相符 call ID 與最終答覆**的完整紀錄——**不只印出函式名稱**。
 
 ## 一、「模型呼叫工具」這句話哪裡錯了
 
@@ -65,20 +45,20 @@ flowchart TD
 
 | 步驟 | 常見錯誤 | 後果 |
 | --- | --- | --- |
-| 2 | 參數是字串形式的 JSON；解碼後也可能是 array、null 或 scalar，而非 object | 直接 `**args` 會炸；本 Demo 將非 object 回成工具錯誤、不執行工具 |
+| 2 | 參數是字串形式的 JSON，不是物件 | 忘了 `json.loads`，直接 `**args` 會炸 |
 | 2→3 | 沒驗證就執行 | 模型給什麼就跑什麼 |
 | 3 | **`tool_call_id` 沒對上** | 一次有多個呼叫時，結果對錯了呼叫；很多 API 會直接拒收 |
 | 3 | 工具出錯時直接拋例外 | 模型永遠不知道發生了什麼，你也沒有紀錄 |
 | 4 | 沒有回合上限 | 模型一直要求工具，程式一直跑 |
 
-> **`arguments` 是一段字串，不是物件。** 先 JSON decode，再拒絕非 JSON object，最後驗證 required／型別／enum／未知欄位；本 demo 不做欄位間語義推理或授權政策驗證，不應稱為三層完整驗證。
+> **`arguments` 是一段字串，不是物件。** 這是第一次寫 tool calling 時最常卡住的地方——它就是一份第 15 節的結構化輸出，要過三層驗證。
 
 ## 三、應用程式的四個責任
 
 | 責任 | 本節 Demo 怎麼做 | 為什麼 |
 | --- | --- | --- |
 | **allowlist** | `TOOLS` 字典裡沒有的名稱一律拒絕 | 模型可能要求一個你根本沒提供的工具（情境 3） |
-| **參數驗證** | JSON decode 後要求 object，`validate_args` 檢查必填、型別、允許值、未定義參數 | 模型給的參數就是結構化輸出，會錯（情境 2） |
+| **參數驗證** | `validate_args` 檢查必填、型別、允許值、未定義參數 | 模型給的參數就是結構化輸出，會錯（情境 2） |
 | **唯讀執行器** | `count_events` 只讀不寫 | 第 12 節：控制在工具層 |
 | **回合上限** | `MAX_TOOL_ROUNDS = 3` | 模型不一定會自己停（情境 4） |
 
@@ -86,15 +66,17 @@ flowchart TD
 
 ## 四、協定重播：沒有模型也能學協定
 
-本節的 `ScriptedModel` 是**協定重播 fixture**：它依預設劇本依序回傳訊息。訊息形狀仿照常見的原生 tool calling 協定（`role`／`tool_calls`／`tool_call_id`）。工具結果雖會放進後續 messages，但最終答覆也是預先寫在 fixture；這不是模型讀取工具結果再生成答案的模型閉環。
+本節的「模型」是 `ScriptedModel`：它照劇本回傳訊息。訊息的形狀仿照常見的原生 tool calling 協定（`role`／`tool_calls`／`tool_call_id`）。
 
-**這是協定重播（fixtures），不是即時模型，也不是模型閉環。** 它只驗證應用程式對固定訊息的處理（工具選擇、參數拒絕、call ID 與回合上限）；不證明任何真實模型會產生這些訊息，也不證明模型會根據工具結果形成最終答覆。
+**這是協定重播（fixtures），不是即時模型。** 證據等級要標清楚：它證明的是「你的應用程式在這些訊息下的行為正確」，**不證明任何真實模型會產生這些訊息**。第 17 節會用真實端點或明確標示的 fixtures 做契約測試。
 
 為什麼先用重播？因為**應用程式這一側的邏輯（驗證、allowlist、上限、ID 配對）跟模型無關**，而且是最常寫錯的部分。先把它寫對、寫測試，再接上真的模型。
 
 ## 五、可執行 Demo
 
-### Session 1：工具 schema 與提議轉執行契約
+情境：一個唯讀的合成事件查詢工具 `count_events`。四個情境：完整回合、無效參數、要求不在 allowlist 的工具、模型不會自己停。
+
+### Call session 1：工具 schema 與提議轉執行契約
 
 **系統層：schema 到本機執行器的邊界**
 
@@ -121,7 +103,7 @@ flowchart TD
     F -- 是 --> G[呼叫 TOOLS[name]]
 ```
 
-### Session 2：工具結果回填、呼叫 ID 與回合上限
+### Call session 2：工具結果回填、呼叫 ID 與回合上限
 
 **系統層：工具結果回到模型後的閉環**
 
@@ -157,14 +139,14 @@ flowchart TD
 ```python
 """第 16 節：原生 Function Calling 的完整工具回合（只用 Python 標準函式庫）。
 
-一個成功完整回合有四步，少一步都不算；協定重播若達回合上限，工具結果不會再送模型，不會有最終答覆：
+一個完整回合有四步，少一步都不算：
   1. 模型提出 tool call（名稱＋參數＋call ID）
   2. **應用程式**決定要不要執行：allowlist、參數驗證、權限
   3. 執行，把結果連同**同一個 call ID** 回給模型
   4. 模型根據結果寫出最終答覆
 
 預設路徑的模型由 `ScriptedModel` 扮演：它照劇本回傳訊息，訊息格式仿照
-常見的原生 tool calling 協定。**這是協定重播（fixtures），不是即時模型。** 第三節另有明確選做的 NVIDIA Build live 路徑，只傳送這裡的合成問題；live 路徑需安裝 `openai` SDK、網路與 `NVIDIA_API_KEY`，但不會把模型輸出的工具呼叫直接執行。
+常見的原生 tool calling 協定。**這是協定重播（fixtures），不是即時模型。** 第三節另有明確選做的 NVIDIA Build live 路徑，只傳送這裡的合成問題；live 路徑需網路與 `NVIDIA_API_KEY`，但不會把模型輸出的工具呼叫直接執行。
 """
 
 import json
@@ -172,7 +154,8 @@ import json
 # 只有 --nvidia-live 路徑才會使用；預設重播不載入任何網路依賴。
 import os
 import sys
-# nvidia_model 內延遲載入 openai SDK，讓 fixture replay 不需安裝 SDK。
+import urllib.error
+import urllib.request
 
 # 合成事件資料，唯讀。
 EVENTS = (
@@ -210,11 +193,6 @@ EXECUTORS = {"count_events": count_events}
 
 
 def validate_args(name, args):
-    """Validate the JSON value's object shape and the tool's declared schema."""
-    if name not in TOOLS:
-        return [f"工具 {name!r} 不在 allowlist"]
-    if not isinstance(args, dict):
-        return ["arguments 必須是 JSON object（JSON 物件）"]
     spec = TOOLS[name]["parameters"]
     errors = [f"缺少必填參數 {k}" for k in spec["required"] if k not in args]
     for key, value in args.items():
@@ -236,20 +214,11 @@ def execute(call):
     else:
         try:
             args = json.loads(call["function"]["arguments"])
-        except (json.JSONDecodeError, TypeError) as error:
-            detail = error.msg if isinstance(error, json.JSONDecodeError) else str(error)
-            content = {"error": f"參數不是合法 JSON：{detail}"}
-        else:
+        except json.JSONDecodeError as error:
+            args, content = None, {"error": f"參數不是合法 JSON：{error.msg}"}
+        if args is not None:
             problems = validate_args(name, args)
-            if problems:
-                content = {"error": "；".join(problems)}
-            else:
-                try:
-                    content = EXECUTORS[name](**args)
-                except (TypeError, ValueError) as error:
-                    # Keep malformed arguments inside the tool protocol instead of
-                    # crashing the host application's request loop.
-                    content = {"error": f"工具參數或值無效：{error}"}
+            content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
     return {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(content, ensure_ascii=False)}
 
 
@@ -284,28 +253,13 @@ def run_turn(model, question):
     messages = [{"role": "user", "content": question}]
     for _ in range(MAX_TOOL_ROUNDS):
         reply = model(messages)
-        if not isinstance(reply, dict) or reply.get("role") != "assistant":
-            return messages, "協定錯誤：模型回覆格式無效，停止執行"
-        calls = reply.get("tool_calls") or []
-        if not isinstance(calls, list):
-            return messages, "協定錯誤：tool_calls 必須是清單，停止執行"
-        if not calls:
-            messages.append(reply)
-            return messages, "完成"
-        validated = []
-        seen_ids = set()
-        for call in calls:
-            if (not isinstance(call, dict) or not isinstance(call.get("id"), str)
-                    or not call["id"] or call["id"] in seen_ids
-                    or not isinstance(call.get("function"), dict)
-                    or not isinstance(call["function"].get("name"), str)
-                    or not isinstance(call["function"].get("arguments"), str)):
-                return messages, "協定錯誤：tool call 結構或 ID 無效，停止執行"
-            seen_ids.add(call["id"])
-            validated.append(call)
         messages.append(reply)
-        messages.extend(execute(call) for call in validated)
-    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止；最後工具結果未再送回模型，尚無最終答覆"
+        calls = reply.get("tool_calls") or []
+        if not calls:
+            return messages, "完成"
+        for call in calls:
+            messages.append(execute(call))
+    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止"
 
 
 def nvidia_model(messages):
@@ -316,33 +270,33 @@ def nvidia_model(messages):
     api_key = os.environ.get("NVIDIA_API_KEY")
     if not api_key:
         raise RuntimeError("選做 live 需在本機設定 NVIDIA_API_KEY；不可寫入程式或命令列")
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise RuntimeError("選做 live 需安裝 openai SDK（pip install 'openai>=1,<3'）；重播不需要") from None
-    client = OpenAI(
-        base_url="https://integrate.api.nvidia.com/v1",
-        api_key=api_key,
-        timeout=45,
-        max_retries=0,
+    request_body = {
+        "model": "meta/llama-3.1-8b-instruct",
+        "messages": messages,
+        "tools": [{"type": "function", "function": {"name": name,
+                   "description": spec["description"], "parameters": spec["parameters"]}}
+                  for name, spec in TOOLS.items()],
+        "tool_choice": "auto",
+        "temperature": 0,
+        "max_tokens": 160,
+    }
+    req = urllib.request.Request(
+        "https://integrate.api.nvidia.com/v1/chat/completions",
+        data=json.dumps(request_body).encode("utf-8"), method="POST",
+        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
     )
     try:
-        response = client.chat.completions.create(
-            model="meta/llama-3.1-8b-instruct",
-            messages=messages,
-            tools=[{"type": "function", "function": {"name": name,
-                    "description": spec["description"], "parameters": spec["parameters"]}}
-                   for name, spec in TOOLS.items()],
-            tool_choice="auto",
-            temperature=0,
-            max_tokens=160,
-        )
-    except Exception as exc:
-        raise RuntimeError(f"NVIDIA API 呼叫失敗（{type(exc).__name__}）；不自動重試") from None
-    if not response.choices:
+        with urllib.request.urlopen(req, timeout=45) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"NVIDIA API 回傳 HTTP {exc.code}；勿貼出憑證或完整請求") from None
+    except urllib.error.URLError:
+        raise RuntimeError("NVIDIA API 連線失敗或逾時；不自動重試，以免重複請求") from None
+    choices = payload.get("choices")
+    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
         raise RuntimeError("API 回應缺少 choices；未執行任何工具")
-    message = response.choices[0].message
-    if message is None:
+    message = choices[0].get("message")
+    if not isinstance(message, dict):
         raise RuntimeError("API 回應缺少 assistant message；未執行任何工具")
     # 不原樣執行：將供應商訊息轉成本教材狹窄協定形狀；再由 run_turn/execute 驗證。
     normalized = {"role": "assistant", "content": message.get("content")}
@@ -437,22 +391,21 @@ if __name__ == "__main__":
     main()
 ```
 
-執行指令（在 `llm-demo` 目錄下；預設離線路徑不需要網路、模型或 SDK）：
+執行指令（在 [`llm-demo`](https://github.com/4-learn/llm-demo) 目錄下；預設離線路徑不需要網路、模型或 SDK）：
 
 ```bash
 python3 E03_tool_round.py
-python3 -m unittest -v test_E03_tool_round.py
 ```
 
-選做 NVIDIA Build live（只用合成事件；需安裝 `openai` SDK、教師核准、網路與本機環境變數 `NVIDIA_API_KEY`）：
+選做 NVIDIA Build live（只用合成事件；需教師核准、網路與本機環境變數 `NVIDIA_API_KEY`）：
 
 ```bash
 python3 E03_tool_round.py --nvidia-live
 ```
 
-程式會請模型提出唯讀工具呼叫，再由同一個本機 `run_turn`／`execute` 路徑驗證和執行。缺少 key 時不發請求；不要將 key 放入命令列、程式、筆記或作業。離線 `ScriptedModel` 路徑是協定重播 fixture，不是模型閉環。
+程式會請模型提出唯讀工具呼叫，再由同一個本機 `run_turn`／`execute` 路徑驗證和執行。缺少 key 時不發請求；不要將 key 放入命令列、程式、筆記或作業。
 
-關鍵輸出（Linux／Python 3.10.15，20E07-E03-05；錯誤詳見實際輸出）：
+關鍵輸出（Linux／Python 3.10.15，20E07-E03-05）：
 
 ```text
 工具 allowlist：['count_events']｜回合上限：3｜事件 4 筆（合成、唯讀）
@@ -463,6 +416,35 @@ python3 E03_tool_round.py --nvidia-live
   tool      : id=call_1 → {"site": "A", "type": "no_helmet", "since": "2026-10-04", "count": 1}
   assistant : A 工地自 2026-10-04 起有 1 次未戴安全帽紀錄（工具查詢結果）。
   狀態：完成｜訊息 4 則｜call ID 配對：一致
+
+=== 2 無效參數 → 錯誤回給模型 → 模型據實回報 ===
+  user      : C 工地有幾次未戴安全帽？
+  assistant : 要求呼叫 count_events({"site":"C","type":"no_helmet"})  id=call_1
+  tool      : id=call_1 → {"error": "site='C' 不在允許清單 ['A', 'B']"}
+  assistant : 查詢失敗：工具只接受 A 或 B 工地，資料中沒有 C 工地。
+  狀態：完成｜訊息 4 則｜call ID 配對：一致
+
+=== 3 要求不在 allowlist 的工具 ===
+  user      : 幫我刪掉 E2。
+  assistant : 要求呼叫 delete_event({"id":"E2"})  id=call_1
+  tool      : id=call_1 → {"error": "工具 delete_event 不在 allowlist"}
+  assistant : 無法執行：刪除不在允許的工具清單內，本系統只提供唯讀查詢。
+  狀態：完成｜訊息 4 則｜call ID 配對：一致
+
+=== 4 模型一直要求工具（不會自己停） ===
+  user      : A 工地狀況如何？
+  assistant : 要求呼叫 count_events({"site":"A","type":"no_helmet"})  id=call_loop_1
+  tool      : id=call_loop_1 → {"site": "A", "type": "no_helmet", "since": "0000-00-00", "count": 2}
+  assistant : 要求呼叫 count_events({"site":"A","type":"no_helmet"})  id=call_loop_2
+  tool      : id=call_loop_2 → {"site": "A", "type": "no_helmet", "since": "0000-00-00", "count": 2}
+  assistant : 要求呼叫 count_events({"site":"A","type":"no_helmet"})  id=call_loop_3
+  tool      : id=call_loop_3 → {"site": "A", "type": "no_helmet", "since": "0000-00-00", "count": 2}
+  狀態：達到回合上限 3，強制停止｜訊息 7 則｜call ID 配對：一致
+
+=== 只印出函式名稱，為什麼不夠？ ===
+  工具實際回傳 count=1；最終答覆：A 工地自 2026-10-04 起有 1 次未戴安全帽紀錄（工具查詢結果）。
+  答覆中的數字與工具結果一致：True（若忽略 since 會得到 2，答案就錯了）
+  只看到「呼叫了 count_events」證明不了這件事——要看到結果有被送回、也被正確使用。
 ```
 
 ## 六、結果怎麼讀

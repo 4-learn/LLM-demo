@@ -1,22 +1,9 @@
 # SFT 資料與按來源拆分
 
-> **新版正文：20E07-E03-05｜對應新版 LLM 第 46 節：SFT 資料與按來源拆分。**
+> **新版正文：20E07-E03-05｜對應新版 LLM 第 42 節：SFT 資料與按來源拆分。**
 > 微調之前，先把**資料**做對：train／validation／test 要**按來源**拆，不是逐筆隨機拆；拆完還要用近重複檢查抓「換了編號的複製品」與「同一個模板」；最後凍結 test manifest。本節只用 Python 標準函式庫，**不訓練任何模型**——洩漏在訓練之前就已經發生，也在訓練之前就能檢查。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：SFT 資料與按來源拆分
-
-```mermaid
-flowchart TD
-    A[原始語料] --> B[建立樣本與來源/模板群組]
-    B --> C[樣本級隨機切分]
-    B --> D[按來源群組切分 train/dev/holdout]
-    C --> E[leakage 檢查]
-    D --> E
-    E --> F[manifest 記錄每筆歸屬]
-    F --> G[比較重疊率與切分計數]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

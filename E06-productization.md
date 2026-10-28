@@ -3,27 +3,7 @@
 > **正文改版：2026-10-24｜對應新版 LLM 選修 E06：Docker、Gradio/Streamlit 與產品化。**
 > 本節用離線示範設計 Web app 服務邊界，涵蓋 Docker、Gradio、Streamlit 的部署概念、health/readiness、輸入限制與秘密管理；本節不是容器或雲端服務的實際部署驗證。
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：Docker、Gradio/Streamlit 與產品化
-
-```mermaid
-flowchart TD
-    A[應用程式與固定依賴設定] --> B[打包 Docker image]
-    B --> C[部署服務並注入環境設定與 secrets]
-    C --> D[啟動程序]
-    D --> E[health：程序存活？]
-    D --> F[readiness：模型與依賴就緒且可接流量？]
-    E --> G{服務可接請求？}
-    F --> G
-    G -- 否 --> H[維持未就緒／回報狀態，不洩漏內部資料]
-    G -- 是 --> I[Gradio／Streamlit 介面接收請求]
-    I --> J[驗證型別、長度與資源限制]
-    J --> K{輸入有效？}
-    K -- 否 --> L[拒絕並回傳安全錯誤]
-    K -- 是 --> M[呼叫應用服務／模型]
-    M --> N[最小化觀測：request ID、耗時、錯誤類別]
-    N --> O[回傳結果]
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

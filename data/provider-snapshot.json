@@ -1,6 +1,6 @@
 {
   "kind": "teacher-snapshot",
-  "purpose": "LLM 第 17 節：供應商能力矩陣與成本估算（2026-10-06 LiteLLM 內建資料快照，非供應商即時狀態；不得視為現價）",
+  "purpose": "LLM 第 14 節：供應商能力矩陣與成本估算（LiteLLM 內建資料，非供應商即時狀態）",
   "source": "litellm 套件內建 model_prices_and_context_window_backup.json（LITELLM_LOCAL_MODEL_COST_MAP=True）",
   "generated_at": "2026-10-06T05:24:23+00:00",
   "checked_on": null,

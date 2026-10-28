@@ -6,7 +6,8 @@
 import json
 import os
 import sys
-# OpenAI SDK is imported only by the explicit live path, so replay stays offline.
+import urllib.error
+import urllib.request
 
 NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 NVIDIA_MODEL = "meta/llama-3.1-8b-instruct"
@@ -32,17 +33,19 @@ def make_request(messages=SYNTHETIC_MESSAGES, model="fixture-model-not-a-real-pr
 
 
 def call_nvidia(request, api_key):
-    """透過標準 OpenAI SDK 呼叫 NVIDIA Build；明確 live 才載入 SDK，不自動重試。"""
-    from openai import OpenAI
-    client = OpenAI(base_url=NVIDIA_BASE_URL, api_key=api_key, timeout=45, max_retries=0)
-    response = client.chat.completions.create(
-        model=request["model"], messages=request["messages"], max_tokens=request["max_tokens"]
+    """選做真實傳輸；只接受由呼叫端提供的金鑰，不列印或保存。"""
+    body = json.dumps(request).encode("utf-8")
+    req = urllib.request.Request(
+        NVIDIA_BASE_URL + "/chat/completions", data=body, method="POST",
+        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
     )
-    return {
-        "choices": [{"message": {"role": "assistant", "content": response.choices[0].message.content or ""},
-                      "finish_reason": response.choices[0].finish_reason}],
-        "usage": response.usage.model_dump() if response.usage else None,
-    }
+    try:
+        with urllib.request.urlopen(req, timeout=45) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"API 回傳 HTTP {exc.code}；不要貼出含憑證的請求或錯誤內容") from None
+    except urllib.error.URLError:
+        raise RuntimeError("連線失敗或逾時；不要自動重試，服務可能已收到請求") from None
 
 
 def parse_response(response):

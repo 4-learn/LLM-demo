@@ -1,24 +1,9 @@
 # VLM 打標與 Metadata 品質
 
-> **正文改版：20E07-E03-06｜對應新版 LLM 第 E03 節：VLM 打標與 Metadata 品質。**
+> **正文改版：20E07-E03-06｜對應新版 LLM 第 16 節：VLM 打標與 Metadata 品質。**
 > 第 10–12 節逐張檢查模型看圖的結果。實務上圖片有幾千張，會讓模型批次打標籤，再用標籤做檢索過濾（第 22 節）。本節對 10 張合成工地圖批次打 3 個標籤，把結果寫成**帶來源的 metadata**（image ID、雜湊、產生方式、模型 revision、提示版本、覆核狀態），做 schema 檢查、與人工標註比對、覆核修正；並示範兩個常見錯誤：**未覆核就拿來過濾**、**把 unknown 默認為 no**。核心主張：**模型標籤是待覆核的提議，不是真值；unknown 是一個值，不是 no；每筆 metadata 都要說得出它從哪裡來。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：VLM 打標與 Metadata 品質
-
-```mermaid
-flowchart TD
-    A[影像與人工真值] --> B[VLM 產生標籤]
-    B --> C[to_record 轉為結構資料]
-    C --> D[schema 與 unknown 檢查]
-    D --> E[人工覆核/隔離不確定樣本]
-    E --> F{是否核可？}
-    F -- 否 --> G[排除於檢索]
-    F -- 是 --> H[加入可用標籤]
-    G --> I[報告安全帽案例結果]
-    H --> I
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 

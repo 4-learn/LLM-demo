@@ -1,21 +1,9 @@
 # HITL：真正拒絕與恢復
 
-> **新版正文：20E07-E03-06｜對應新版 LLM 第 33 節：HITL：真正拒絕與恢復。**
+> **新版正文：20E07-E03-06｜對應新版 LLM 第 30 節：HITL：真正拒絕與恢復。**
 > 「人在迴圈中」常被做成一個會跳出來的確認框：按什麼都繼續跑，或者通知早就寄出去了才問。核心主張：**人工的回答必須真正決定下一步——拒絕就不執行；流程中斷後，換一個程序也要能從存檔接著走；而 resume 會重跑節點，所以副作用要放在核准之後，而且要冪等。**
 
-[回 51 節必修＋9 節選修課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
-
-## 流程圖：HITL：真正拒絕與恢復
-
-```mermaid
-flowchart TD
-    A[輸入：課程情境與資料] --> B[執行 E08_hitl_resume.py]
-    B --> C{輸入與前置條件有效？}
-    C -- 否 --> D[回報錯誤或拒絕處理]
-    C -- 是 --> E[依本課流程執行核心步驟]
-    E --> F[檢查結果與證據]
-    F --> G[輸出可核對結果]
-```
+[回 50 節課綱](https://hackmd.io/@yillkid/HJl8JXTNkl)
 
 ## 學習目標與時間
 
@@ -64,7 +52,13 @@ LangGraph 恢復時，會**從 interrupt 所在節點的開頭重新執行**，�
 
 ## 四、可執行 Demo
 
-### Session 1：中斷點、核准與拒絕路徑
+需要 `langgraph==1.2.12` 與 `langgraph-checkpoint-sqlite==3.1.1`；不需要模型。「寄出通知」寫進本機 SQLite 的 `outbox` 表，不會真的寄信。`attempts` 表記錄每一次**嘗試**寄出，用來看出重複。
+
+```bash
+python -m pip install "langgraph==1.2.12" "langgraph-checkpoint-sqlite==3.1.1"
+```
+
+### Call session 1：中斷點、核准與拒絕路徑
 
 **系統層：interrupt 暫停副作用，等待人工決策**
 
@@ -91,7 +85,7 @@ flowchart TD
     E --> G[send(store, key, body)]
 ```
 
-### Session 2：checkpoint 恢復與副作用冪等檢查
+### Call session 2：checkpoint 恢復與副作用冪等檢查
 
 **系統層：持久化 checkpoint 後用同一 thread 恢復**
 
