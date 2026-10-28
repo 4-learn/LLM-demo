@@ -49,13 +49,13 @@
 | 48 | 微調前後評估與 Adapter 交付 | `51_adapter_eval.py` | — |
 | 49 | Prefill、Decode 與 Token 成本 | `E09_prefill_decode.py` | — |
 | 50 | 模型路由、級聯與品質門檻 | `51_routing.py` | — |
-| 04 | Transformer、Attention、MoE 與推理模型 | `04_transformer_attention.py` | — |
-| 08 | Prompt 與 Context Engineering | `08_prompt_context.py` | — |
-| 11 | 進階 LLM/RAG 評估、Judge 校準與回歸測試 | `11_llm_evaluation.py` | — |
-| 13 | OWASP LLM Top 10 與 Guardrails | `13_llm_guardrails.py` | — |
-| 20 | 20｜文件證據抽取（PDF 解析／OCR／版面表格待補） | `20_document_parsing.py` | — |
-| 25 | 25｜混合檢索與查詢改寫 | `25_hybrid_retrieval.py` | — |
-| 41 | 41｜Agent 設計模式與記憶 | `41_agent_patterns.py` | — |
+| 04 | 04｜Transformer、Attention、MoE 與推理模型 | `04_transformer_attention.py` | — |
+| 08 | 08｜Prompt 與 Context Engineering | `08_prompt_context.py` | — |
+| 11 | 11｜檢查模型回答：正確率 | `11_llm_evaluation.py` | — |
+| 13 | 13｜資料不等於指令 | `13_llm_guardrails.py` | — |
+| 20 | 20｜從文字找出工單編號 | `20_document_parsing.py` | — |
+| 25 | 25｜用關鍵字找文件 | `25_hybrid_retrieval.py` | — |
+| 41 | 41｜固定流程與 Agent | `41_agent_patterns.py` | — |
 
 ## Electives
 
@@ -67,9 +67,9 @@
 | E07 | 量化與 CPU 實驗 | `E07_quant_cpu.py` | 重播標準函式庫；--live 需 torch、transformers |
 | E08 | KV Cache 與 Prefix Cache 的機制與局限 | `E08_prefix_cache.py` | 輸出計量依環境，版本會不同，不作逐字比對 |
 | E09 | 推測解碼與服務端推論 | `E09_speculative.py` | 重播需 speculative-record.json；--live 需模型快取 |
-| E04 | 知識圖譜與 GraphRAG | `E04_graphrag.py` | — |
-| E05 | 語音 ASR／TTS 與語音代理 | `E05_voice_agents.py` | — |
-| E06 | Docker、Gradio/Streamlit 與產品化 | `E06_productization.py` | — |
+| E04 | E04｜用關係找到答案 | `E04_graphrag.py` | — |
+| E05 | E05｜語音指令要聽清楚 | `E05_voice_agents.py` | — |
+| E06 | E06｜先檢查使用者輸入 | `E06_productization.py` | — |
 
 ## Acceptance
 

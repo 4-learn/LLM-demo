@@ -79,9 +79,12 @@ def execute(call):
             args = json.loads(call["function"]["arguments"])
         except json.JSONDecodeError as error:
             args, content = None, {"error": f"參數不是合法 JSON：{error.msg}"}
-        if args is not None:
-            problems = validate_args(name, args)
-            content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
+        else:
+            if isinstance(args, dict):
+                problems = validate_args(name, args)
+                content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
+            else:
+                content = {"error": "參數必須是 JSON object"}
     return {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(content, ensure_ascii=False)}
 
 
