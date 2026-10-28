@@ -21,7 +21,7 @@
 | E01 | 可核對的圖像描述 | `E01-grounded-caption.md` | `E01_grounded_caption.py` | 252 | 4 | replay/fixture; HF/local inference | 部分可替換；保留本地/工具/驗證流程 |
 | E02 | VLM 文件摘要、來源與頁碼 | `E02-doc-citations.md` | `E02_doc_citations.py` | 233 | 4 | replay/fixture; HF/local inference | 部分可替換；保留本地/工具/驗證流程 |
 | 15 | Structured Output：語法、Schema 與語義 | `15-structured-output.md` | `E07_structured_output.py` | 176 | 0 | 未見模型呼叫（純流程/演算法或缺 demo） | 可完整替換文字 LLM live 呼叫 |
-| 16 | 原生 Function Calling 完整工具回合 | `16-tool-round.md` | `E03_tool_round.py` | 252 | 4 | replay/fixture; HTTP/API live; tool/MCP | 可完整替換文字 LLM live 呼叫 |
+| 16 | 原生 Function Calling 完整工具回合 | `16-tool-round.md` | `E03_tool_round.py` | 271 | 4 | replay/fixture; HTTP/API live; tool/MCP | 可完整替換文字 LLM live 呼叫 |
 | 17 | 多供應商介面、LiteLLM 與 API 成本 | `17-providers-cost.md` | `E07_provider_contract.py` | 174 | 0 | replay/fixture; HTTP/API live | 可完整替換文字 LLM live 呼叫 |
 | E03 | VLM 打標與 Metadata 品質 | `E03-vlm-tagging.md` | `E03_vlm_tagging.py` | 269 | 4 | replay/fixture; HF/local inference | 部分可替換；保留本地/工具/驗證流程 |
 | 18 | Embedding 原理與中文適配 | `18-embedding.md` | `E07_embedding_lab.py` | 67 | 0 | HF/local inference | 依課程目的不需/不宜改，或非模型呼叫 |

@@ -78,13 +78,10 @@ def execute(call):
         try:
             args = json.loads(call["function"]["arguments"])
         except json.JSONDecodeError as error:
-            args, content = None, {"error": f"參數不是合法 JSON：{error.msg}"}
+            content = {"error": f"參數不是合法 JSON：{error.msg}"}
         else:
-            if isinstance(args, dict):
-                problems = validate_args(name, args)
-                content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
-            else:
-                content = {"error": "參數必須是 JSON object"}
+            problems = validate_args(name, args)
+            content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
     return {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(content, ensure_ascii=False)}
 
 
@@ -119,22 +116,32 @@ def run_turn(model, question):
     messages = [{"role": "user", "content": question}]
     for _ in range(MAX_TOOL_ROUNDS):
         reply = model(messages)
-        messages.append(reply)
         calls = reply.get("tool_calls") or []
         if not calls:
+            messages.append(reply)
             return messages, "完成"
-        if not isinstance(calls, list):
-            return messages[:-1], "協定錯誤：tool_calls 必須是 list"
-        call_ids = [call.get("id") for call in calls if isinstance(call, dict)]
-        if len(call_ids) != len(calls) or any(not isinstance(cid, str) or not cid for cid in call_ids):
-            return messages[:-1], "協定錯誤：tool call 缺少有效 ID"
-        if len(set(call_ids)) != len(call_ids):
-            return messages[:-1], "協定錯誤：tool call ID 重複"
+        if not isinstance(calls, list) or any(
+            not isinstance(call, dict)
+            or not isinstance(call.get("id"), str)
+            or not call["id"]
+            or not isinstance(call.get("function"), dict)
+            or not isinstance(call["function"].get("name"), str)
+            or not isinstance(call["function"].get("arguments"), str)
+            for call in calls
+        ):
+            return messages, "協定錯誤：tool call 結構不合法，未執行工具"
+        call_ids = [call["id"] for call in calls]
+        if len(set(call_ids)) != len(call_ids) or any(
+            message.get("role") == "tool" and message.get("tool_call_id") in call_ids
+            for message in messages
+        ):
+            return messages, "協定錯誤：tool call ID 重複，未執行工具"
+        messages.append(reply)
         for call in calls:
             if not isinstance(call.get("function"), dict):
                 return messages[:-1], "協定錯誤：tool function 格式錯誤"
             messages.append(execute(call))
-    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止（尚無最終答覆）"
+    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，尚無最終答覆；強制停止"
 
 
 def nvidia_model(messages):
