@@ -193,6 +193,8 @@ EXECUTORS = {"count_events": count_events}
 
 
 def validate_args(name, args):
+    if not isinstance(args, dict):
+        return ["參數必須是 JSON object"]
     spec = TOOLS[name]["parameters"]
     errors = [f"缺少必填參數 {k}" for k in spec["required"] if k not in args]
     for key, value in args.items():
@@ -216,9 +218,12 @@ def execute(call):
             args = json.loads(call["function"]["arguments"])
         except json.JSONDecodeError as error:
             args, content = None, {"error": f"參數不是合法 JSON：{error.msg}"}
-        if args is not None:
-            problems = validate_args(name, args)
-            content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
+        else:
+            if isinstance(args, dict):
+                problems = validate_args(name, args)
+                content = {"error": "；".join(problems)} if problems else EXECUTORS[name](**args)
+            else:
+                content = {"error": "參數必須是 JSON object"}
     return {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(content, ensure_ascii=False)}
 
 
@@ -257,9 +262,18 @@ def run_turn(model, question):
         calls = reply.get("tool_calls") or []
         if not calls:
             return messages, "完成"
+        if not isinstance(calls, list):
+            return messages[:-1], "協定錯誤：tool_calls 必須是 list"
+        call_ids = [call.get("id") for call in calls if isinstance(call, dict)]
+        if len(call_ids) != len(calls) or any(not isinstance(cid, str) or not cid for cid in call_ids):
+            return messages[:-1], "協定錯誤：tool call 缺少有效 ID"
+        if len(set(call_ids)) != len(call_ids):
+            return messages[:-1], "協定錯誤：tool call ID 重複"
         for call in calls:
+            if not isinstance(call.get("function"), dict):
+                return messages[:-1], "協定錯誤：tool function 格式錯誤"
             messages.append(execute(call))
-    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止"
+    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止（尚無最終答覆）"
 
 
 def nvidia_model(messages):
@@ -439,7 +453,7 @@ python3 E03_tool_round.py --nvidia-live
   tool      : id=call_loop_2 → {"site": "A", "type": "no_helmet", "since": "0000-00-00", "count": 2}
   assistant : 要求呼叫 count_events({"site":"A","type":"no_helmet"})  id=call_loop_3
   tool      : id=call_loop_3 → {"site": "A", "type": "no_helmet", "since": "0000-00-00", "count": 2}
-  狀態：達到回合上限 3，強制停止｜訊息 7 則｜call ID 配對：一致
+  狀態：達到回合上限 3，強制停止（尚無最終答覆）｜訊息 7 則｜call ID 配對：一致
 
 === 只印出函式名稱，為什麼不夠？ ===
   工具實際回傳 count=1；最終答覆：A 工地自 2026-10-04 起有 1 次未戴安全帽紀錄（工具查詢結果）。
@@ -467,7 +481,7 @@ python3 E03_tool_round.py --nvidia-live
 
 ### 4. 回合上限是唯一保證會停的東西
 
-情境 4 的模型劇本是空的，所以它每一輪都要求同一個工具。**沒有上限，這個迴圈會一直跑下去**（真實環境裡則是一直花錢）。本節的上限是 3，程式在 7 則訊息後強制停止，並把狀態寫成「達到回合上限」而不是「完成」。
+情境 4 的模型劇本是空的，所以它每一輪都要求同一個工具。**沒有上限，這個迴圈會一直跑下去**（真實環境裡則是一直花錢）。本節的上限是 3，程式在 7 則訊息後強制停止，並把狀態寫成「達到回合上限（尚無最終答覆）」而不是「完成」。
 
 注意：每次呼叫的 ID 都不同（`call_loop_1`、`_2`、`_3`）。**ID 重複是協定錯誤**，`call_ids_match` 會把它當成不一致。
 
@@ -495,10 +509,10 @@ python3 E03_tool_round.py --nvidia-live
 
 ### 參考判讀
 
-- 第 1 題：**7 則**——1 則 user，加上 3 輪 ×（1 則 assistant ＋ 1 則 tool）。最後一則是 tool 訊息，**沒有最終答覆**，所以狀態是「達到回合上限」而不是「完成」。
+- 第 1 題：**7 則**——1 則 user，加上 3 輪 ×（1 則 assistant ＋ 1 則 tool）。最後一則是 tool 訊息，**沒有最終答覆**，所以狀態是「達到回合上限（尚無最終答覆）」而不是「完成」。
 - 第 3 題：`execute` 會回傳 `{"error": "參數不是合法 JSON：..."}`，**帶著同一個 call ID**。程式不會崩潰，模型會收到錯誤。
 - 第 4 題：會被擋下（`未定義的參數 limit`）。刪掉那段之後，`count_events(**args)` 會因為 `limit` 不是它的參數而拋出 `TypeError`——**這個例外沒有被 `execute` 接住**，整個回合會崩潰。這說明參數驗證不只是安全問題，也是穩定性問題。
-- 第 5 題：模型提出呼叫、工具回傳結果，然後**迴圈就結束了**，模型沒有機會寫最終答覆，狀態是「達到回合上限 1」。一個需要工具的正常回合至少需要 **2** 次模型呼叫；上限要大於這個數字。
+- 第 5 題：模型提出呼叫、工具回傳結果，然後**迴圈就結束了**，模型沒有機會寫最終答覆，狀態是「達到回合上限 1（尚無最終答覆）」。一個需要工具的正常回合至少需要 **2** 次模型呼叫；上限要大於這個數字。
 
 ### 驗收
 

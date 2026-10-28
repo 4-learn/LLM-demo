@@ -1,26 +1,6 @@
-def plan_context(instructions, documents, budget, count=None):
-    if budget < 0:
-        raise ValueError("budget must be nonnegative")
-    if count is None:
-        count = len
-    if not callable(count):
-        raise ValueError("count must be callable")
-    used = count(instructions)
-    if type(used) is not int or used < 0:
-        raise ValueError("count must return a nonnegative int")
-    if used > budget:
-        raise ValueError("instructions exceed budget")
-    kept = []
-    for document in documents:
-        cost = count(document)
-        if type(cost) is not int or cost < 0:
-            raise ValueError("count must return a nonnegative int")
-        if used + cost <= budget:
-            kept.append(document)
-            used += cost
-    return kept, used
+task = "用一句話摘要"
+data = "今天下雨，公園活動改到室內。"
+rule = "只根據資料回答。"
 
-if __name__ == "__main__":
-    kept, used = plan_context("任務", ["甲", "乙乙"], 4)
-    print("kept:", kept)
-    print("used:", used)
+prompt = task + "\n" + rule + "\n資料：" + data
+print(prompt)
