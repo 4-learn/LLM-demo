@@ -193,6 +193,8 @@ EXECUTORS = {"count_events": count_events}
 
 
 def validate_args(name, args):
+    if not isinstance(args, dict):
+        return ["參數必須是 JSON object"]
     spec = TOOLS[name]["parameters"]
     errors = [f"缺少必填參數 {k}" for k in spec["required"] if k not in args]
     for key, value in args.items():
@@ -257,9 +259,18 @@ def run_turn(model, question):
         calls = reply.get("tool_calls") or []
         if not calls:
             return messages, "完成"
+        if not isinstance(calls, list):
+            return messages[:-1], "協定錯誤：tool_calls 必須是 list"
+        call_ids = [call.get("id") for call in calls if isinstance(call, dict)]
+        if len(call_ids) != len(calls) or any(not isinstance(cid, str) or not cid for cid in call_ids):
+            return messages[:-1], "協定錯誤：tool call 缺少有效 ID"
+        if len(set(call_ids)) != len(call_ids):
+            return messages[:-1], "協定錯誤：tool call ID 重複"
         for call in calls:
+            if not isinstance(call.get("function"), dict):
+                return messages[:-1], "協定錯誤：tool function 格式錯誤"
             messages.append(execute(call))
-    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止"
+    return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，強制停止（尚無最終答覆）"
 
 
 def nvidia_model(messages):
