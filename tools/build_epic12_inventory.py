@@ -24,7 +24,7 @@ def main(argv=None):
         raise SystemExit(f'mapping file not found: {a.mapping}; pass --mapping PATH to the authoritative 60-course CSV')
     rows=list(csv.DictReader(a.mapping.open(encoding='utf-8-sig')))
     if len(rows)!=60: raise SystemExit(f'mapping rows={len(rows)}, expected 60')
-    out=['# 60 課呼叫、圖示與長程式盤點','',f'> 盤點來源：課程 mapping（{len(rows)} 節）與本 repo main 基線 abbb7ea；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。','', '| 課號 | 課名 | 講義 | Demo 檔案（依錨點） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |','|---|---|---|---|---:|---:|---|---|']
+    out=['# 60 課呼叫、圖示與長程式盤點','',f'> 盤點來源：課程 mapping（{len(rows)} 節）與目前目標 main 基線；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。','', '| 課號 | 課名 | 講義 | Demo 檔案（依錨點） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |','|---|---|---|---|---:|---:|---|---|']
     missing=[]
     for r in rows:
         id=r['new_id']; mds=sorted(ROOT.glob(id+'-*.md')); md=mds[0] if mds else (ROOT/'51-acceptance.md' if id=='51' and (ROOT/'51-acceptance.md').exists() else None)
