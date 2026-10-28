@@ -138,6 +138,8 @@ def run_turn(model, question):
             return messages, "協定錯誤：tool call ID 重複，未執行工具"
         messages.append(reply)
         for call in calls:
+            if not isinstance(call.get("function"), dict):
+                return messages[:-1], "協定錯誤：tool function 格式錯誤"
             messages.append(execute(call))
     return messages, f"達到回合上限 {MAX_TOOL_ROUNDS}，尚無最終答覆；強制停止"
 
