@@ -2,16 +2,16 @@ old_id,new_id,track,title,status
 01,01,core,系統責任與任務 Baseline,existing
 02,02,core,Tokenizer 與上下文預算,existing
 03,03,core,自回歸生成、Logits 與 Inference,existing
-,04,core,Transformer、Attention、MoE 與推理模型,new_written
+,04,core,Attention｜用權重混合資訊,new_written
 04,05,core,Sampling 與生成實驗,existing
 05,06,core,Hugging Face 模型選型與授權,existing
 06,07,core,API 呼叫：HTTP、JSON 與安全金鑰,existing
-,08,core,Prompt 與 Context Engineering,new_written
+,08,core,Prompt Engineering｜把任務和資料說清楚,new_written
 07,09,core,本地推論載入與 CPU Smoke Test,existing
 08,10,core,評測集、指標與可重現基準,existing
-,11,core,進階 LLM/RAG 評估、Judge 校準與回歸測試,new_written
+,11,core,LLM 評估｜用正確率檢查回答,new_written
 09,12,core,幻覺、提示注入與權限邊界,existing
-,13,core,OWASP LLM Top 10 與 Guardrails,new_written
+,13,core,Guardrails｜把資料和指令分開,new_written
 10,14,core,多模態輸入、證據與未知,existing
 11,E01,elective,可核對的圖像描述,existing
 12,E02,elective,VLM 文件摘要、來源與頁碼,existing
@@ -21,12 +21,12 @@ old_id,new_id,track,title,status
 16,E03,elective,VLM 打標與 Metadata 品質,existing
 17,18,core,Embedding 原理與中文適配,existing
 18,19,core,相似度、失敗案例與評測,existing
-,20,core,文件證據抽取（可選性 PDF 文字抽取；OCR／版面表格待補）,new_written
+,20,core,文件處理｜從文字找出工單編號,new_written
 19,21,core,Chunk 與來源資料模型,existing
 20,22,core,記憶體精確檢索 Baseline,existing
 21,23,core,MariaDB Vector 持久化銜接,existing
 22,24,core,Metadata 過濾與版本更新,existing
-,25,core,混合檢索與查詢改寫,new_written
+,25,core,混合檢索｜用關鍵字找候選文件,new_written
 23,26,core,Reranking 與 Retrieval Evaluation,existing
 24,27,core,RAG 引用與查無答案,existing
 25,28,core,Orchestration 與 LangChain LCEL,existing
@@ -42,7 +42,7 @@ old_id,new_id,track,title,status
 35,38,core,LLM 與 MCP 完整工具回合,existing
 36,39,core,真實檔案資料來源的 MCP Server,existing
 37,40,core,Streamable HTTP MCP 服務與部署,existing
-,41,core,Agent 設計模式與記憶,new_written
+,41,core,Agent 設計｜依結果選擇下一步,new_written
 38,42,core,Multi-Agent、固定 Workflow 與 Reducer,existing
 39,43,core,單／多 Agent 品質、延遲與成本比較,existing
 40,44,core,MCP 增量整合里程碑,existing
@@ -56,6 +56,6 @@ old_id,new_id,track,title,status
 48,50,core,模型路由、級聯與品質門檻,existing
 49,E09,elective,推測解碼與服務端推論,existing
 50,51,core,全課增量驗收與評估報告,existing
-,E04,elective,知識圖譜與 GraphRAG,new_written
-,E05,elective,語音 ASR／TTS 與語音代理,new_written
-,E06,elective,Docker、Gradio/Streamlit 與產品化,new_written
+,E04,elective,知識圖譜｜沿著兩條關係查位置,new_written
+,E05,elective,語音代理｜先確認聽到的指令,new_written
+,E06,elective,產品化｜先檢查文字輸入,new_written
