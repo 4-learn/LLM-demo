@@ -1,6 +1,6 @@
 # 60 課呼叫、圖示與長程式盤點
 
-> 盤點來源：課程 mapping（60 節）與本 repo main 基線 b2db366；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。
+> 盤點來源：課程 mapping（60 節）與本 repo main 基線 abbb7ea；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。
 
 | 課號 | 課名 | 講義 | Demo 檔案（依錨點） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |
 |---|---|---|---|---:|---:|---|---|

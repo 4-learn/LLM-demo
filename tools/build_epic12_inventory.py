@@ -4,13 +4,12 @@ from __future__ import annotations
 import argparse, csv, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-DEFAULT_MAPPING = pathlib.Path('/home/dsh/workspace/swarm/hives/4-learn/course-plans/llm-restructure-mapping.csv')
-if not DEFAULT_MAPPING.is_file():
-    DEFAULT_MAPPING = ROOT.parent/'course-plans'/'llm-restructure-mapping.csv'
+DEFAULT_MAPPING = ROOT/'docs/course-mapping.csv'
 API_COMPLETE = {'07','15','16','17','27','28','31','33','34','35','41','42','50'}
 API_PARTIAL = {'05','10','12','14','25','29','38','43','45','51','E01','E02','E03','E04','E05'}
 API_NO = {'03','09','48','49','E07','E09'}
 LONG = {'14','16','23','27','28','33','35','38','39','40','42','43','44','45','46','48','E01','E02','E03','E07','E09'}
+
 
 def classify(text, files):
     s=text+'\n'+'\n'.join(p.read_text(encoding='utf-8',errors='ignore') for p in files)
@@ -18,16 +17,17 @@ def classify(text, files):
     found=[name for name,pat in checks if re.search(pat,s,re.I)]
     return '; '.join(found) or '未見模型呼叫（純流程/演算法或缺 demo）'
 
-def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--mapping',type=pathlib.Path,default=DEFAULT_MAPPING); ap.add_argument('--output',type=pathlib.Path,default=ROOT/'docs/course-inventory.md'); ap.add_argument('--check',action='store_true'); a=ap.parse_args()
-    rows=list(csv.DictReader(a.mapping.open(encoding='utf-8')))
+
+def main(argv=None):
+    ap=argparse.ArgumentParser(); ap.add_argument('--mapping',type=pathlib.Path,default=DEFAULT_MAPPING); ap.add_argument('--output',type=pathlib.Path,default=ROOT/'docs/course-inventory.md'); ap.add_argument('--check',action='store_true'); a=ap.parse_args(argv)
+    if not a.mapping.is_file():
+        raise SystemExit(f'mapping file not found: {a.mapping}; pass --mapping PATH to the authoritative 60-course CSV')
+    rows=list(csv.DictReader(a.mapping.open(encoding='utf-8-sig')))
     if len(rows)!=60: raise SystemExit(f'mapping rows={len(rows)}, expected 60')
-    out=['# 60 課呼叫、圖示與長程式盤點','',f'> 盤點來源：課程 mapping（{len(rows)} 節）與本 repo main 基線 b2db366；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。','', '| 課號 | 課名 | 講義 | Demo 檔案（依錨點） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |','|---|---|---|---|---:|---:|---|---|']
+    out=['# 60 課呼叫、圖示與長程式盤點','',f'> 盤點來源：課程 mapping（{len(rows)} 節）與本 repo main 基線 abbb7ea；此 inventory 由 `tools/build_epic12_inventory.py` 產生。Demo 檔依講義 `<!-- demo: ... -->` 錨點核對；行數為錨點所指 demo 最大行數。','', '| 課號 | 課名 | 講義 | Demo 檔案（依錨點） | 行數(最大) | Mermaid flowchart 數 | 執行型態/依賴線索 | Build SDK 結論 |','|---|---|---|---|---:|---:|---|---|']
     missing=[]
     for r in rows:
         id=r['new_id']; mds=sorted(ROOT.glob(id+'-*.md')); md=mds[0] if mds else (ROOT/'51-acceptance.md' if id=='51' and (ROOT/'51-acceptance.md').exists() else None)
-        # Resolve demos from actual lesson anchors, not filename prefixes: historical
-        # filenames are intentionally retained and prefix matches can cross-map lessons.
         anchors=re.findall(r'<!--\s*demo:\s*([^\s]+\.py)\s*-->',md.read_text(encoding='utf8') if md else '')
         pys=[ROOT/name for name in dict.fromkeys(anchors) if (ROOT/name).is_file()]
         missing_demos=[name for name in dict.fromkeys(anchors) if not (ROOT/name).is_file()]
