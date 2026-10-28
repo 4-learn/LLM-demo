@@ -14,7 +14,7 @@
 
 ## 延伸閱讀
 
-加權混合向量是課程補充，非原系列 Day 4 主題；[看延伸頁與 Mermaid 示意圖](DAY-04-WEIGHTED-MIXING.md)。
+加權混合向量是課程補充，非原系列 Day 4 主題；[看延伸頁與 Mermaid 示意圖](https://hackmd.io/@yillkid/Syijmlgpfg)。
 
 ## 動手做：建立可重用的提示模板
 

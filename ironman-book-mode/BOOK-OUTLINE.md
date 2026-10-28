@@ -4,14 +4,16 @@
 
 ## 課程章節
 
+- [Day 4 延伸｜加權混合向量（課程補充）](https://hackmd.io/@yillkid/BvONQVPxTXySiKh5ZJTXFA)
+
 - [Day 1｜從問題開始：LLM 應用可以做什麼？](https://hackmd.io/@yillkid/Psl8p55FTMGUm_bUy9qrmw)
-- [Day 2｜AI、LLM 與文字接龍](https://hackmd.io/@yillkid/vBznR5iMShqb9gphBdQ9Rw)
-- [Day 3｜第一次呼叫 LLM API](https://hackmd.io/@yillkid/LUOju9ELRFmfU-IjRTIYJA)
-- [Day 4｜提示詞：把任務說清楚](https://hackmd.io/@yillkid/IOdwhEXdQ3eKNOsbwq5wiw)
+- [Day 2｜AI、LLM 與文字接龍](https://hackmd.io/@yillkid/9FG1fSjERmGRUcNwNAhq-Q)
+- [Day 3｜第一次呼叫 LLM API](https://hackmd.io/@yillkid/rWRMRgrgQpq5KRGIuk11XQ)
+- [Day 4｜提示詞：把任務說清楚](https://hackmd.io/@yillkid/gAecpjtoRyWnA6Leh9lNCA)
 - [Day 5｜對話記憶就是保留上下文](https://hackmd.io/@yillkid/UouH5cTgTJuGDvaRLaK9fw)
 - [Day 6｜讓程式做精確計算](https://hackmd.io/@yillkid/zhec6Ns9TF2PYtfqStHLFQ)
 - [Day 7｜工具呼叫：資料要驗證，動作由程式控制](https://hackmd.io/@yillkid/RDxGIAuLTHKNzAa6_e4UwA)
-- [Day 8｜RAG：先找資料，再請模型回答](https://hackmd.io/@yillkid/rfyPPb_SQtug5BNzeqdzhQ)
+- [Day 8｜RAG：先找資料，再請模型回答](https://hackmd.io/@yillkid/HePByJoHRtW_mnIlOcXNQA)
 - [Day 9｜組成簡單的 RAG 問答流程](https://hackmd.io/@yillkid/pUkLUt6PQA60InJfYzYVTw)
 - [Day 10｜本地模型與資料邊界](https://hackmd.io/@yillkid/HHJud-chQqG4V8oAAEt5nA)
 - [Day 11｜Unsloth 微調：資料、Adapter 與可重現評估](https://hackmd.io/@yillkid/QxVLkeuMQTCXMpoh6C354w)

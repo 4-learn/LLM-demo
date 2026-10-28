@@ -1,6 +1,6 @@
 # iThome Ironman 30-Day LLM Course
 
-Student Book Mode sources for Day 1–30, with original article URLs and version notes. Teacher-only notes are intentionally excluded. Published student book: https://hackmd.io/@yillkid/Hyt3-5kTfe
+Student Book Mode sources for Day 1–30, with original article URLs and version notes. Teacher-only notes are intentionally excluded. Published student book: https://hackmd.io/@yillkid/Hk8hQlgTzl
 
 ## Files
 - `BOOK-OUTLINE.md`: Book Mode index with verified student note links.
