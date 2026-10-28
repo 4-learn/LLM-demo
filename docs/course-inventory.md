@@ -7,7 +7,7 @@
 | 01 | 系統責任與任務 Baseline | `01-model-role.md` | `01_role_baseline.py` | 49 | 1 | 未見模型呼叫（純流程/演算法或缺 demo） | 依課程目的不需/不宜改，或非模型呼叫 |
 | 02 | Tokenizer 與上下文預算 | `02-tokenizer.md` | `02_token_budget.py` | 119 | 6 | replay/fixture; HF/local inference | 依課程目的不需/不宜改，或非模型呼叫 |
 | 03 | 自回歸生成、Logits 與 Inference | `03-inference.md` | `03_inference_lab.py` | 114 | 5 | 未見模型呼叫（純流程/演算法或缺 demo） | 不改呼叫方式；可補本機 vs API 對照 |
-| 04 | Attention｜用權重混合資訊 | `04-transformer-attention.md` | `04_transformer_attention.py` | 9 | 0 | 未見模型呼叫（純流程/演算法或缺 demo） | 依課程目的不需/不宜改，或非模型呼叫 |
+| 04 | Attention｜用權重混合資訊 | `04-transformer-attention.md` | `04_transformer_attention.py` | 5 | 0 | 未見模型呼叫（純流程/演算法或缺 demo） | 依課程目的不需/不宜改，或非模型呼叫 |
 | 05 | Sampling 與生成實驗 | `05-sampling.md` | `E02_sampling.py` | 165 | 1 | 未見模型呼叫（純流程/演算法或缺 demo） | 部分可替換；保留本地/工具/驗證流程 |
 | 06 | Hugging Face 模型選型與授權 | `06-model-selection.md` | `E02_model_selection.py` | 179 | 1 | 未見模型呼叫（純流程/演算法或缺 demo） | 依課程目的不需/不宜改，或非模型呼叫 |
 | 07 | API 呼叫：HTTP、JSON 與安全金鑰 | `07-api-basics.md` | `E02_api_basics.py` | 89 | 0 | replay/fixture; HTTP/API live | 可完整替換文字 LLM live 呼叫 |
