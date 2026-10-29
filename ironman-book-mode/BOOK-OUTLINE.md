@@ -1,15 +1,14 @@
 # Python 新手的 AI 之旅：從零開始打造 LLM 應用
 
-> 30 天學生教材目錄草稿；教師手冊不列在學生書籍中，另建筆記並設 `readPermission: owner`、`writePermission: owner`。學生章節依原系列 Day 1–30 順序，每頁均保留原文連結與版本註記。
+> 30 天學生教材目錄；教師手冊不列在學生書籍中，另設 `readPermission: owner`、`writePermission: owner`。學生章節依原系列 Day 1–30 順序，每頁保留原文連結與版本註記。
 
 ## 課程章節
-
-- [Day 4 延伸｜加權混合向量（課程補充）](https://hackmd.io/@yillkid/BvONQVPxTXySiKh5ZJTXFA)
 
 - [Day 1｜從問題開始：LLM 應用可以做什麼？](https://hackmd.io/@yillkid/Psl8p55FTMGUm_bUy9qrmw)
 - [Day 2｜AI、LLM 與文字接龍](https://hackmd.io/@yillkid/9FG1fSjERmGRUcNwNAhq-Q)
 - [Day 3｜第一次呼叫 LLM API](https://hackmd.io/@yillkid/rWRMRgrgQpq5KRGIuk11XQ)
 - [Day 4｜提示詞：把任務說清楚](https://hackmd.io/@yillkid/gAecpjtoRyWnA6Leh9lNCA)
+  - [Day 4 延伸｜加權混合向量（課程補充）](https://hackmd.io/@yillkid/BvONQVPxTXySiKh5ZJTXFA)
 - [Day 5｜對話記憶就是保留上下文](https://hackmd.io/@yillkid/UouH5cTgTJuGDvaRLaK9fw)
 - [Day 6｜讓程式做精確計算](https://hackmd.io/@yillkid/zhec6Ns9TF2PYtfqStHLFQ)
 - [Day 7｜工具呼叫：資料要驗證，動作由程式控制](https://hackmd.io/@yillkid/RDxGIAuLTHKNzAa6_e4UwA)
@@ -37,4 +36,4 @@
 - [Day 29｜AI 工具選擇：依任務評估，不依品牌追逐](https://hackmd.io/@yillkid/xIv0VLKuS_O2n45681Vwmg)
 - [Day 30｜結語：從需求到可用的 LLM 應用](https://hackmd.io/@yillkid/jkY1BEkpRx6Wtt70Mm1blQ)
 
-> 建立 HackMD 子頁後，以其真實 URL 替換本目錄佔位符。發布時須逐頁設定並驗證學生筆記 `readPermission: guest`、`writePermission: owner`；不得把私有教師筆記放進學生書籍目錄。
+> 學生筆記權限為 `readPermission: guest`、`writePermission: owner`；私有教師手冊不列入目錄。
